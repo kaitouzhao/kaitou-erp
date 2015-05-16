@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+    <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern"
+                   value="%d [%p] %c.%M(%L) | %m%n"/>
+        </layout>
+    </appender>
+    <!--系统日志-->
+    <appender name="SYSTEM-LOG" class="kaitou.ppp.common.log.DayRollingFileAppender">
+        <param name="Append" value="true"/>
+        <param name="file" value="${log.dir}/kaitou-ppp-system.log"/>
+        <param name="maxBackupIndex" value="3"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d [%p] %c.%M(%L) | %m%n"/>
+        </layout>
+    </appender>
+    <!--操作日志-->
+    <appender name="OPERATION-LOG" class="kaitou.ppp.common.log.DayRollingFileAppender">
+        <param name="Append" value="true"/>
+        <param name="file" value="${log.dir}/kaitou-ppp-operation.log"/>
+        <param name="maxBackupIndex" value="7"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d | %m%n"/>
+        </layout>
+    </appender>
+
+    <logger name="kaitou.ppp" additivity="false">
+        <level value="ERROR"/>
+        <appender-ref ref="SYSTEM-LOG"/>
+    </logger>
+
+    <logger name="kaitou.operation" additivity="false">
+        <level value="INFO"/>
+        <appender-ref ref="OPERATION-LOG"/>
+    </logger>
+
+    <root>
+        <level value="ERROR"/>
+        <!--<appender-ref ref="CONSOLE"/>-->
+        <appender-ref ref="SYSTEM-LOG"/>
+    </root>
+
+</log4j:configuration>

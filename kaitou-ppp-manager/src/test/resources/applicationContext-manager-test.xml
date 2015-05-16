@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+       default-lazy-init="false">
+
+    <bean id="mockEngineerDao" class="kaitou.ppp.manager.mock.dao.MockEngineerDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\engineer"/>
+    </bean>
+
+    <bean id="mockEngineerManager" class="kaitou.ppp.manager.mock.manager.MockEngineerManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\engineer"/>
+        <property name="dao" ref="mockEngineerDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockEngineerTrainingDao" class="kaitou.ppp.manager.mock.dao.MockEngineerTrainingDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\engineer_training"/>
+    </bean>
+
+    <bean id="mockEngineerTrainingManager" class="kaitou.ppp.manager.mock.manager.MockEngineerTrainingManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\engineer_training"/>
+        <property name="dao" ref="mockEngineerTrainingDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockCachedShopDao" class="kaitou.ppp.manager.mock.dao.MockCachedShopDaoImpl"/>
+
+    <bean id="mockShopDao" class="kaitou.ppp.manager.mock.dao.MockShopDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop"/>
+    </bean>
+
+    <bean id="mockShopManager" class="kaitou.ppp.manager.mock.manager.MockShopManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop"/>
+        <property name="dao" ref="mockShopDao"/>
+        <property name="shopDao" ref="mockShopDao"/>
+        <property name="cachedShopDao" ref="mockCachedShopDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockShopDetailDao" class="kaitou.ppp.manager.mock.dao.MockShopDetailDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop_detail"/>
+    </bean>
+
+    <bean id="mockShopDetailManager" class="kaitou.ppp.manager.mock.manager.MockShopDetailManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop_detail"/>
+        <property name="dao" ref="mockShopDetailDao"/>
+        <property name="shopDetailDao" ref="mockShopDetailDao"/>
+        <property name="cachedShopDao" ref="mockCachedShopDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockShopRTSDao" class="kaitou.ppp.manager.mock.dao.MockShopRTSDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop_rts"/>
+    </bean>
+
+    <bean id="mockShopRTSManager" class="kaitou.ppp.manager.mock.manager.MockShopRTSManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop_rts"/>
+        <property name="dao" ref="mockShopRTSDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockShopPayDao" class="kaitou.ppp.manager.mock.dao.MockShopPayDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop_pay"/>
+    </bean>
+
+    <bean id="mockShopPayManager" class="kaitou.ppp.manager.mock.manager.MockShopPayManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\shop_pay"/>
+        <property name="dao" ref="mockShopPayDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockSystemSettingsDao" class="kaitou.ppp.manager.mock.dao.MockSystemSettingsDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\system"/>
+    </bean>
+
+    <bean id="mockSystemSettingsManager" class="kaitou.ppp.manager.mock.manager.MockSystemSettingsManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\system"/>
+        <property name="systemSettingsDao" ref="mockSystemSettingsDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockRemoteRegistryDao" class="kaitou.ppp.manager.mock.dao.MockRemoteRegistryDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\remote"/>
+    </bean>
+
+    <bean id="mockRemoteRegistryManager" class="kaitou.ppp.manager.mock.manager.MockRemoteRegistryManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\remote"/>
+        <property name="remoteRegistryDao" ref="mockRemoteRegistryDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+    <bean id="mockLocalDBVersionDao" class="kaitou.ppp.manager.mock.dao.MockLocalDBVersionDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\db_version"/>
+    </bean>
+
+    <bean id="mockCardApplicationRecordDao" class="kaitou.ppp.manager.mock.dao.MockCardApplicationRecordDaoImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\card_app_record"/>
+    </bean>
+
+    <bean id="mockCardApplicationRecordManager"
+          class="kaitou.ppp.manager.mock.manager.MockCardApplicationRecordManagerImpl">
+        <property name="dbDir" value="D:\temp\ppp\test\card_app_record"/>
+        <property name="dao" ref="mockCardApplicationRecordDao"/>
+        <property name="localDBVersionDao" ref="mockLocalDBVersionDao"/>
+    </bean>
+
+</beans>

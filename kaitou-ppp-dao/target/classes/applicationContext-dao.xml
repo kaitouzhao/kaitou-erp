@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="engineerDao" class="kaitou.ppp.dao.engineer.impl.EngineerDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="engineerTrainingDao" class="kaitou.ppp.dao.engineer.impl.EngineerTrainingDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="shopDao" class="kaitou.ppp.dao.shop.impl.ShopDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="shopDetailDao" class="kaitou.ppp.dao.shop.impl.ShopDetailDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="shopRTSDao" class="kaitou.ppp.dao.shop.impl.ShopRTSDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="shopPayDao" class="kaitou.ppp.dao.shop.impl.ShopPayDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="cardApplicationRecordDao" class="kaitou.ppp.dao.card.impl.CardApplicationRecordDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="cachedShopDao" class="kaitou.ppp.dao.shop.impl.CachedShopDaoImpl"/>
+
+    <bean id="systemSettingsDao" class="kaitou.ppp.dao.system.impl.SystemSettingsDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//conf"/>
+    </bean>
+
+    <bean id="remoteRegistryDao" class="kaitou.ppp.dao.system.impl.RemoteRegistryDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//conf"/>
+    </bean>
+
+    <bean id="localDBVersionDao" class="kaitou.ppp.dao.system.impl.LocalDBVersionDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//conf"/>
+    </bean>
+
+    <bean id="outboxDBVersionDao" class="kaitou.ppp.dao.system.impl.OutboxDBVersionDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="warrantyFeeDao" class="kaitou.ppp.dao.warranty.impl.WarrantyFeeDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+    <bean id="warrantyPartsDao" class="kaitou.ppp.dao.warranty.impl.WarrantyPartsDaoImpl">
+        <property name="dbDir" value="d://temp//ppp//db"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+       default-lazy-init="true">
+
+    <!--远程注册服务-->
+    <bean id="remoteRegistryService" class="kaitou.ppp.service.rmi.RemoteRegistryServiceImpl">
+        <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
+    </bean>
+    <!--远程认定店服务-->
+    <bean id="remoteShopService" class="kaitou.ppp.service.rmi.RemoteShopServiceImpl">
+        <property name="shopManager" ref="shopManager"/>
+        <property name="shopDetailManager" ref="shopDetailManager"/>
+        <property name="shopPayManager" ref="shopPayManager"/>
+        <property name="shopRTSManager" ref="shopRTSManager"/>
+        <property name="shopUpdateListeners">
+            <list>
+                <ref bean="shopManager"/>
+                <ref bean="shopDetailManager"/>
+                <ref bean="shopPayManager"/>
+                <ref bean="shopRTSManager"/>
+                <ref bean="engineerManager"/>
+                <ref bean="engineerTrainingManager"/>
+                <ref bean="warrantyFeeManager"/>
+                <ref bean="warrantyPartsManager"/>
+            </list>
+        </property>
+    </bean>
+    <!--远程工程师服务-->
+    <bean id="remoteEngineerService" class="kaitou.ppp.service.rmi.RemoteEngineerServiceImpl">
+        <property name="engineerManager" ref="engineerManager"/>
+        <property name="engineerTrainingManager" ref="engineerTrainingManager"/>
+        <property name="engineerUpdateListeners">
+            <list>
+                <ref bean="engineerTrainingManager"/>
+            </list>
+        </property>
+    </bean>
+    <!--远程待发箱服务-->
+    <bean id="remoteOutboxService" class="kaitou.ppp.service.rmi.RemoteOutboxServiceImpl">
+        <property name="outboxDBVersionManager" ref="outboxDBVersionManager"/>
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+    <!--远程DB版本库服务-->
+    <bean id="remoteDBVersionService" class="kaitou.ppp.service.rmi.RemoteDBVersionServiceImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+        <property name="localDBVersionManager" ref="localDBVersionManager"/>
+    </bean>
+    <!--远程保修卡服务-->
+    <bean id="remoteCardService" class="kaitou.ppp.service.rmi.RemoteCardServiceImpl">
+        <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
+    </bean>
+    <!--远程保修管理服务-->
+    <bean id="remoteWarrantyService" class="kaitou.ppp.service.rmi.RemoteWarrantyServiceImpl">
+        <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
+        <property name="warrantyPartsManager" ref="warrantyPartsManager"/>
+    </bean>
+    <!--远程服务提供容器-->
+    <bean id="serviceProvider" class="kaitou.ppp.rmi.ServiceProvider">
+        <property name="remoteServices">
+            <map>
+                <entry key="RemoteRegistryService" value-ref="remoteRegistryService"/>
+                <entry key="RemoteShopService" value-ref="remoteShopService"/>
+                <entry key="RemoteEngineerService" value-ref="remoteEngineerService"/>
+                <entry key="RemoteDBVersionService" value-ref="remoteDBVersionService"/>
+                <entry key="RemoteCardService" value-ref="remoteCardService"/>
+                <entry key="RemoteWarrantyService" value-ref="remoteWarrantyService"/>
+            </map>
+        </property>
+    </bean>
+
+</beans>
