@@ -3,7 +3,6 @@ package kaitou.ppp.service.impl;
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.domain.card.CardApplication;
 import kaitou.ppp.domain.card.CardApplicationRecord;
-import kaitou.ppp.domain.system.SysCode;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
@@ -35,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
+import static kaitou.ppp.domain.system.SysCode.*;
 
 /**
  * 保修卡处理业务层实现.
@@ -115,24 +115,21 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
         for (File appFile : appFiles) {
             Workbook workbook = create(appFile);
             int numberOfSheets = workbook.getNumberOfSheets();
-            for (int j = 0; j < numberOfSheets; j++) {
+            for (int j = 1; j < numberOfSheets; j++) {
                 Sheet sheet = workbook.getSheetAt(j);
                 CardApplication application = new CardApplication();
                 application.fill(sheet);
-                SysCode.Code code = SysCode.Code.getCode(application.getModels().substring(0, 1));
-                String lastWarrantyCard = getLastRowCellStrValue(log, code.getCardNoPref(), 3, SysCode.CellType.STRING);
+                ModelCode code = ModelCode.getCode(application.getModels().substring(0, 1));
+                String lastWarrantyCard = getLastRowCellStrValue(log, code.getCardNoPref(), 3, CellType.STRING);
                 long warrantyCardIndex = 0;
                 if (lastWarrantyCard != null && !"".equals(lastWarrantyCard.trim())) {
                     warrantyCardIndex = Long.valueOf(lastWarrantyCard.substring(5));
                 }
                 application.setWarrantyCard(code.getCardNoPref() + "-A" + df.format(++warrantyCardIndex));
-                application.setApplyDate(now.toString("yyyy/MM/dd"));
-                DateTime installedDate = application.convertInstalledDate();
-                DateTime endDate = installedDate.plusDays(364);
-                if (endDate.isBeforeNow()) {
-                    application.setStatus("过保");
-                }
-                application.setEndDate(endDate.toString("yyyy/MM/dd"));
+                application.setApplyDate(now.toString(WarrantyStatus.DATE_FORMAT_YYYY_MM_DD));
+                application.setInstalledDate(WarrantyStatus.convert2Standard(application.getInstalledDate()));
+                application.setEndDate(WarrantyStatus.getEndDateStr(application.getInstalledDate()));
+                application.setStatus(WarrantyStatus.getStatus(application.getInstalledDate()));
                 application.setAllModels(code.getModels());
                 application.setInitData(application.getInitData() + code.getReadUnit());
                 logSystemInfo(application.toString());
@@ -252,7 +249,7 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
      * @param type        类型
      * @return 单元格数据
      */
-    private String getLastRowCellStrValue(File file, String sheetName, int columnIndex, SysCode.CellType type) {
+    private String getLastRowCellStrValue(File file, String sheetName, int columnIndex, CellType type) {
         Workbook workbook = create(file);
         Sheet sheet = workbook.getSheet(sheetName);
         int lastRowNum = sheet.getLastRowNum();
@@ -270,15 +267,15 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
      * @param type 类型
      * @return 字符串
      */
-    private String getStringCellValue(Cell cell, SysCode.CellType type) {
+    private String getStringCellValue(Cell cell, CellType type) {
         DecimalFormat df = new DecimalFormat("0");
         try {
             switch (type.getValue()) {
-                case SysCode.CELL_TYPE_STRING:
+                case CELL_TYPE_STRING:
                     return cell.getStringCellValue();
-                case SysCode.CELL_TYPE_DATE:
+                case CELL_TYPE_DATE:
                     return new DateTime(cell.getDateCellValue().getTime()).toString("yyyy/MM/dd");
-                case SysCode.CELL_TYPE_NUMERIC:
+                case CELL_TYPE_NUMERIC:
                     return df.format(cell.getNumericCellValue());
                 default:
                     return "";
@@ -342,7 +339,11 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
 
     @Override
     public List<CardApplicationRecord> queryCardApplicationRecords() {
-        return cardApplicationRecordManager.query();
+        List<CardApplicationRecord> cardApplicationRecords = cardApplicationRecordManager.query();
+        for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
+            cardApplicationRecord.setStatus(WarrantyStatus.getStatus(cardApplicationRecord.getInstalledDate()));
+        }
+        return cardApplicationRecords;
     }
 
     @Override

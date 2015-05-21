@@ -87,4 +87,11 @@ public interface IQueryObject<T extends BaseDomain> {
      * @return class
      */
     public Class<T> domainClass();
+
+    /**
+     * table是否自动设置大小
+     *
+     * @return 是为真
+     */
+    public boolean autoResizeMode();
 }

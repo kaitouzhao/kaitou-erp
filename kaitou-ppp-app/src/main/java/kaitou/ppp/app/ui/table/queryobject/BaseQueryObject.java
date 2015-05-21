@@ -2,6 +2,8 @@ package kaitou.ppp.app.ui.table.queryobject;
 
 import kaitou.ppp.app.ui.table.IQueryObject;
 
+import java.lang.reflect.ParameterizedType;
+
 import static com.womai.bsp.tool.utils.PropertyUtil.getValue;
 
 /**
@@ -10,7 +12,7 @@ import static com.womai.bsp.tool.utils.PropertyUtil.getValue;
  * Date: 2015/2/28
  * Time: 14:27
  */
-public abstract class BaseQueryObject implements IQueryObject {
+public abstract class BaseQueryObject<T> implements IQueryObject {
 
     private static final String SCHEME_PROPERTIES = "scheme.properties";
 
@@ -62,5 +64,16 @@ public abstract class BaseQueryObject implements IQueryObject {
     @Override
     public String[] saveFieldNames() {
         return getValue(SCHEME_PROPERTIES, domainType() + "_SAVE_FIELD_NAMES").split(",");
+    }
+
+    @Override
+    public boolean autoResizeMode() {
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class domainClass() {
+        return (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 }

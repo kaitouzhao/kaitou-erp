@@ -77,6 +77,14 @@ public class EngineerTraining extends BaseDomain {
      * 培训机型
      */
     protected String trainingModel;
+    /**
+     * 培训是否合格
+     */
+    private String qualified;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public String dbFileSuffix() {
@@ -141,6 +149,8 @@ public class EngineerTraining extends BaseDomain {
                 ", trainingType='" + trainingType + '\'' +
                 ", dateOfTraining='" + dateOfTraining + '\'' +
                 ", trainingModel='" + trainingModel + '\'' +
+                ", qualified='" + qualified + '\'' +
+                ", note='" + note + '\'' +
                 '}';
     }
 
@@ -172,6 +182,22 @@ public class EngineerTraining extends BaseDomain {
         result = 31 * result + (dateOfTraining != null ? dateOfTraining.hashCode() : 0);
         result = 31 * result + (trainingModel != null ? trainingModel.hashCode() : 0);
         return result;
+    }
+
+    public String getQualified() {
+        return qualified;
+    }
+
+    public void setQualified(String qualified) {
+        this.qualified = qualified;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getId() {

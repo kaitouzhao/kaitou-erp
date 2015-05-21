@@ -1,9 +1,6 @@
 package kaitou.ppp.service;
 
-import kaitou.ppp.domain.shop.Shop;
-import kaitou.ppp.domain.shop.ShopDetail;
-import kaitou.ppp.domain.shop.ShopPay;
-import kaitou.ppp.domain.shop.ShopRTS;
+import kaitou.ppp.domain.shop.*;
 
 import java.io.File;
 import java.util.List;
@@ -166,4 +163,74 @@ public interface ShopService {
      * @param targetFile 目标文件
      */
     public void countShopEquipment(File targetFile);
+
+    /**
+     * 导入合同信息
+     *
+     * @param srcFile 源文件
+     */
+    public void importShopContracts(File srcFile);
+
+    /**
+     * 导出合同信息
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportShopContracts(File targetFile);
+
+    /**
+     * 查询合同信息
+     *
+     * @return 合同信息列表
+     */
+    public List<ShopContract> queryShopContracts();
+
+    /**
+     * 保存/更新合同信息
+     *
+     * @param shopContracts 合同信息
+     */
+    public void saveOrUpdateShopContracts(ShopContract... shopContracts);
+
+    /**
+     * 删除合同信息
+     *
+     * @param shopContracts 合同信息
+     */
+    public void deleteShopContract(Object... shopContracts);
+
+    /**
+     * 导入零件备库信息
+     *
+     * @param srcFile 源文件
+     */
+    public void importPartsLibrary(File srcFile);
+
+    /**
+     * 导出零件备库信息
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportPartsLibrary(File targetFile);
+
+    /**
+     * 查询零件备库信息
+     *
+     * @return 零件备库信息列表
+     */
+    public List<PartsLibrary> queryPartsLibrary();
+
+    /**
+     * 保存/更新零件备库信息
+     *
+     * @param partsLibraries 零件备库信息
+     */
+    public void saveOrUpdatePartsLibrary(PartsLibrary... partsLibraries);
+
+    /**
+     * 删除零件备库信息
+     *
+     * @param partsLibraries 零件备库信息
+     */
+    public void deletePartsLibrary(Object... partsLibraries);
 }

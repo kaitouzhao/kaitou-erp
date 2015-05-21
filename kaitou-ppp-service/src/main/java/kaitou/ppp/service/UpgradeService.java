@@ -23,4 +23,19 @@ public interface UpgradeService {
      */
     @Deprecated
     public void upgradeTo2Dot1();
+
+    /**
+     * 升级至3.1操作
+     * <ul>
+     * <li>认定店帐号信息与基本信息合并</li>
+     * </ul>
+     */
+    @Deprecated
+    public void upgradeTo3Dot1();
+
+    /**
+     * 升级至3.2操作
+     * <ul><li>保修费分年份存储</li></ul>
+     */
+    public void upgradeTo3Dot2();
 }

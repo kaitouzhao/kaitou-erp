@@ -23,9 +23,10 @@ public interface WarrantyFeeDao {
     /**
      * 查询保修费
      *
+     * @param numberOfYear 查询年份。为空则为全部
      * @return 保修费
      */
-    public List<WarrantyFee> query();
+    public List<WarrantyFee> query(String... numberOfYear);
 
     /**
      * 删除

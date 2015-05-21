@@ -11,9 +11,11 @@
     <!--远程认定店服务-->
     <bean id="remoteShopService" class="kaitou.ppp.service.rmi.RemoteShopServiceImpl">
         <property name="shopManager" ref="shopManager"/>
-        <property name="shopDetailManager" ref="shopDetailManager"/>
         <property name="shopPayManager" ref="shopPayManager"/>
         <property name="shopRTSManager" ref="shopRTSManager"/>
+        <property name="shopDetailManager" ref="shopDetailManager"/>
+        <property name="shopContractManager" ref="shopContractManager"/>
+        <property name="partsLibraryManager" ref="partsLibraryManager"/>
         <property name="shopUpdateListeners">
             <list>
                 <ref bean="shopManager"/>
@@ -24,6 +26,15 @@
                 <ref bean="engineerTrainingManager"/>
                 <ref bean="warrantyFeeManager"/>
                 <ref bean="warrantyPartsManager"/>
+                <ref bean="shopContractManager"/>
+                <ref bean="partsLibraryManager"/>
+                <ref bean="warrantyPrintManager"/>
+                <ref bean="warrantyConsumablesManager"/>
+                <ref bean="manualPermissionsManager"/>
+                <ref bean="soidCodeManager"/>
+                <ref bean="sdsPermissionManager"/>
+                <ref bean="techSupportManager"/>
+                <ref bean="installPermissionManager"/>
             </list>
         </property>
     </bean>
@@ -55,6 +66,27 @@
     <bean id="remoteWarrantyService" class="kaitou.ppp.service.rmi.RemoteWarrantyServiceImpl">
         <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
         <property name="warrantyPartsManager" ref="warrantyPartsManager"/>
+        <property name="warrantyPrintManager" ref="warrantyPrintManager"/>
+        <property name="warrantyConsumablesManager" ref="warrantyConsumablesManager"/>
+    </bean>
+    <!--远程技术管理服务-->
+    <bean id="remoteTechService" class="kaitou.ppp.service.rmi.RemoteTechServiceImpl">
+        <property name="soidCodeManager" ref="soidCodeManager"/>
+        <property name="techSupportManager" ref="techSupportManager"/>
+        <property name="sdsPermissionManager" ref="sdsPermissionManager"/>
+        <property name="installPermissionManager" ref="installPermissionManager"/>
+        <property name="manualPermissionsManager" ref="manualPermissionsManager"/>
+    </bean>
+    <!--远程TS管理服务-->
+    <bean id="remoteTSService" class="kaitou.ppp.service.rmi.RemoteTSServiceImpl">
+        <property name="tsTrainingManager" ref="tsTrainingManager"/>
+        <property name="toolRecipientsManager" ref="toolRecipientsManager"/>
+        <property name="tsSDSPermissionManager" ref="tsSDSPermissionManager"/>
+        <property name="oldMachineRenewManager" ref="oldMachineRenewManager"/>
+        <property name="newMachineClaimManager" ref="newMachineClaimManager"/>
+        <property name="componentBorrowingManager" ref="componentBorrowingManager"/>
+        <property name="tsInstallPermissionManager" ref="tsInstallPermissionManager"/>
+        <property name="tsManualPermissionsManager" ref="tsManualPermissionsManager"/>
     </bean>
     <!--远程服务提供容器-->
     <bean id="serviceProvider" class="kaitou.ppp.rmi.ServiceProvider">
@@ -66,6 +98,8 @@
                 <entry key="RemoteDBVersionService" value-ref="remoteDBVersionService"/>
                 <entry key="RemoteCardService" value-ref="remoteCardService"/>
                 <entry key="RemoteWarrantyService" value-ref="remoteWarrantyService"/>
+                <entry key="RemoteTechService" value-ref="remoteTechService"/>
+                <entry key="RemoteTSService" value-ref="remoteTSService"/>
             </map>
         </property>
     </bean>

@@ -51,6 +51,15 @@ public abstract class BaseFileDaoManager<T extends BaseDomain> extends FileDaoMa
     }
 
     /**
+     * 查询全部
+     *
+     * @return 实体列表
+     */
+    public List<T> queryAll() {
+        return dao.queryAll();
+    }
+
+    /**
      * 删除
      *
      * @param domains 待删除集合

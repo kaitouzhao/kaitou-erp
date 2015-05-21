@@ -34,7 +34,7 @@ public class Shop extends BaseDomain {
      */
     protected String phone;
     /**
-     * 邮寄地址
+     * 联系地址
      */
     protected String address;
     /**
@@ -47,6 +47,30 @@ public class Shop extends BaseDomain {
      * @see kaitou.ppp.domain.system.SysCode.ShopStatus
      */
     protected String status = SysCode.ShopStatus.IN_THE_USE.getValue();
+    /**
+     * PPP业务接口人姓名
+     */
+    private String pppBusinessInterfacePeople;
+    /**
+     * 付款代码
+     */
+    protected String payCode;
+    /**
+     * 付款名称
+     */
+    protected String payName;
+    /**
+     * 开户行
+     */
+    protected String accountBank;
+    /**
+     * 帐号
+     */
+    protected String accountNo;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public boolean equals(Object o) {
@@ -75,6 +99,12 @@ public class Shop extends BaseDomain {
                 ", address='" + address + '\'' +
                 ", email='" + email + '\'' +
                 ", status='" + status + '\'' +
+                ", pppBusinessInterfacePeople='" + pppBusinessInterfacePeople + '\'' +
+                ", payCode='" + payCode + '\'' +
+                ", payName='" + payName + '\'' +
+                ", accountBank='" + accountBank + '\'' +
+                ", accountNo='" + accountNo + '\'' +
+                ", note='" + note + '\'' +
                 '}';
     }
 
@@ -96,6 +126,54 @@ public class Shop extends BaseDomain {
     @Override
     public String dbFileSuffix() {
         return '_' + getClass().getSimpleName() + DB_SUFFIX;
+    }
+
+    public String getPppBusinessInterfacePeople() {
+        return pppBusinessInterfacePeople;
+    }
+
+    public void setPppBusinessInterfacePeople(String pppBusinessInterfacePeople) {
+        this.pppBusinessInterfacePeople = pppBusinessInterfacePeople;
+    }
+
+    public String getPayCode() {
+        return payCode;
+    }
+
+    public void setPayCode(String payCode) {
+        this.payCode = payCode;
+    }
+
+    public String getPayName() {
+        return payName;
+    }
+
+    public void setPayName(String payName) {
+        this.payName = payName;
+    }
+
+    public String getAccountBank() {
+        return accountBank;
+    }
+
+    public void setAccountBank(String accountBank) {
+        this.accountBank = accountBank;
+    }
+
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public void setAccountNo(String accountNo) {
+        this.accountNo = accountNo;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getSaleRegion() {

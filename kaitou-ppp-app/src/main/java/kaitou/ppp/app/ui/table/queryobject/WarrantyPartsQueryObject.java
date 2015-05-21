@@ -8,9 +8,10 @@ import kaitou.ppp.domain.warranty.WarrantyParts;
  * Date: 2015/5/10
  * Time: 16:45
  */
-public class WarrantyPartsQueryObject extends BaseQueryObject {
+public class WarrantyPartsQueryObject extends BaseQueryObject<WarrantyParts> {
+
     @Override
-    public Class domainClass() {
-        return WarrantyParts.class;
+    public boolean autoResizeMode() {
+        return false;
     }
 }

@@ -2,7 +2,9 @@ package kaitou.ppp.dao.system.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.dao.AbstractDaoTest;
+import kaitou.ppp.dao.BaseDao;
 import kaitou.ppp.dao.system.LocalDBVersionDao;
+import kaitou.ppp.domain.system.DBVersion;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -52,5 +54,11 @@ public class LocalDBVersionDaoImplTest extends AbstractDaoTest {
         localDBVersionDao.upgrade(toUpgradeDBMap);
         assertEquals(7l, localDBVersionDao.getDBLatestVersion(dbFileName1));
         assertTrue(dbLatestVersion22 == localDBVersionDao.getDBLatestVersion(dbFileName2));
+    }
+
+    @Test
+    public void testGetDomainClass() {
+        assertEquals(DBVersion.class, ((BaseDao<DBVersion>) localDBVersionDao).getDomainClass());
+        assertEquals(DBVersion.class.getSimpleName(), ((BaseDao<DBVersion>) localDBVersionDao).getDomainClass().getSimpleName());
     }
 }

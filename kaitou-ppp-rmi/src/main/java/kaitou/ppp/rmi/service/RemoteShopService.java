@@ -1,9 +1,6 @@
 package kaitou.ppp.rmi.service;
 
-import kaitou.ppp.domain.shop.Shop;
-import kaitou.ppp.domain.shop.ShopDetail;
-import kaitou.ppp.domain.shop.ShopPay;
-import kaitou.ppp.domain.shop.ShopRTS;
+import kaitou.ppp.domain.shop.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -71,4 +68,32 @@ public interface RemoteShopService extends Remote {
      * @param shopRTS 认定店RTS
      */
     public void deleteShopRTS(Object... shopRTS) throws RemoteException;
+
+    /**
+     * 保存认定店合同信息
+     *
+     * @param shopContracts 认定店合同信息
+     */
+    public void saveShopContracts(List<ShopContract> shopContracts) throws RemoteException;
+
+    /**
+     * 删除认定店合同信息
+     *
+     * @param shopContracts 认定店合同信息
+     */
+    public void deleteShopContracts(Object... shopContracts) throws RemoteException;
+
+    /**
+     * 保存零件备库信息
+     *
+     * @param partsLibraries 零件备库信息
+     */
+    public void savePartsLibrary(List<PartsLibrary> partsLibraries) throws RemoteException;
+
+    /**
+     * 删除零件备库信息
+     *
+     * @param partsLibraries 零件备库信息
+     */
+    public void deletePartsLibrary(Object... partsLibraries) throws RemoteException;
 }

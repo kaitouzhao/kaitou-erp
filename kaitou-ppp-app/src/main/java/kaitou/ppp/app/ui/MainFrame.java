@@ -14,13 +14,14 @@ import kaitou.ppp.app.ui.table.queryobject.*;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
 import kaitou.ppp.domain.engineer.EngineerTraining;
-import kaitou.ppp.domain.shop.Shop;
-import kaitou.ppp.domain.shop.ShopDetail;
-import kaitou.ppp.domain.shop.ShopPay;
-import kaitou.ppp.domain.shop.ShopRTS;
+import kaitou.ppp.domain.shop.*;
 import kaitou.ppp.domain.system.DBVersion;
+import kaitou.ppp.domain.tech.*;
+import kaitou.ppp.domain.ts.*;
+import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
+import kaitou.ppp.domain.warranty.WarrantyPrint;
 import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteDBVersionService;
 import kaitou.ppp.rmi.service.RemoteRegistryService;
@@ -73,6 +74,8 @@ public class MainFrame extends JFrame {
      * @param args 参数
      */
     public static void main(String[] args) {
+        getUpgradeService().upgradeTo3Dot2();
+
         asynchronousInit();
 
         new MainFrame();
@@ -533,9 +536,18 @@ public class MainFrame extends JFrame {
 
     private void exportWarrantyFeeActionPerformed(ActionEvent e) {
         try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
             if (targetFile == null) return;
-            getWarrantyService().exportWarrantyFee(targetFile);
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getWarrantyService().exportWarrantyFee(targetFile);
+            } else {
+                getWarrantyService().exportWarrantyFee(targetFile, numberOfYear);
+            }
             new OperationHint(this, "导出成功");
         } catch (Exception ex) {
             handleEx(ex, this);
@@ -585,6 +597,520 @@ public class MainFrame extends JFrame {
         new ReportErrorHint(this);
     }
 
+    private void queryShopContractsActionPerformed(ActionEvent e) {
+        new QueryFrame<ShopContract>(getShopService().queryShopContracts(), new ShopContractQueryObject());
+    }
+
+    private void importShopContractsActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getShopService().importShopContracts(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportShopContractsActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getShopService().exportShopContracts(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryPartsLibraryActionPerformed(ActionEvent e) {
+        new QueryFrame<PartsLibrary>(getShopService().queryPartsLibrary(), new PartsLibraryQueryObject());
+    }
+
+    private void importPartsLibraryActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getShopService().importPartsLibrary(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportPartsLibraryActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getShopService().exportPartsLibrary(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryPrintHeadActionPerformed(ActionEvent e) {
+        new QueryFrame<WarrantyPrint>(getWarrantyService().queryWarrantyPrint(), new WarrantyPrintQueryObject());
+    }
+
+    private void importPrintHeadActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getWarrantyService().importWarrantyPrint(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportPrintHeadActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getWarrantyService().exportWarrantyPrint(targetFile);
+            } else {
+                getWarrantyService().exportWarrantyPrint(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryConsumablesActionPerformed(ActionEvent e) {
+        new QueryFrame<WarrantyConsumables>(getWarrantyService().queryWarrantyConsumables(), new WarrantyConsumablesQueryObject());
+    }
+
+    private void importConsumablesActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getWarrantyService().importWarrantyConsumables(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportConsumablesActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getWarrantyService().exportWarrantyConsumables(targetFile);
+            } else {
+                getWarrantyService().exportWarrantyConsumables(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryTechManualActionPerformed(ActionEvent e) {
+        new QueryFrame<TechManualPermissions>(getTechService().queryManualPermissions(), new ManualPermissionsQueryObject());
+    }
+
+    private void importTechManualActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTechService().importManualPermissions(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportTechManualActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTechService().exportManualPermissions(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void querySOIDCodeActionPerformed(ActionEvent e) {
+        new QueryFrame<SOIDCode>(getTechService().querySOIDCode(), new SOIDCodeQueryObject());
+    }
+
+    private void importSOIDCodeActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTechService().importSOIDCode(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportSOIDCodeActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTechService().exportSOIDCode(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void querySDSPermissionActionPerformed(ActionEvent e) {
+        new QueryFrame<TechSDSPermission>(getTechService().querySDSPermissions(), new SDSPermissionQueryObject());
+    }
+
+    private void importSDSPermissionActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTechService().importSDSPermissions(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportSDSPermissionActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTechService().exportSDSPermissions(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryTechSupportActionPerformed(ActionEvent e) {
+        new QueryFrame<TechSupport>(getTechService().queryTechSupport(), new TechSupportQueryObject());
+    }
+
+    private void importTechSupportActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTechService().importTechSupport(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportTechSupportActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getTechService().exportTechSupport(targetFile);
+            } else {
+                getTechService().exportTechSupport(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryInstallPermissionActionPerformed(ActionEvent e) {
+        new QueryFrame<TechInstallPermission>(getTechService().queryInstallPermission(), new InstallPermissionQueryObject());
+    }
+
+    private void importInstallPermissionActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTechService().importInstallPermission(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportInstallPermissionActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTechService().exportInstallPermission(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryTSTrainingActionPerformed(ActionEvent e) {
+        new QueryFrame<TSTraining>(getTsService().queryTSTraining(), new TSTrainingQueryObject());
+    }
+
+    private void importTSTrainingActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importTSTraining(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportTSTrainingActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getTsService().exportTSTraining(targetFile);
+            } else {
+                getTsService().exportTSTraining(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryTSManualPermissionsActionPerformed(ActionEvent e) {
+        new QueryFrame<TSManualPermissions>(getTsService().queryTSManualPermission(), new TSManualPermissionsQueryObject());
+    }
+
+    private void importTSManualPermissionsActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importTSManualPermission(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportTSManualPermissionsActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTsService().exportTSManualPermission(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryTSSDSPermissionActionPerformed(ActionEvent e) {
+        new QueryFrame<TSSDSPermission>(getTsService().queryTSSDSPermission(), new TSSDSPermissionQueryObject());
+    }
+
+    private void importTSSDSPermissionActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importTSSDSPermission(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportTSSDSPermissionActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTsService().exportTSSDSPermission(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryTSInstallPermissionActionPerformed(ActionEvent e) {
+        new QueryFrame<TSInstallPermission>(getTsService().queryTSInstallPermission(), new TSInstallPermissionQueryObject());
+    }
+
+    private void importTSInstallPermissionActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importTSInstallPermission(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportTSInstallPermissionActionPerformed(ActionEvent e) {
+        try {
+            File targetFile = chooseExportFile("excel文件", "xlsx");
+            if (targetFile == null) return;
+            getTsService().exportTSInstallPermission(targetFile);
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryOldMachineRenewActionPerformed(ActionEvent e) {
+        new QueryFrame<OldMachineRenew>(getTsService().queryOldMachineRenew(), new OldMachineRenewQueryObject());
+    }
+
+    private void importOldMachineRenewActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importOldMachineRenew(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportOldMachineRenewActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getTsService().exportOldMachineRenew(targetFile);
+            } else {
+                getTsService().exportOldMachineRenew(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryNewMachineClaimActionPerformed(ActionEvent e) {
+        new QueryFrame<NewMachineClaim>(getTsService().queryNewMachineClaim(), new NewMachineClaimQueryObject());
+    }
+
+    private void importNewMachineClaimActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importNewMachineClaim(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportNewMachineClaimActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getTsService().exportNewMachineClaim(targetFile);
+            } else {
+                getTsService().exportNewMachineClaim(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryToolRecipientsActionPerformed(ActionEvent e) {
+        new QueryFrame<ToolRecipients>(getTsService().queryToolRecipients(), new ToolRecipientsQueryObject());
+    }
+
+    private void importToolRecipientsActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importToolRecipients(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportToolRecipientsActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getTsService().exportToolRecipients(targetFile);
+            } else {
+                getTsService().exportToolRecipients(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void queryComponentBorrowingActionPerformed(ActionEvent e) {
+        new QueryFrame<ComponentBorrowing>(getTsService().queryComponentBorrowing(), new ComponentBorrowingQueryObject());
+    }
+
+    private void importComponentBorrowingActionPerformed(ActionEvent e) {
+        try {
+            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+            if (srcFile == null) return;
+            getTsService().importComponentBorrowing(srcFile);
+            new OperationHint(this, "导入成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
+    private void exportComponentBorrowingActionPerformed(ActionEvent e) {
+        try {
+            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
+            if (!inputHint.isOk()) {
+                return;
+            }
+            String numberOfYear = inputHint.getInputResult()[0];
+            File targetFile = chooseExportFile("excel文件", "xls");
+            if (targetFile == null) return;
+            if (StringUtils.isEmpty(numberOfYear)) {
+                getTsService().exportComponentBorrowing(targetFile);
+            } else {
+                getTsService().exportComponentBorrowing(targetFile, numberOfYear);
+            }
+            new OperationHint(this, "导出成功");
+        } catch (Exception ex) {
+            handleEx(ex, this);
+        }
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         managerMenuBar = new JMenuBar();
@@ -597,14 +1123,10 @@ public class MainFrame extends JFrame {
         queryShopDetail = new JMenuItem();
         importShopDetail = new JMenuItem();
         exportShopDetail = new JMenuItem();
-        rtsMenu = new JMenu();
-        queryShopRTS = new JMenuItem();
-        importShopRTS = new JMenuItem();
-        exportShopRTS = new JMenuItem();
-        shopPayMenu = new JMenu();
-        queryShopPay = new JMenuItem();
-        importShopPay = new JMenuItem();
-        exportShopPay = new JMenuItem();
+        shopContractMenu = new JMenu();
+        queryShopContracts = new JMenuItem();
+        importShopContracts = new JMenuItem();
+        exportShopContracts = new JMenuItem();
         exportAll = new JMenuItem();
         countEngineerByProductLine = new JMenuItem();
         countEngineerByShop = new JMenuItem();
@@ -614,7 +1136,10 @@ public class MainFrame extends JFrame {
         exportEngineerBasic = new JMenuItem();
         shopEquipmentList = new JMenu();
         countShopEquipment = new JMenuItem();
-        partsManagement = new JMenu();
+        partsLibrary = new JMenu();
+        queryPartsLibrary = new JMenuItem();
+        importPartsLibrary = new JMenuItem();
+        exportPartsLibrary = new JMenuItem();
         warrantyManagement = new JMenu();
         cardRecordManagement = new JMenu();
         queryCardApplicationRecord = new JMenuItem();
@@ -630,26 +1155,71 @@ public class MainFrame extends JFrame {
         importWarrantyFee = new JMenuItem();
         exportWarrantyFee = new JMenuItem();
         printHead = new JMenu();
+        queryPrintHead = new JMenuItem();
+        importPrintHead = new JMenuItem();
+        exportPrintHead = new JMenuItem();
         consumables = new JMenu();
+        queryConsumables = new JMenuItem();
+        importConsumables = new JMenuItem();
+        exportConsumables = new JMenuItem();
         technicalManagement = new JMenu();
         techTraining = new JMenu();
         queryEngineerTraining = new JMenuItem();
         importEngineerTraining = new JMenuItem();
         exportEngineerTraining = new JMenuItem();
         techManualPermission = new JMenu();
+        queryTechManual = new JMenuItem();
+        importTechManual = new JMenuItem();
+        exportTechManual = new JMenuItem();
         techSDSPermission = new JMenu();
+        querySDSPermission = new JMenuItem();
+        importSDSPermission = new JMenuItem();
+        exportSDSPermission = new JMenuItem();
         techSupporter = new JMenu();
+        queryTechSupport = new JMenuItem();
+        importTechSupport = new JMenuItem();
+        exportTechSupport = new JMenuItem();
         techSOID = new JMenu();
+        querySOIDCode = new JMenuItem();
+        importSOIDCode = new JMenuItem();
+        exportSOIDCode = new JMenuItem();
         techInstallPermission = new JMenu();
+        queryInstallPermission = new JMenuItem();
+        importInstallPermission = new JMenuItem();
+        exportInstallPermission = new JMenuItem();
         tsManagement = new JMenu();
         tsTraining = new JMenu();
+        queryTSTraining = new JMenuItem();
+        importTSTraining = new JMenuItem();
+        exportTSTraining = new JMenuItem();
         tsManualPermission = new JMenu();
+        queryTSManualPermissions = new JMenuItem();
+        importTSManualPermissions = new JMenuItem();
+        exportTSManualPermissions = new JMenuItem();
         tsSDSPermission = new JMenu();
+        queryTSSDSPermission = new JMenuItem();
+        importTSSDSPermission = new JMenuItem();
+        exportTSSDSPermission = new JMenuItem();
         tsInstallPermission = new JMenu();
+        queryTSInstallPermission = new JMenuItem();
+        importTSInstallPermission = new JMenuItem();
+        exportTSInstallPermission = new JMenuItem();
         renewManagement = new JMenu();
+        queryOldMachineRenew = new JMenuItem();
+        importOldMachineRenew = new JMenuItem();
+        exportOldMachineRenew = new JMenuItem();
         newClaim = new JMenu();
+        queryNewMachineClaim = new JMenuItem();
+        importNewMachineClaim = new JMenuItem();
+        exportNewMachineClaim = new JMenuItem();
         toolRecipients = new JMenu();
+        queryToolRecipients = new JMenuItem();
+        importToolRecipients = new JMenuItem();
+        exportToolRecipients = new JMenuItem();
         componentBorrowing = new JMenu();
+        queryComponentBorrowing = new JMenuItem();
+        importComponentBorrowing = new JMenuItem();
+        exportComponentBorrowing = new JMenuItem();
         onlineMenu = new JMenu();
         onlineSetting = new JMenuItem();
         startOnline = new JMenuItem();
@@ -714,7 +1284,7 @@ public class MainFrame extends JFrame {
 
                     //======== shopDetailMenu ========
                     {
-                        shopDetailMenu.setText("\u8ba4\u5b9a\u7ea7\u522b");
+                        shopDetailMenu.setText("\u8ba4\u5b9a\u5e97\u8ba4\u5b9a\u7ea7\u522b");
 
                         //---- queryShopDetail ----
                         queryShopDetail.setText("\u67e5\u8be2");
@@ -748,77 +1318,41 @@ public class MainFrame extends JFrame {
                     }
                     shopManagement.add(shopDetailMenu);
 
-                    //======== rtsMenu ========
+                    //======== shopContractMenu ========
                     {
-                        rtsMenu.setText("RTS");
+                        shopContractMenu.setText("\u8ba4\u5b9a\u5e97\u5408\u540c\u4fe1\u606f");
 
-                        //---- queryShopRTS ----
-                        queryShopRTS.setText("\u67e5\u8be2");
-                        queryShopRTS.addActionListener(new ActionListener() {
+                        //---- queryShopContracts ----
+                        queryShopContracts.setText("\u67e5\u8be2");
+                        queryShopContracts.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                queryShopRTSActionPerformed(e);
+                                queryShopContractsActionPerformed(e);
                             }
                         });
-                        rtsMenu.add(queryShopRTS);
+                        shopContractMenu.add(queryShopContracts);
 
-                        //---- importShopRTS ----
-                        importShopRTS.setText("\u5bfc\u5165");
-                        importShopRTS.addActionListener(new ActionListener() {
+                        //---- importShopContracts ----
+                        importShopContracts.setText("\u5bfc\u5165");
+                        importShopContracts.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                importShopRTSActionPerformed(e);
+                                importShopContractsActionPerformed(e);
                             }
                         });
-                        rtsMenu.add(importShopRTS);
+                        shopContractMenu.add(importShopContracts);
 
-                        //---- exportShopRTS ----
-                        exportShopRTS.setText("\u5bfc\u51fa");
-                        exportShopRTS.addActionListener(new ActionListener() {
+                        //---- exportShopContracts ----
+                        exportShopContracts.setText("\u5bfc\u51fa");
+                        exportShopContracts.addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                exportShopRTSActionPerformed(e);
+                                exportShopContractsActionPerformed(e);
                             }
                         });
-                        rtsMenu.add(exportShopRTS);
+                        shopContractMenu.add(exportShopContracts);
                     }
-                    shopManagement.add(rtsMenu);
-
-                    //======== shopPayMenu ========
-                    {
-                        shopPayMenu.setText("\u5e10\u53f7\u4fe1\u606f");
-
-                        //---- queryShopPay ----
-                        queryShopPay.setText("\u67e5\u8be2");
-                        queryShopPay.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                queryShopPayActionPerformed(e);
-                            }
-                        });
-                        shopPayMenu.add(queryShopPay);
-
-                        //---- importShopPay ----
-                        importShopPay.setText("\u5bfc\u5165");
-                        importShopPay.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                importShopPayActionPerformed(e);
-                            }
-                        });
-                        shopPayMenu.add(importShopPay);
-
-                        //---- exportShopPay ----
-                        exportShopPay.setText("\u5bfc\u51fa");
-                        exportShopPay.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                exportShopPayActionPerformed(e);
-                            }
-                        });
-                        shopPayMenu.add(exportShopPay);
-                    }
-                    shopManagement.add(shopPayMenu);
+                    shopManagement.add(shopContractMenu);
 
                     //---- exportAll ----
                     exportAll.setText("\u57fa\u7840\u4fe1\u606f\u5168\u5bfc\u51fa");
@@ -904,11 +1438,41 @@ public class MainFrame extends JFrame {
                 }
                 basicManagement.add(shopEquipmentList);
 
-                //======== partsManagement ========
+                //======== partsLibrary ========
                 {
-                    partsManagement.setText("\u96f6\u4ef6\u5907\u5e93\u7ba1\u7406");
+                    partsLibrary.setText("\u96f6\u4ef6\u5907\u5e93\u7ba1\u7406");
+
+                    //---- queryPartsLibrary ----
+                    queryPartsLibrary.setText("\u67e5\u8be2");
+                    queryPartsLibrary.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryPartsLibraryActionPerformed(e);
+                        }
+                    });
+                    partsLibrary.add(queryPartsLibrary);
+
+                    //---- importPartsLibrary ----
+                    importPartsLibrary.setText("\u5bfc\u5165");
+                    importPartsLibrary.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importPartsLibraryActionPerformed(e);
+                        }
+                    });
+                    partsLibrary.add(importPartsLibrary);
+
+                    //---- exportPartsLibrary ----
+                    exportPartsLibrary.setText("\u5bfc\u51fa");
+                    exportPartsLibrary.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportPartsLibraryActionPerformed(e);
+                        }
+                    });
+                    partsLibrary.add(exportPartsLibrary);
                 }
-                basicManagement.add(partsManagement);
+                basicManagement.add(partsLibrary);
             }
             managerMenuBar.add(basicManagement);
 
@@ -1007,7 +1571,6 @@ public class MainFrame extends JFrame {
                     queryWarrantyFee.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            importWarrantyFeeActionPerformed(e);
                             queryWarrantyFeeActionPerformed(e);
                         }
                     });
@@ -1028,7 +1591,6 @@ public class MainFrame extends JFrame {
                     exportWarrantyFee.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            importWarrantyFeeActionPerformed(e);
                             exportWarrantyFeeActionPerformed(e);
                         }
                     });
@@ -1039,12 +1601,72 @@ public class MainFrame extends JFrame {
                 //======== printHead ========
                 {
                     printHead.setText("\u6253\u5370\u5934\u4fdd\u4fee");
+
+                    //---- queryPrintHead ----
+                    queryPrintHead.setText("\u67e5\u8be2");
+                    queryPrintHead.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryPrintHeadActionPerformed(e);
+                        }
+                    });
+                    printHead.add(queryPrintHead);
+
+                    //---- importPrintHead ----
+                    importPrintHead.setText("\u5bfc\u5165");
+                    importPrintHead.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importPrintHeadActionPerformed(e);
+                        }
+                    });
+                    printHead.add(importPrintHead);
+
+                    //---- exportPrintHead ----
+                    exportPrintHead.setText("\u5bfc\u51fa");
+                    exportPrintHead.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportPrintHeadActionPerformed(e);
+                        }
+                    });
+                    printHead.add(exportPrintHead);
                 }
                 warrantyManagement.add(printHead);
 
                 //======== consumables ========
                 {
                     consumables.setText("\u8017\u6750\u4fdd\u4fee");
+
+                    //---- queryConsumables ----
+                    queryConsumables.setText("\u67e5\u8be2");
+                    queryConsumables.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryConsumablesActionPerformed(e);
+                        }
+                    });
+                    consumables.add(queryConsumables);
+
+                    //---- importConsumables ----
+                    importConsumables.setText("\u5bfc\u5165");
+                    importConsumables.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importConsumablesActionPerformed(e);
+                        }
+                    });
+                    consumables.add(importConsumables);
+
+                    //---- exportConsumables ----
+                    exportConsumables.setText("\u5bfc\u51fa");
+                    exportConsumables.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportConsumablesActionPerformed(e);
+                        }
+                    });
+                    consumables.add(exportConsumables);
                 }
                 warrantyManagement.add(consumables);
             }
@@ -1093,30 +1715,180 @@ public class MainFrame extends JFrame {
                 //======== techManualPermission ========
                 {
                     techManualPermission.setText("\u624b\u518c\u6743\u9650\u7ba1\u7406");
+
+                    //---- queryTechManual ----
+                    queryTechManual.setText("\u67e5\u8be2");
+                    queryTechManual.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTechManualActionPerformed(e);
+                        }
+                    });
+                    techManualPermission.add(queryTechManual);
+
+                    //---- importTechManual ----
+                    importTechManual.setText("\u5bfc\u5165");
+                    importTechManual.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTechManualActionPerformed(e);
+                        }
+                    });
+                    techManualPermission.add(importTechManual);
+
+                    //---- exportTechManual ----
+                    exportTechManual.setText("\u5bfc\u51fa");
+                    exportTechManual.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTechManualActionPerformed(e);
+                        }
+                    });
+                    techManualPermission.add(exportTechManual);
                 }
                 technicalManagement.add(techManualPermission);
 
                 //======== techSDSPermission ========
                 {
                     techSDSPermission.setText("SDS\u6743\u9650\u7ba1\u7406");
+
+                    //---- querySDSPermission ----
+                    querySDSPermission.setText("\u67e5\u8be2");
+                    querySDSPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            querySDSPermissionActionPerformed(e);
+                        }
+                    });
+                    techSDSPermission.add(querySDSPermission);
+
+                    //---- importSDSPermission ----
+                    importSDSPermission.setText("\u5bfc\u5165");
+                    importSDSPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importSDSPermissionActionPerformed(e);
+                        }
+                    });
+                    techSDSPermission.add(importSDSPermission);
+
+                    //---- exportSDSPermission ----
+                    exportSDSPermission.setText("\u5bfc\u51fa");
+                    exportSDSPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportSDSPermissionActionPerformed(e);
+                        }
+                    });
+                    techSDSPermission.add(exportSDSPermission);
                 }
                 technicalManagement.add(techSDSPermission);
 
                 //======== techSupporter ========
                 {
                     techSupporter.setText("\u6280\u672f\u652f\u63f4\u7ba1\u7406");
+
+                    //---- queryTechSupport ----
+                    queryTechSupport.setText("\u67e5\u8be2");
+                    queryTechSupport.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTechSupportActionPerformed(e);
+                        }
+                    });
+                    techSupporter.add(queryTechSupport);
+
+                    //---- importTechSupport ----
+                    importTechSupport.setText("\u5bfc\u5165");
+                    importTechSupport.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTechSupportActionPerformed(e);
+                        }
+                    });
+                    techSupporter.add(importTechSupport);
+
+                    //---- exportTechSupport ----
+                    exportTechSupport.setText("\u5bfc\u51fa");
+                    exportTechSupport.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTechSupportActionPerformed(e);
+                        }
+                    });
+                    techSupporter.add(exportTechSupport);
                 }
                 technicalManagement.add(techSupporter);
 
                 //======== techSOID ========
                 {
                     techSOID.setText("SOID\u8bc6\u522b\u7801");
+
+                    //---- querySOIDCode ----
+                    querySOIDCode.setText("\u67e5\u8be2");
+                    querySOIDCode.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            querySOIDCodeActionPerformed(e);
+                        }
+                    });
+                    techSOID.add(querySOIDCode);
+
+                    //---- importSOIDCode ----
+                    importSOIDCode.setText("\u5bfc\u5165");
+                    importSOIDCode.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importSOIDCodeActionPerformed(e);
+                        }
+                    });
+                    techSOID.add(importSOIDCode);
+
+                    //---- exportSOIDCode ----
+                    exportSOIDCode.setText("\u5bfc\u51fa");
+                    exportSOIDCode.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportSOIDCodeActionPerformed(e);
+                        }
+                    });
+                    techSOID.add(exportSOIDCode);
                 }
                 technicalManagement.add(techSOID);
 
                 //======== techInstallPermission ========
                 {
                     techInstallPermission.setText("\u88c5\u673a\u6743\u9650\u7ba1\u7406");
+
+                    //---- queryInstallPermission ----
+                    queryInstallPermission.setText("\u67e5\u8be2");
+                    queryInstallPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryInstallPermissionActionPerformed(e);
+                        }
+                    });
+                    techInstallPermission.add(queryInstallPermission);
+
+                    //---- importInstallPermission ----
+                    importInstallPermission.setText("\u5bfc\u5165");
+                    importInstallPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importInstallPermissionActionPerformed(e);
+                        }
+                    });
+                    techInstallPermission.add(importInstallPermission);
+
+                    //---- exportInstallPermission ----
+                    exportInstallPermission.setText("\u5bfc\u51fa");
+                    exportInstallPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportInstallPermissionActionPerformed(e);
+                        }
+                    });
+                    techInstallPermission.add(exportInstallPermission);
                 }
                 technicalManagement.add(techInstallPermission);
             }
@@ -1129,48 +1901,288 @@ public class MainFrame extends JFrame {
                 //======== tsTraining ========
                 {
                     tsTraining.setText("\u57f9\u8bad\u8bb0\u5f55");
+
+                    //---- queryTSTraining ----
+                    queryTSTraining.setText("\u67e5\u8be2");
+                    queryTSTraining.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTSTrainingActionPerformed(e);
+                        }
+                    });
+                    tsTraining.add(queryTSTraining);
+
+                    //---- importTSTraining ----
+                    importTSTraining.setText("\u5bfc\u5165");
+                    importTSTraining.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTSTrainingActionPerformed(e);
+                        }
+                    });
+                    tsTraining.add(importTSTraining);
+
+                    //---- exportTSTraining ----
+                    exportTSTraining.setText("\u5bfc\u51fa");
+                    exportTSTraining.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTSTrainingActionPerformed(e);
+                        }
+                    });
+                    tsTraining.add(exportTSTraining);
                 }
                 tsManagement.add(tsTraining);
 
                 //======== tsManualPermission ========
                 {
                     tsManualPermission.setText("\u624b\u518c\u6743\u9650\u7ba1\u7406");
+
+                    //---- queryTSManualPermissions ----
+                    queryTSManualPermissions.setText("\u67e5\u8be2");
+                    queryTSManualPermissions.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTSManualPermissionsActionPerformed(e);
+                        }
+                    });
+                    tsManualPermission.add(queryTSManualPermissions);
+
+                    //---- importTSManualPermissions ----
+                    importTSManualPermissions.setText("\u5bfc\u5165");
+                    importTSManualPermissions.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTSManualPermissionsActionPerformed(e);
+                        }
+                    });
+                    tsManualPermission.add(importTSManualPermissions);
+
+                    //---- exportTSManualPermissions ----
+                    exportTSManualPermissions.setText("\u5bfc\u51fa");
+                    exportTSManualPermissions.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTSManualPermissionsActionPerformed(e);
+                        }
+                    });
+                    tsManualPermission.add(exportTSManualPermissions);
                 }
                 tsManagement.add(tsManualPermission);
 
                 //======== tsSDSPermission ========
                 {
                     tsSDSPermission.setText("SDS\u6743\u9650\u7ba1\u7406");
+
+                    //---- queryTSSDSPermission ----
+                    queryTSSDSPermission.setText("\u67e5\u8be2");
+                    queryTSSDSPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTSSDSPermissionActionPerformed(e);
+                        }
+                    });
+                    tsSDSPermission.add(queryTSSDSPermission);
+
+                    //---- importTSSDSPermission ----
+                    importTSSDSPermission.setText("\u5bfc\u5165");
+                    importTSSDSPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTSSDSPermissionActionPerformed(e);
+                        }
+                    });
+                    tsSDSPermission.add(importTSSDSPermission);
+
+                    //---- exportTSSDSPermission ----
+                    exportTSSDSPermission.setText("\u5bfc\u51fa");
+                    exportTSSDSPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTSSDSPermissionActionPerformed(e);
+                        }
+                    });
+                    tsSDSPermission.add(exportTSSDSPermission);
                 }
                 tsManagement.add(tsSDSPermission);
 
                 //======== tsInstallPermission ========
                 {
                     tsInstallPermission.setText("\u88c5\u673a\u6743\u9650\u7ba1\u7406");
+
+                    //---- queryTSInstallPermission ----
+                    queryTSInstallPermission.setText("\u67e5\u8be2");
+                    queryTSInstallPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTSInstallPermissionActionPerformed(e);
+                        }
+                    });
+                    tsInstallPermission.add(queryTSInstallPermission);
+
+                    //---- importTSInstallPermission ----
+                    importTSInstallPermission.setText("\u5bfc\u5165");
+                    importTSInstallPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTSInstallPermissionActionPerformed(e);
+                        }
+                    });
+                    tsInstallPermission.add(importTSInstallPermission);
+
+                    //---- exportTSInstallPermission ----
+                    exportTSInstallPermission.setText("\u5bfc\u51fa");
+                    exportTSInstallPermission.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTSInstallPermissionActionPerformed(e);
+                        }
+                    });
+                    tsInstallPermission.add(exportTSInstallPermission);
                 }
                 tsManagement.add(tsInstallPermission);
 
                 //======== renewManagement ========
                 {
                     renewManagement.setText("\u65e7\u673a\u7ffb\u65b0\u7ba1\u7406");
+
+                    //---- queryOldMachineRenew ----
+                    queryOldMachineRenew.setText("\u67e5\u8be2");
+                    queryOldMachineRenew.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryOldMachineRenewActionPerformed(e);
+                        }
+                    });
+                    renewManagement.add(queryOldMachineRenew);
+
+                    //---- importOldMachineRenew ----
+                    importOldMachineRenew.setText("\u5bfc\u5165");
+                    importOldMachineRenew.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importOldMachineRenewActionPerformed(e);
+                        }
+                    });
+                    renewManagement.add(importOldMachineRenew);
+
+                    //---- exportOldMachineRenew ----
+                    exportOldMachineRenew.setText("\u5bfc\u51fa");
+                    exportOldMachineRenew.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportOldMachineRenewActionPerformed(e);
+                        }
+                    });
+                    renewManagement.add(exportOldMachineRenew);
                 }
                 tsManagement.add(renewManagement);
 
                 //======== newClaim ========
                 {
                     newClaim.setText("\u65b0\u88c5\u673a\u7d22\u8d54\u7ba1\u7406");
+
+                    //---- queryNewMachineClaim ----
+                    queryNewMachineClaim.setText("\u67e5\u8be2");
+                    queryNewMachineClaim.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryNewMachineClaimActionPerformed(e);
+                        }
+                    });
+                    newClaim.add(queryNewMachineClaim);
+
+                    //---- importNewMachineClaim ----
+                    importNewMachineClaim.setText("\u5bfc\u5165");
+                    importNewMachineClaim.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importNewMachineClaimActionPerformed(e);
+                        }
+                    });
+                    newClaim.add(importNewMachineClaim);
+
+                    //---- exportNewMachineClaim ----
+                    exportNewMachineClaim.setText("\u5bfc\u51fa");
+                    exportNewMachineClaim.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportNewMachineClaimActionPerformed(e);
+                        }
+                    });
+                    newClaim.add(exportNewMachineClaim);
                 }
                 tsManagement.add(newClaim);
 
                 //======== toolRecipients ========
                 {
                     toolRecipients.setText("\u5de5\u5177\u9886\u7528\u8bb0\u5f55");
+
+                    //---- queryToolRecipients ----
+                    queryToolRecipients.setText("\u67e5\u8be2");
+                    queryToolRecipients.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryToolRecipientsActionPerformed(e);
+                        }
+                    });
+                    toolRecipients.add(queryToolRecipients);
+
+                    //---- importToolRecipients ----
+                    importToolRecipients.setText("\u5bfc\u5165");
+                    importToolRecipients.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importToolRecipientsActionPerformed(e);
+                        }
+                    });
+                    toolRecipients.add(importToolRecipients);
+
+                    //---- exportToolRecipients ----
+                    exportToolRecipients.setText("\u5bfc\u51fa");
+                    exportToolRecipients.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportToolRecipientsActionPerformed(e);
+                        }
+                    });
+                    toolRecipients.add(exportToolRecipients);
                 }
                 tsManagement.add(toolRecipients);
 
                 //======== componentBorrowing ========
                 {
                     componentBorrowing.setText("\u96f6\u4ef6\u501f\u7528\u7ba1\u7406");
+
+                    //---- queryComponentBorrowing ----
+                    queryComponentBorrowing.setText("\u67e5\u8be2");
+                    queryComponentBorrowing.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryComponentBorrowingActionPerformed(e);
+                        }
+                    });
+                    componentBorrowing.add(queryComponentBorrowing);
+
+                    //---- importComponentBorrowing ----
+                    importComponentBorrowing.setText("\u5bfc\u5165");
+                    importComponentBorrowing.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importComponentBorrowingActionPerformed(e);
+                        }
+                    });
+                    componentBorrowing.add(importComponentBorrowing);
+
+                    //---- exportComponentBorrowing ----
+                    exportComponentBorrowing.setText("\u5bfc\u51fa");
+                    exportComponentBorrowing.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportComponentBorrowingActionPerformed(e);
+                        }
+                    });
+                    componentBorrowing.add(exportComponentBorrowing);
                 }
                 tsManagement.add(componentBorrowing);
             }
@@ -1277,14 +2289,10 @@ public class MainFrame extends JFrame {
     private JMenuItem queryShopDetail;
     private JMenuItem importShopDetail;
     private JMenuItem exportShopDetail;
-    private JMenu rtsMenu;
-    private JMenuItem queryShopRTS;
-    private JMenuItem importShopRTS;
-    private JMenuItem exportShopRTS;
-    private JMenu shopPayMenu;
-    private JMenuItem queryShopPay;
-    private JMenuItem importShopPay;
-    private JMenuItem exportShopPay;
+    private JMenu shopContractMenu;
+    private JMenuItem queryShopContracts;
+    private JMenuItem importShopContracts;
+    private JMenuItem exportShopContracts;
     private JMenuItem exportAll;
     private JMenuItem countEngineerByProductLine;
     private JMenuItem countEngineerByShop;
@@ -1294,7 +2302,10 @@ public class MainFrame extends JFrame {
     private JMenuItem exportEngineerBasic;
     private JMenu shopEquipmentList;
     private JMenuItem countShopEquipment;
-    private JMenu partsManagement;
+    private JMenu partsLibrary;
+    private JMenuItem queryPartsLibrary;
+    private JMenuItem importPartsLibrary;
+    private JMenuItem exportPartsLibrary;
     private JMenu warrantyManagement;
     private JMenu cardRecordManagement;
     private JMenuItem queryCardApplicationRecord;
@@ -1310,26 +2321,71 @@ public class MainFrame extends JFrame {
     private JMenuItem importWarrantyFee;
     private JMenuItem exportWarrantyFee;
     private JMenu printHead;
+    private JMenuItem queryPrintHead;
+    private JMenuItem importPrintHead;
+    private JMenuItem exportPrintHead;
     private JMenu consumables;
+    private JMenuItem queryConsumables;
+    private JMenuItem importConsumables;
+    private JMenuItem exportConsumables;
     private JMenu technicalManagement;
     private JMenu techTraining;
     private JMenuItem queryEngineerTraining;
     private JMenuItem importEngineerTraining;
     private JMenuItem exportEngineerTraining;
     private JMenu techManualPermission;
+    private JMenuItem queryTechManual;
+    private JMenuItem importTechManual;
+    private JMenuItem exportTechManual;
     private JMenu techSDSPermission;
+    private JMenuItem querySDSPermission;
+    private JMenuItem importSDSPermission;
+    private JMenuItem exportSDSPermission;
     private JMenu techSupporter;
+    private JMenuItem queryTechSupport;
+    private JMenuItem importTechSupport;
+    private JMenuItem exportTechSupport;
     private JMenu techSOID;
+    private JMenuItem querySOIDCode;
+    private JMenuItem importSOIDCode;
+    private JMenuItem exportSOIDCode;
     private JMenu techInstallPermission;
+    private JMenuItem queryInstallPermission;
+    private JMenuItem importInstallPermission;
+    private JMenuItem exportInstallPermission;
     private JMenu tsManagement;
     private JMenu tsTraining;
+    private JMenuItem queryTSTraining;
+    private JMenuItem importTSTraining;
+    private JMenuItem exportTSTraining;
     private JMenu tsManualPermission;
+    private JMenuItem queryTSManualPermissions;
+    private JMenuItem importTSManualPermissions;
+    private JMenuItem exportTSManualPermissions;
     private JMenu tsSDSPermission;
+    private JMenuItem queryTSSDSPermission;
+    private JMenuItem importTSSDSPermission;
+    private JMenuItem exportTSSDSPermission;
     private JMenu tsInstallPermission;
+    private JMenuItem queryTSInstallPermission;
+    private JMenuItem importTSInstallPermission;
+    private JMenuItem exportTSInstallPermission;
     private JMenu renewManagement;
+    private JMenuItem queryOldMachineRenew;
+    private JMenuItem importOldMachineRenew;
+    private JMenuItem exportOldMachineRenew;
     private JMenu newClaim;
+    private JMenuItem queryNewMachineClaim;
+    private JMenuItem importNewMachineClaim;
+    private JMenuItem exportNewMachineClaim;
     private JMenu toolRecipients;
+    private JMenuItem queryToolRecipients;
+    private JMenuItem importToolRecipients;
+    private JMenuItem exportToolRecipients;
     private JMenu componentBorrowing;
+    private JMenuItem queryComponentBorrowing;
+    private JMenuItem importComponentBorrowing;
+    private JMenuItem exportComponentBorrowing;
     private JMenu onlineMenu;
     private JMenuItem onlineSetting;
     private JMenuItem startOnline;

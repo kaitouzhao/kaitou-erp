@@ -2,8 +2,12 @@ package kaitou.ppp.domain.card;
 
 import kaitou.ppp.domain.BaseDomain4InDoubt;
 import kaitou.ppp.domain.annotation.PKField;
-import kaitou.ppp.domain.system.SysCode;
 import org.apache.commons.lang.StringUtils;
+
+import java.awt.*;
+
+import static kaitou.ppp.domain.system.SysCode.PKViolationType;
+import static kaitou.ppp.domain.system.SysCode.WarrantyStatus;
 
 /**
  * 保修卡生成记录.
@@ -12,23 +16,92 @@ import org.apache.commons.lang.StringUtils;
  * Time: 21:22
  */
 public class CardApplicationRecord extends BaseDomain4InDoubt {
-    private String applyDate;
-    private String status;
-    private String isBack;
+    /**
+     * 保修卡号
+     */
     private String warrantyCard;
+    /**
+     * 申请日期
+     */
+    private String applyDate;
+    /**
+     * 状态
+     *
+     * @see kaitou.ppp.domain.system.SysCode.WarrantyStatus
+     */
+    private String status;
+    /**
+     * 保卡是否寄回
+     */
+    private String isBack;
+    /**
+     * 产品线
+     *
+     * @see kaitou.ppp.domain.system.SysCode.ModelCode
+     */
     private String allModels;
+    /**
+     * 机型分类
+     */
+    private String modelType;
+    /**
+     * 机型
+     */
     private String models;
-    @PKField(PKViolationType = SysCode.PKViolationType.IN_DOUBT)
+    /**
+     * 机身号
+     * <p>主键</p>
+     */
+    @PKField(PKViolationType = PKViolationType.IN_DOUBT)
     private String fuselage;
+    /**
+     * 认定店编号
+     */
     private String shopId;
+    /**
+     * 认定店名称
+     */
     private String shopName;
+    /**
+     * 装机时间
+     */
     private String installedDate;
+    /**
+     * 到期时间
+     */
     private String endDate;
+    /**
+     * 初始读数
+     */
     private String initData;
+    /**
+     * 最终用户名称
+     */
     private String userCompanyName;
+    /**
+     * 联系人
+     */
     private String userLinkMan;
+    /**
+     * 联系方式
+     */
     private String userContact;
+    /**
+     * 联系地址
+     */
     private String installedAddress;
+    /**
+     * 备注
+     */
+    private String note;
+
+    @Override
+    public Color tableRowColor() {
+        if (WarrantyStatus.JUST_OUT_WARRANTY.getValue().equals(status)) {
+            return new Color(39, 200, 199);
+        }
+        return super.tableRowColor();
+    }
 
     @Override
     public void check() {
@@ -109,11 +182,12 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
     @Override
     public String toString() {
         return "CardApplicationRecord{" +
-                "applyDate='" + applyDate + '\'' +
+                "warrantyCard='" + warrantyCard + '\'' +
+                ", applyDate='" + applyDate + '\'' +
                 ", status='" + status + '\'' +
                 ", isBack='" + isBack + '\'' +
-                ", warrantyCard='" + warrantyCard + '\'' +
                 ", allModels='" + allModels + '\'' +
+                ", modelType='" + modelType + '\'' +
                 ", models='" + models + '\'' +
                 ", fuselage='" + fuselage + '\'' +
                 ", shopId='" + shopId + '\'' +
@@ -125,7 +199,24 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
                 ", userLinkMan='" + userLinkMan + '\'' +
                 ", userContact='" + userContact + '\'' +
                 ", installedAddress='" + installedAddress + '\'' +
+                ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getShopId() {

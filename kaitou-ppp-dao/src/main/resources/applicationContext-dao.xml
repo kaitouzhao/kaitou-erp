@@ -27,6 +27,14 @@
         <property name="dbDir" value="${db.file.dir}"/>
     </bean>
 
+    <bean id="shopContractDao" class="kaitou.ppp.dao.shop.impl.ShopContractDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="partsLibraryDao" class="kaitou.ppp.dao.shop.impl.PartsLibraryDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
     <bean id="cardApplicationRecordDao" class="kaitou.ppp.dao.card.impl.CardApplicationRecordDaoImpl">
         <property name="dbDir" value="${db.file.dir}"/>
     </bean>
@@ -54,6 +62,66 @@
     </bean>
 
     <bean id="warrantyPartsDao" class="kaitou.ppp.dao.warranty.impl.WarrantyPartsDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="warrantyPrintDao" class="kaitou.ppp.dao.warranty.impl.WarrantyPrintDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="warrantyConsumablesDao" class="kaitou.ppp.dao.warranty.impl.WarrantyConsumablesDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="manualPermissionsDao" class="kaitou.ppp.dao.tech.impl.ManualPermissionsDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="soidCodeDao" class="kaitou.ppp.dao.tech.impl.SOIDCodeDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="sdsPermissionDao" class="kaitou.ppp.dao.tech.impl.SDSPermissionDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="techSupportDao" class="kaitou.ppp.dao.tech.impl.TechSupportDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="installPermissionDao" class="kaitou.ppp.dao.tech.impl.InstallPermissionDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="tsTrainingDao" class="kaitou.ppp.dao.ts.impl.TSTrainingDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="tsManualPermissionsDao" class="kaitou.ppp.dao.ts.impl.TSManualPermissionsDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="tsSDSPermissionDao" class="kaitou.ppp.dao.ts.impl.TSSDSPermissionDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="tsInstallPermissionDao" class="kaitou.ppp.dao.ts.impl.TSInstallPermissionDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="oldMachineRenewDao" class="kaitou.ppp.dao.ts.impl.OldMachineRenewDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="newMachineClaimDao" class="kaitou.ppp.dao.ts.impl.NewMachineClaimDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="toolRecipientsDao" class="kaitou.ppp.dao.ts.impl.ToolRecipientsDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="componentBorrowingDao" class="kaitou.ppp.dao.ts.impl.ComponentBorrowingDaoImpl">
         <property name="dbDir" value="${db.file.dir}"/>
     </bean>
 

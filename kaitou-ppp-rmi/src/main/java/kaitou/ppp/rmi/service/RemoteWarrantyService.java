@@ -1,7 +1,9 @@
 package kaitou.ppp.rmi.service;
 
+import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
+import kaitou.ppp.domain.warranty.WarrantyPrint;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -41,4 +43,32 @@ public interface RemoteWarrantyService extends Remote {
      * @param warrantyParts 零件
      */
     public void deleteWarrantyParts(Object... warrantyParts) throws RemoteException;
+
+    /**
+     * 保存打印头保修
+     *
+     * @param warrantyPrint 打印头保修列表
+     */
+    public void saveWarrantyPrint(List<WarrantyPrint> warrantyPrint) throws RemoteException;
+
+    /**
+     * 删除打印头保修
+     *
+     * @param warrantyPrint 打印头保修
+     */
+    public void deleteWarrantyPrint(Object... warrantyPrint) throws RemoteException;
+
+    /**
+     * 保存耗材保修
+     *
+     * @param warrantyConsumables 耗材保修列表
+     */
+    public void saveWarrantyConsumables(List<WarrantyConsumables> warrantyConsumables) throws RemoteException;
+
+    /**
+     * 删除打印头保修
+     *
+     * @param warrantyConsumables 耗材保修
+     */
+    public void deleteWarrantyConsumables(Object... warrantyConsumables) throws RemoteException;
 }

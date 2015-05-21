@@ -8,9 +8,5 @@ import kaitou.ppp.domain.card.CardApplicationRecord;
  * Date: 2015/3/7
  * Time: 22:15
  */
-public class CardApplicationRecordQueryObject extends BaseQueryObject {
-    @Override
-    public Class domainClass() {
-        return CardApplicationRecord.class;
-    }
+public class CardApplicationRecordQueryObject extends BaseQueryObject<CardApplicationRecord> {
 }

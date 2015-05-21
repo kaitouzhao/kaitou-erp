@@ -51,6 +51,10 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      */
     private static final int DATA_COLUMN_START_INDEX = 1;
     /**
+     * 存疑筛选名
+     */
+    private static final String CHOOSE_IN_DOUBT_LABEL = "存疑";
+    /**
      * 当前frame
      */
     private QueryFrame self = this;
@@ -90,6 +94,10 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      * 操作列号
      */
     private int opColumnIndex = -1;
+    /**
+     * 筛选存疑
+     */
+    private JCheckBox selectInDoubt;
 
     /**
      * 构造器
@@ -188,6 +196,9 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         String[] tableTitles = queryObject.tableTitles();
         dataTable.setModel(new QueryTable(objects,
                 tableTitles));
+        if (!queryObject.autoResizeMode()) {
+            dataTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        }
         for (int index = DATA_COLUMN_START_INDEX; index < fieldNamesSize; index++) {
             dataTable.getColumnModel().getColumn(index).setCellRenderer(new QueryTableColorRenderer());
         }
@@ -205,7 +216,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      */
     private List<Integer> getSelectedRows() {
         List<Integer> selectedRows = new ArrayList<Integer>();
-        for (int row = 0; row < countPerPage; row++) {
+        for (int row = 0; row < dataTable.getRowCount(); row++) {
             if (dataTable.getValueAt(row, SELECT_COLUMN_INDEX) == Boolean.TRUE) {
                 selectedRows.add(row);
             }
@@ -244,7 +255,15 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
 
     @SuppressWarnings(value = "unchecked")
     private void queryBtnActionPerformed(ActionEvent e) {
+        queryByCondition();
+    }
+
+    /**
+     * 根据查询条件筛选
+     */
+    private void queryByCondition() {
         try {
+            boolean pickInDoubt = selectInDoubt != null ? selectInDoubt.isSelected() : false;
             shownDatas.clear();
             if (!CollectionUtil.isEmpty(datas) && !CollectionUtil.isEmpty(queryTextFields)) {
                 List<Integer> excludes = new ArrayList<Integer>();
@@ -252,13 +271,20 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
                 String textFieldValue;
                 String[] queryFieldNames = queryObject.queryFieldNames();
                 for (int i = 0; i < datas.size(); i++) {
+                    T data = datas.get(i);
+                    if (pickInDoubt && data instanceof BaseDomain4InDoubt) {
+                        if (!((BaseDomain4InDoubt) data).isInDoubt()) {
+                            excludes.add(i);
+                            continue;
+                        }
+                    }
                     for (int j = 0; j < queryTextFields.size(); j++) {
                         textField = queryTextFields.get(j);
                         textFieldValue = StringUtils.isEmpty(textField.getText()) ? "" : textField.getText().trim();
                         if (StringUtils.isEmpty(textFieldValue)) {
                             continue;
                         }
-                        Object fieldValue = getFieldValue(queryFieldNames[j], datas.get(i));
+                        Object fieldValue = getFieldValue(queryFieldNames[j], data);
                         if (fieldValue == null || fieldValue.toString().trim().equals("")) {
                             excludes.add(i);
                             break;
@@ -306,8 +332,11 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             for (JTextField queryTextField : queryTextFields) {
                 queryTextField.setText("");
             }
+            if (selectInDoubt != null) {
+                selectInDoubt.setSelected(false);
+            }
             shownDatas.addAll(datas);
-            queryBtnActionPerformed(e);
+            queryByCondition();
         } catch (Exception ex) {
             handleEx(ex, this);
         }
@@ -319,7 +348,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
         T t = shownDatas.get(getShownDataIndex(dataTable.getSelectedRow()));
         Object[] datas = t.export2Array(queryObject.fieldNames());
-        Object data = datas[dataTable.getSelectedColumn()];
+        Object data = datas[dataTable.getSelectedColumn() - DATA_COLUMN_START_INDEX];
         String copyData = String.valueOf(data == null ? "" : data);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         StringSelection text = new StringSelection(copyData);
@@ -350,7 +379,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             }
             delete(queryObject.domainType(), deleted);
             new OperationHint(this, "删除成功！");
-            queryBtnActionPerformed(e);
+            queryByCondition();
         } catch (Exception ex) {
             handleEx(ex, this);
         }
@@ -364,7 +393,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             }
             datas.add(saveDialog.getDomain());
             new OperationHint(self, "添加成功");
-            queryBtnActionPerformed(e);
+            queryByCondition();
         } catch (Exception ex) {
             handleEx(ex, this);
         }
@@ -400,11 +429,11 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             }
             Object edited = shownDatas.get(getShownDataIndex(row));
             Object dataObj = datas.get(datas.indexOf(edited));
-            String fieldName = String.valueOf(Array.get(queryObject.fieldNames(), column));
+            String fieldName = String.valueOf(Array.get(queryObject.fieldNames(), column - 1));
             String fieldValue = String.valueOf(dataTable.getValueAt(row, column));
             setFieldValue(fieldName, edited, fieldValue);
             setFieldValue(fieldName, dataObj, fieldValue);
-            saveOrUpdate(queryObject.domainType(), dataObj);
+            saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(dataObj), queryObject.domainClass()));
             new OperationHint(self, "更新成功");
             select();
         }
@@ -431,7 +460,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
                 if (((BaseDomain4InDoubt) t).isInDoubt()) {
                     component.setBackground(Color.yellow);
                 } else {
-                    component.setBackground(null);
+                    component.setBackground(t.tableRowColor());
                 }
             }
             return component;
@@ -474,7 +503,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             String opFieldName = queryObject.opFieldName();
             setFieldValue(opFieldName, shownObj, changeValue);
             setFieldValue(opFieldName, dataObj, changeValue);
-            saveOrUpdate(queryObject.domainType(), dataObj);
+            saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(dataObj), queryObject.domainClass()));
             new OperationHint(self, "操作成功");
             select();
         }
@@ -566,6 +595,14 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
+    private void resultAreaMouseWheelMoved(MouseWheelEvent e) {
+        if (e.getWheelRotation() < 0) {
+            previousPage();
+        } else {
+            nextPage();
+        }
+    }
+
     /**
      * 初始化界面
      */
@@ -600,8 +637,15 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         //======== resultArea ========
         {
             resultArea.setAutoscrolls(true);
+            resultArea.addMouseWheelListener(new MouseWheelListener() {
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent e) {
+                    resultAreaMouseWheelMoved(e);
+                }
+            });
 
             //---- dataTable ----
+            dataTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
             dataTable.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -774,7 +818,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         for (String queryFieldName : queryFieldNames) {
             for (int j = 0; j < fieldNames.length; j++) {
                 if (queryFieldName.equals(fieldNames[j])) {
-                    queryLabelTitle = queryObject.tableTitles()[j];
+                    queryLabelTitle = queryObject.tableTitles()[DATA_COLUMN_START_INDEX + j];
                     break;
                 }
             }
@@ -792,7 +836,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
 
                 @Override
                 public void keyPressed(KeyEvent e) {
-                    queryBtnActionPerformed(null);
+                    queryByCondition();
                 }
 
                 @Override
@@ -802,6 +846,17 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             });
             queryArea.add(queryTextField);
             queryTextFields.add(queryTextField);
+        }
+        if (queryObject.domainClass().getSuperclass() == BaseDomain4InDoubt.class) {
+            selectInDoubt = new JCheckBox(CHOOSE_IN_DOUBT_LABEL);
+            selectInDoubt.addItemListener(new ItemListener() {
+                @Override
+                public void itemStateChanged(ItemEvent e) {
+                    selectInDoubt.setSelected(e.getStateChange() == ItemEvent.SELECTED);
+                    queryByCondition();
+                }
+            });
+            queryArea.add(selectInDoubt);
         }
     }
 

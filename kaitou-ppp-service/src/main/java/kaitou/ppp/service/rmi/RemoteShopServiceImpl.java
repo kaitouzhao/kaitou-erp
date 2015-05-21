@@ -1,15 +1,9 @@
 package kaitou.ppp.service.rmi;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
-import kaitou.ppp.domain.shop.Shop;
-import kaitou.ppp.domain.shop.ShopDetail;
-import kaitou.ppp.domain.shop.ShopPay;
-import kaitou.ppp.domain.shop.ShopRTS;
+import kaitou.ppp.domain.shop.*;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
-import kaitou.ppp.manager.shop.ShopDetailManager;
-import kaitou.ppp.manager.shop.ShopManager;
-import kaitou.ppp.manager.shop.ShopPayManager;
-import kaitou.ppp.manager.shop.ShopRTSManager;
+import kaitou.ppp.manager.shop.*;
 import kaitou.ppp.rmi.service.RemoteShopService;
 
 import java.rmi.RemoteException;
@@ -28,10 +22,20 @@ public class RemoteShopServiceImpl extends UnicastRemoteObject implements Remote
     private ShopRTSManager shopRTSManager;
     private ShopPayManager shopPayManager;
     private ShopDetailManager shopDetailManager;
+    private ShopContractManager shopContractManager;
+    private PartsLibraryManager partsLibraryManager;
     private List<ShopUpdateListener> shopUpdateListeners;
 
     public void setShopUpdateListeners(List<ShopUpdateListener> shopUpdateListeners) {
         this.shopUpdateListeners = shopUpdateListeners;
+    }
+
+    public void setPartsLibraryManager(PartsLibraryManager partsLibraryManager) {
+        this.partsLibraryManager = partsLibraryManager;
+    }
+
+    public void setShopContractManager(ShopContractManager shopContractManager) {
+        this.shopContractManager = shopContractManager;
     }
 
     public void setShopManager(ShopManager shopManager) {
@@ -114,5 +118,25 @@ public class RemoteShopServiceImpl extends UnicastRemoteObject implements Remote
     @Override
     public void deleteShopRTS(Object... shopRTS) throws RemoteException {
         shopRTSManager.delete(shopRTS);
+    }
+
+    @Override
+    public void saveShopContracts(List<ShopContract> shopContracts) throws RemoteException {
+        shopContractManager.save(shopContracts);
+    }
+
+    @Override
+    public void deleteShopContracts(Object... shopContracts) throws RemoteException {
+        shopContractManager.delete(shopContracts);
+    }
+
+    @Override
+    public void savePartsLibrary(List<PartsLibrary> partsLibraries) throws RemoteException {
+        partsLibraryManager.save(partsLibraries);
+    }
+
+    @Override
+    public void deletePartsLibrary(Object... partsLibraries) throws RemoteException {
+        partsLibraryManager.delete(partsLibraries);
     }
 }

@@ -23,6 +23,7 @@ public interface WarrantyPartsDao {
     /**
      * 查询保修零件及索赔零件
      *
+     * @param numberOfYear 查询年份。为空则为全部
      * @return 零件列表
      */
     public List<WarrantyParts> query(String... numberOfYear);

@@ -8,9 +8,5 @@ import kaitou.ppp.domain.warranty.WarrantyFee;
  * Date: 2015/5/7
  * Time: 12:48
  */
-public class WarrantyFeeQueryObject extends BaseQueryObject {
-    @Override
-    public Class domainClass() {
-        return WarrantyFee.class;
-    }
+public class WarrantyFeeQueryObject extends BaseQueryObject<WarrantyFee> {
 }

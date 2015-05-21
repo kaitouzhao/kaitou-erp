@@ -18,8 +18,10 @@ public abstract class SpringContextManager {
     private static ApplicationContext ctx;
 
     private static DbService dbService;
+    private static TSService tsService;
     private static CardService cardService;
     private static ShopService shopService;
+    private static TechService techService;
     private static ExportService exportService;
     private static UpgradeService upgradeService;
     private static EngineerService engineerService;
@@ -43,6 +45,13 @@ public abstract class SpringContextManager {
             dbService = ctx.getBean(DbService.class);
         }
         return dbService;
+    }
+
+    public static TSService getTsService() {
+        if (tsService == null) {
+            tsService = ctx.getBean(TSService.class);
+        }
+        return tsService;
     }
 
     public static CardService getCardService() {
@@ -113,5 +122,12 @@ public abstract class SpringContextManager {
             warrantyService = ctx.getBean(WarrantyService.class);
         }
         return warrantyService;
+    }
+
+    public static TechService getTechService() {
+        if (techService == null) {
+            techService = ctx.getBean(TechService.class);
+        }
+        return techService;
     }
 }

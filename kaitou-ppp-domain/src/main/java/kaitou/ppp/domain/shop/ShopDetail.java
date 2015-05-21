@@ -41,6 +41,10 @@ public class ShopDetail extends BaseDomain {
      * 认定机型
      */
     protected String model;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public void check() {
@@ -85,7 +89,6 @@ public class ShopDetail extends BaseDomain {
         ShopDetail that = (ShopDetail) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-//        if (model != null ? !model.equals(that.model) : that.model != null) return false;
         if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
         return !(productLine != null ? !productLine.equals(that.productLine) : that.productLine != null);
 
@@ -110,7 +113,16 @@ public class ShopDetail extends BaseDomain {
                 ", productLine='" + productLine + '\'' +
                 ", level='" + level + '\'' +
                 ", model='" + model + '\'' +
+                ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getSaleRegion() {

@@ -8,10 +8,5 @@ import kaitou.ppp.domain.engineer.Engineer;
  * Date: 2015/2/6
  * Time: 10:22
  */
-public class EngineerQueryObject extends BaseQueryObject {
-
-    @Override
-    public Class<Engineer> domainClass() {
-        return Engineer.class;
-    }
+public class EngineerQueryObject extends BaseQueryObject<Engineer> {
 }

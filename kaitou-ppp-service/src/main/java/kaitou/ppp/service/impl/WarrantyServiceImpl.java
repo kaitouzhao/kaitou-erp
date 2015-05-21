@@ -1,13 +1,17 @@
 package kaitou.ppp.service.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
+import kaitou.ppp.domain.warranty.WarrantyPrint;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
+import kaitou.ppp.manager.warranty.WarrantyConsumablesManager;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 import kaitou.ppp.manager.warranty.WarrantyPartsManager;
+import kaitou.ppp.manager.warranty.WarrantyPrintManager;
 import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteWarrantyService;
 import kaitou.ppp.service.BaseExcelService;
@@ -27,11 +31,21 @@ import java.util.List;
  */
 public class WarrantyServiceImpl extends BaseExcelService implements WarrantyService {
 
+    private ShopManager shopManager;
     private WarrantyFeeManager warrantyFeeManager;
     private WarrantyPartsManager warrantyPartsManager;
-    private ShopManager shopManager;
+    private WarrantyPrintManager warrantyPrintManager;
     private SystemSettingsManager systemSettingsManager;
     private RemoteRegistryManager remoteRegistryManager;
+    private WarrantyConsumablesManager warrantyConsumablesManager;
+
+    public void setWarrantyConsumablesManager(WarrantyConsumablesManager warrantyConsumablesManager) {
+        this.warrantyConsumablesManager = warrantyConsumablesManager;
+    }
+
+    public void setWarrantyPrintManager(WarrantyPrintManager warrantyPrintManager) {
+        this.warrantyPrintManager = warrantyPrintManager;
+    }
 
     public void setShopManager(ShopManager shopManager) {
         this.shopManager = shopManager;
@@ -59,8 +73,8 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
     }
 
     @Override
-    public void exportWarrantyFee(File targetFile) {
-        export2Excel(warrantyFeeManager.query(), targetFile, WarrantyFee.class);
+    public void exportWarrantyFee(File targetFile, String... numberOfYear) {
+        export2Excel(warrantyFeeManager.query(numberOfYear), targetFile, WarrantyFee.class);
     }
 
     @Override
@@ -189,6 +203,146 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
                 for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
                     try {
                         remoteWarrantyService.deleteWarrantyParts(warrantyParts);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void importWarrantyPrint(File srcFile) {
+        saveOrUpdateWarrantyPrint(CollectionUtil.toArray(readFromExcel(srcFile, WarrantyPrint.class), WarrantyPrint.class));
+    }
+
+    @Override
+    public void exportWarrantyPrint(File targetFile, String... numberOfYear) {
+        export2Excel(warrantyPrintManager.query(numberOfYear), targetFile, WarrantyPrint.class);
+    }
+
+    @Override
+    public List<WarrantyPrint> queryWarrantyPrint() {
+        return warrantyPrintManager.query();
+    }
+
+    @Override
+    public void saveOrUpdateWarrantyPrint(WarrantyPrint... warrantyPrint) {
+        if (CollectionUtil.isEmpty(warrantyPrint)) {
+            return;
+        }
+        final List<WarrantyPrint> warrantyPrints = new ArrayList<WarrantyPrint>();
+        for (WarrantyPrint print : warrantyPrint) {
+            print.setShopId(shopManager.getCachedIdByName(print.getShopName()));
+            warrantyPrints.add(print);
+        }
+        logOperation("成功导入/更新打印头保修数：" + warrantyPrintManager.save(warrantyPrints));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteWarrantyService> remoteWarrantyServices = ServiceClient.queryServicesOfListener(RemoteWarrantyService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteWarrantyServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新打印头保修");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    try {
+                        remoteWarrantyService.saveWarrantyPrint(warrantyPrints);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void deleteWarrantyPrint(final Object... warrantyPrint) {
+        if (CollectionUtil.isEmpty(warrantyPrint)) {
+            return;
+        }
+        logOperation("成功删除打印头保修数：" + warrantyPrintManager.delete(warrantyPrint));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteWarrantyService> remoteWarrantyServices = ServiceClient.queryServicesOfListener(RemoteWarrantyService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteWarrantyServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新删除打印头保修");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    try {
+                        remoteWarrantyService.deleteWarrantyPrint(warrantyPrint);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void importWarrantyConsumables(File srcFile) {
+        saveOrUpdateWarrantyConsumables(CollectionUtil.toArray(readFromExcel(srcFile, WarrantyConsumables.class), WarrantyConsumables.class));
+    }
+
+    @Override
+    public void exportWarrantyConsumables(File targetFile, String... numberOfYear) {
+        export2Excel(warrantyConsumablesManager.query(numberOfYear), targetFile, WarrantyConsumables.class);
+    }
+
+    @Override
+    public List<WarrantyConsumables> queryWarrantyConsumables() {
+        return warrantyConsumablesManager.query();
+    }
+
+    @Override
+    public void saveOrUpdateWarrantyConsumables(WarrantyConsumables... warrantyConsumables) {
+        if (CollectionUtil.isEmpty(warrantyConsumables)) {
+            return;
+        }
+        final List<WarrantyConsumables> warrantyConsumablesList = new ArrayList<WarrantyConsumables>();
+        for (WarrantyConsumables warrantConsumable : warrantyConsumables) {
+            warrantConsumable.setShopId(shopManager.getCachedIdByName(warrantConsumable.getShopName()));
+            warrantyConsumablesList.add(warrantConsumable);
+        }
+        logOperation("成功导入/更新耗材保修数：" + warrantyConsumablesManager.save(warrantyConsumablesList));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteWarrantyService> remoteWarrantyServices = ServiceClient.queryServicesOfListener(RemoteWarrantyService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteWarrantyServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新耗材保修");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    try {
+                        remoteWarrantyService.saveWarrantyConsumables(warrantyConsumablesList);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void deleteWarrantyConsumables(final Object... warrantyConsumables) {
+        if (CollectionUtil.isEmpty(warrantyConsumables)) {
+            return;
+        }
+        logOperation("成功删除耗材保修数：" + warrantyConsumablesManager.delete(warrantyConsumables));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteWarrantyService> remoteWarrantyServices = ServiceClient.queryServicesOfListener(RemoteWarrantyService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteWarrantyServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新删除耗材保修");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    try {
+                        remoteWarrantyService.deleteWarrantyConsumables(warrantyConsumables);
                     } catch (RemoteException e) {
                         logSystemEx(e);
                     }

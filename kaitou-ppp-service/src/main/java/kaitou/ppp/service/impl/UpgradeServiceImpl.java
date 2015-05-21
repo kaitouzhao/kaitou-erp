@@ -2,16 +2,24 @@ package kaitou.ppp.service.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.common.log.BaseLogManager;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
+import kaitou.ppp.domain.shop.Shop;
+import kaitou.ppp.domain.shop.ShopPay;
 import kaitou.ppp.domain.system.SysCode;
+import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
+import kaitou.ppp.manager.shop.ShopManager;
+import kaitou.ppp.manager.shop.ShopPayManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
+import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 import kaitou.ppp.service.UpgradeService;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
 
+import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
 import static kaitou.ppp.common.utils.FileUtil.copy;
 import static kaitou.ppp.common.utils.FileUtil.delete;
 
@@ -32,6 +40,21 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
     private String confDir;
     private CardApplicationRecordManager cardApplicationRecordManager;
     private SystemSettingsManager systemSettingsManager;
+    private ShopManager shopManager;
+    private ShopPayManager shopPayManager;
+    private WarrantyFeeManager warrantyFeeManager;
+
+    public void setWarrantyFeeManager(WarrantyFeeManager warrantyFeeManager) {
+        this.warrantyFeeManager = warrantyFeeManager;
+    }
+
+    public void setShopManager(ShopManager shopManager) {
+        this.shopManager = shopManager;
+    }
+
+    public void setShopPayManager(ShopPayManager shopPayManager) {
+        this.shopPayManager = shopPayManager;
+    }
 
     public void setSystemSettingsManager(SystemSettingsManager systemSettingsManager) {
         this.systemSettingsManager = systemSettingsManager;
@@ -91,5 +114,41 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
         List<CardApplicationRecord> cardApplicationRecords = cardApplicationRecordManager.query();
         cardApplicationRecordManager.delete(CollectionUtil.toArray(cardApplicationRecords, CardApplicationRecord.class));
         cardApplicationRecordManager.save(cardApplicationRecords);
+    }
+
+    @Override
+    public void upgradeTo3Dot1() {
+        if ("3.1".equals(systemSettingsManager.getSystemSetting(SysCode.LATEST_VERSION_KEY))) {
+            return;
+        }
+        List<ShopPay> shopPays = shopPayManager.query();
+        if (CollectionUtil.isNotEmpty(shopPays)) {
+            List<Shop> shops = shopManager.query();
+            for (Shop shop : shops) {
+                for (ShopPay shopPay : shopPays) {
+                    if (shopPay.getId().equals(shop.getId()) && shopPay.getName().equals(shop.getName())) {
+                        copyBean(shopPay, shop);
+                    }
+                }
+            }
+            try {
+                shopManager.save(shops);
+            } catch (Exception e) {
+                logSystemEx(e);
+            }
+        }
+    }
+
+    @Override
+    public void upgradeTo3Dot2() {
+        if ("3.2".equals(systemSettingsManager.getSystemSetting(SysCode.LATEST_VERSION_KEY))) {
+            return;
+        }
+        List<WarrantyFee> warrantyFees = warrantyFeeManager.query();
+        if (CollectionUtil.isEmpty(warrantyFees)) {
+            return;
+        }
+        warrantyFeeManager.save(warrantyFees);
+        FileUtil.delete(dbDir + File.separatorChar + "WarrantyFee.kdb");
     }
 }

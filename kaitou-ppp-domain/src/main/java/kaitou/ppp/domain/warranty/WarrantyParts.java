@@ -2,6 +2,7 @@ package kaitou.ppp.domain.warranty;
 
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.system.SysCode;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 保修零件及索赔零件.
@@ -21,10 +22,12 @@ public class WarrantyParts extends BaseDomain {
     /**
      * 费用承担部门
      */
+    @Deprecated
     private String expenseDepartment;
     /**
      * 费用承担区域
      */
+    @Deprecated
     private String expenseRegion;
     /**
      * 维修站所属销售区域
@@ -33,8 +36,17 @@ public class WarrantyParts extends BaseDomain {
      */
     private String saleRegion;
     /**
+     * 产品线
+     */
+    private String productLine;
+    /**
+     * 结账类型
+     */
+    private String payType;
+    /**
      * 保修类型
      */
+    @Deprecated
     private String warrantyType;
     /**
      * 订单类型
@@ -45,11 +57,17 @@ public class WarrantyParts extends BaseDomain {
     /**
      * Exp Class
      */
+    @Deprecated
     private String expClass;
     /**
      * Exp P/Div
      */
+    @Deprecated
     private String expPDiv;
+    /**
+     * Selling Division
+     */
+    private String sellingDivision;
     /**
      * EO订单号/ME管理号
      */
@@ -57,14 +75,17 @@ public class WarrantyParts extends BaseDomain {
     /**
      * 发票日期
      */
+    @Deprecated
     private String invoiceDate;
     /**
      * RAMBO订单号
      */
+    @Deprecated
     private String ramboOrderNo;
     /**
      * RAMBO发票号
      */
+    @Deprecated
     private String ramboInvoiceNo;
     /**
      * 认定店公司代码
@@ -85,49 +106,57 @@ public class WarrantyParts extends BaseDomain {
     /**
      * SIZE
      */
+    @Deprecated
     private String size;
     /**
      * DIV
      */
+    @Deprecated
     private String div;
     /**
      * CAMG
      */
+    @Deprecated
     private String camg;
     /**
-     * 品名
+     * 零件名称
      */
     private String productName;
     /**
      * 系统机型
      */
+    @Deprecated
     private String sysModel;
     /**
      * 单位成本
      */
+    @Deprecated
     private String costPerUnit;
     /**
-     * 发货数量
+     * 数量
      */
     private String deliveryNumber;
     /**
      * 税前合计
      */
+    @Deprecated
     private String totalPreTax;
     /**
      * 税金
      */
+    @Deprecated
     private String tax;
     /**
-     * 税后合计
+     * 金额（税后合计）
      */
     private String totalAfterTax;
     /**
      * 订单提交日期
      */
+    @Deprecated
     private String orderSubmitDate;
     /**
-     * 最终用户公司名称
+     * 最终用户名称
      */
     private String userCompanyName;
     /**
@@ -135,7 +164,7 @@ public class WarrantyParts extends BaseDomain {
      */
     private String userLinkMan;
     /**
-     * 联系电话
+     * 电话
      */
     private String userContact;
     /**
@@ -161,43 +190,58 @@ public class WarrantyParts extends BaseDomain {
     /**
      * class
      */
+    @Deprecated
     private String classNo;
     /**
      * DIV
      */
+    @Deprecated
     private String div1;
     /**
      * CAMG
      */
+    @Deprecated
     private String camg1;
     /**
      * ICP特殊
      */
+    @Deprecated
     private String icpSpecial;
     /**
      * ICP特殊税
      */
+    @Deprecated
     private String icpSpecialTax;
     /**
      * ICP特殊合计
      */
+    @Deprecated
     private String icpSpecialTotal;
     /**
      * A
      */
+    @Deprecated
     private String a;
     /**
      * CRS
      */
+    @Deprecated
     private String crs;
     /**
      * 类别
      */
+    @Deprecated
     private String category;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public void check() {
-
+        if (StringUtils.isEmpty(numberOfYear)) {
+            throw new RuntimeException("年份为空");
+        }
     }
 
     @Override
@@ -215,49 +259,28 @@ public class WarrantyParts extends BaseDomain {
         return "WarrantyParts{" +
                 "numberOfYear='" + numberOfYear + '\'' +
                 ", numberOfMonth='" + numberOfMonth + '\'' +
-                ", expenseDepartment='" + expenseDepartment + '\'' +
-                ", expenseRegion='" + expenseRegion + '\'' +
                 ", saleRegion='" + saleRegion + '\'' +
-                ", warrantyType='" + warrantyType + '\'' +
+                ", productLine='" + productLine + '\'' +
+                ", payType='" + payType + '\'' +
                 ", warrantyOrderType='" + warrantyOrderType + '\'' +
-                ", expClass='" + expClass + '\'' +
-                ", expPDiv='" + expPDiv + '\'' +
+                ", sellingDivision='" + sellingDivision + '\'' +
                 ", eoOrMeOrderNo='" + eoOrMeOrderNo + '\'' +
-                ", invoiceDate='" + invoiceDate + '\'' +
-                ", ramboOrderNo='" + ramboOrderNo + '\'' +
-                ", ramboInvoiceNo='" + ramboInvoiceNo + '\'' +
                 ", shopCompanyCode='" + shopCompanyCode + '\'' +
                 ", shopId='" + shopId + '\'' +
                 ", shopName='" + shopName + '\'' +
                 ", partNo='" + partNo + '\'' +
-                ", size='" + size + '\'' +
-                ", div='" + div + '\'' +
-                ", camg='" + camg + '\'' +
                 ", productName='" + productName + '\'' +
-                ", sysModel='" + sysModel + '\'' +
-                ", costPerUnit='" + costPerUnit + '\'' +
                 ", deliveryNumber='" + deliveryNumber + '\'' +
-                ", totalPreTax='" + totalPreTax + '\'' +
-                ", tax='" + tax + '\'' +
                 ", totalAfterTax='" + totalAfterTax + '\'' +
-                ", orderSubmitDate='" + orderSubmitDate + '\'' +
                 ", userCompanyName='" + userCompanyName + '\'' +
                 ", userLinkMan='" + userLinkMan + '\'' +
-                ", userContact='" + userContact + '\'' +
                 ", purchaseDate='" + purchaseDate + '\'' +
+                ", userContact='" + userContact + '\'' +
                 ", model='" + model + '\'' +
                 ", fuselage='" + fuselage + '\'' +
                 ", repairOrder='" + repairOrder + '\'' +
                 ", faultPhenomenon='" + faultPhenomenon + '\'' +
-                ", classNo='" + classNo + '\'' +
-                ", div1='" + div1 + '\'' +
-                ", camg1='" + camg1 + '\'' +
-                ", icpSpecial='" + icpSpecial + '\'' +
-                ", icpSpecialTax='" + icpSpecialTax + '\'' +
-                ", icpSpecialTotal='" + icpSpecialTotal + '\'' +
-                ", a='" + a + '\'' +
-                ", crs='" + crs + '\'' +
-                ", category='" + category + '\'' +
+                ", note='" + note + '\'' +
                 '}';
     }
 
@@ -379,6 +402,38 @@ public class WarrantyParts extends BaseDomain {
         result = 31 * result + (crs != null ? crs.hashCode() : 0);
         result = 31 * result + (category != null ? category.hashCode() : 0);
         return result;
+    }
+
+    public String getProductLine() {
+        return productLine;
+    }
+
+    public void setProductLine(String productLine) {
+        this.productLine = productLine;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
+    }
+
+    public String getSellingDivision() {
+        return sellingDivision;
+    }
+
+    public void setSellingDivision(String sellingDivision) {
+        this.sellingDivision = sellingDivision;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getNumberOfYear() {

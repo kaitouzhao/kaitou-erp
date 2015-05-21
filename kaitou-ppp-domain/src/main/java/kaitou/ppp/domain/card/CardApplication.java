@@ -31,9 +31,9 @@ public class CardApplication {
     private String serviceCompanyName;
     @Coordinates(x = {13, 14}, y = {24, 34})
     private String serviceLinkMan;
-    @Coordinates(x = {17, 17}, y = {6, 20})
+    @Coordinates(x = {16, 17}, y = {6, 13})
     private String serviceLinkEmail;
-    @Coordinates(x = {17, 17}, y = {24, 34})
+    @Coordinates(x = {16, 17}, y = {24, 34})
     private String servicePhoneNumber;
 
     @Coordinates(x = {25, 26}, y = {9, 34})
@@ -255,11 +255,6 @@ public class CardApplication {
                 ", status='" + status + '\'' +
                 ", allModels='" + allModels + '\'' +
                 '}';
-    }
-
-    public DateTime convertInstalledDate() {
-        String[] split = installedDate.split("/");
-        return new DateTime(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]), 0, 0);
     }
 
     public String getAllModels() {

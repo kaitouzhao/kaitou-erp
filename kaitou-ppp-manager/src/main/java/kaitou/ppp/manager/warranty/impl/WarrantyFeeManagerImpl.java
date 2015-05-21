@@ -8,8 +8,6 @@ import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -22,22 +20,6 @@ public class WarrantyFeeManagerImpl extends BaseFileDaoManager<WarrantyFee> impl
     @Override
     public Class<WarrantyFee> domainClass() {
         return WarrantyFee.class;
-    }
-
-    @Override
-    public List<WarrantyFee> query() {
-        List<WarrantyFee> warrantyFees = super.query();
-        Collections.sort(warrantyFees, new Comparator<WarrantyFee>() {
-            @Override
-            public int compare(WarrantyFee o1, WarrantyFee o2) {
-                try {
-                    return Long.valueOf(o1.getWarrantyCardNo().substring(5)).compareTo(Long.valueOf(o2.getWarrantyCardNo().substring(5)));
-                } catch (Exception e) {
-                    return 0;
-                }
-            }
-        });
-        return warrantyFees;
     }
 
     @Override

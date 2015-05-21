@@ -21,15 +21,15 @@ public class WarrantyFee extends BaseDomain4InDoubt {
      */
     private String quarter;
     /**
-     * 保修卡号
-     */
-    private String warrantyCardNo;
-    /**
      * 销售区域
      *
      * @see kaitou.ppp.domain.system.SysCode.SaleRegion
      */
     private String saleRegion;
+    /**
+     * 保修卡号
+     */
+    private String warrantyCardNo;
     /**
      * 认定店编号
      */
@@ -42,6 +42,10 @@ public class WarrantyFee extends BaseDomain4InDoubt {
      * 产品线
      */
     private String productLine;
+    /**
+     * 机型分类
+     */
+    private String modelType;
     /**
      * 机型
      */
@@ -56,7 +60,7 @@ public class WarrantyFee extends BaseDomain4InDoubt {
      */
     private String installedDate;
     /**
-     * 终止日期
+     * 到期日期
      */
     private String endDate;
     /**
@@ -72,12 +76,23 @@ public class WarrantyFee extends BaseDomain4InDoubt {
      */
     private String maintenanceFee;
     /**
-     * TTL
+     * 延保支持费
+     */
+    private String extendedPayFee;
+    /**
+     * 总计
      */
     private String ttl;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public void check() {
+        if (StringUtils.isEmpty(numberOfYear)) {
+            throw new RuntimeException("年份为空");
+        }
         if (StringUtils.isEmpty(fuselage)) {
             doInDoubt();
         }
@@ -85,12 +100,12 @@ public class WarrantyFee extends BaseDomain4InDoubt {
 
     @Override
     public String dbFileName() {
-        return dbFileSuffix();
+        return numberOfYear + dbFileSuffix();
     }
 
     @Override
     public String dbFileSuffix() {
-        return getClass().getSimpleName() + DB_SUFFIX;
+        return '_' + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
@@ -98,11 +113,12 @@ public class WarrantyFee extends BaseDomain4InDoubt {
         return "WarrantyFee{" +
                 "numberOfYear='" + numberOfYear + '\'' +
                 ", quarter='" + quarter + '\'' +
-                ", warrantyCardNo='" + warrantyCardNo + '\'' +
                 ", saleRegion='" + saleRegion + '\'' +
+                ", warrantyCardNo='" + warrantyCardNo + '\'' +
                 ", shopId='" + shopId + '\'' +
                 ", shopName='" + shopName + '\'' +
                 ", productLine='" + productLine + '\'' +
+                ", modelType='" + modelType + '\'' +
                 ", model='" + model + '\'' +
                 ", fuselage='" + fuselage + '\'' +
                 ", installedDate='" + installedDate + '\'' +
@@ -110,7 +126,9 @@ public class WarrantyFee extends BaseDomain4InDoubt {
                 ", userCompanyName='" + userCompanyName + '\'' +
                 ", installedFee='" + installedFee + '\'' +
                 ", maintenanceFee='" + maintenanceFee + '\'' +
+                ", extendedPayFee='" + extendedPayFee + '\'' +
                 ", ttl='" + ttl + '\'' +
+                ", note='" + note + '\'' +
                 '}';
     }
 
@@ -172,6 +190,30 @@ public class WarrantyFee extends BaseDomain4InDoubt {
         result = 31 * result + (maintenanceFee != null ? maintenanceFee.hashCode() : 0);
         result = 31 * result + (ttl != null ? ttl.hashCode() : 0);
         return result;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public String getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
+    }
+
+    public String getExtendedPayFee() {
+        return extendedPayFee;
+    }
+
+    public void setExtendedPayFee(String extendedPayFee) {
+        this.extendedPayFee = extendedPayFee;
     }
 
     public String getNumberOfYear() {

@@ -23,9 +23,10 @@ public interface WarrantyFeeManager {
     /**
      * 获取保修费记录
      *
+     * @param numberOfYear 查询年份，可以是单年，也可以是多年
      * @return 保修费记录列表
      */
-    public List<WarrantyFee> query();
+    public List<WarrantyFee> query(String... numberOfYear);
 
     /**
      * 删除

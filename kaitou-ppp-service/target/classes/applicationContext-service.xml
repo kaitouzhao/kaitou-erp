@@ -8,12 +8,12 @@
     <import resource="applicationContext-tx.xml"/>
 
     <bean id="cardService" class="kaitou.ppp.service.impl.CardServiceImpl">
-        <property name="complete" value="d://temp//ppp//complete//"/>
+        <property name="complete" value="d://ppp//complete//"/>
         <property name="logFileName" value="记录.xlsx"/>
-        <property name="output" value="d://temp//ppp//output//"/>
-        <property name="template" value="d://temp//ppp//template//"/>
+        <property name="output" value="d://ppp//output//"/>
+        <property name="template" value="d://ppp//template//"/>
         <property name="templateName" value="保修卡.xls"/>
-        <property name="workspace" value="d://temp//ppp//workspace//"/>
+        <property name="workspace" value="d://ppp//workspace//"/>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
         <property name="shopManager" ref="shopManager"/>
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
@@ -48,30 +48,44 @@
                 <ref bean="engineerTrainingManager"/>
                 <ref bean="warrantyFeeManager"/>
                 <ref bean="warrantyPartsManager"/>
+                <ref bean="shopContractManager"/>
+                <ref bean="partsLibraryManager"/>
+                <ref bean="warrantyPrintManager"/>
+                <ref bean="warrantyConsumablesManager"/>
+                <ref bean="manualPermissionsManager"/>
+                <ref bean="soidCodeManager"/>
+                <ref bean="sdsPermissionManager"/>
+                <ref bean="techSupportManager"/>
+                <ref bean="installPermissionManager"/>
             </list>
         </property>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
+        <property name="shopContractManager" ref="shopContractManager"/>
+        <property name="partsLibraryManager" ref="partsLibraryManager"/>
     </bean>
 
     <bean id="systemSettingsService" class="kaitou.ppp.service.impl.SystemSettingsServiceImpl">
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
-        <property name="pppDir" value="d://temp//ppp"/>
+        <property name="pppDir" value="d://ppp"/>
     </bean>
 
     <bean id="dbService" class="kaitou.ppp.service.impl.DbServiceImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
-        <property name="backDbFile" value="d://temp//ppp//db_back.zip"/>
-        <property name="pppDir" value="d://temp//ppp"/>
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="backDbFile" value="d://ppp//db_back.zip"/>
+        <property name="pppDir" value="d://ppp"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
     </bean>
 
     <bean id="upgradeService" class="kaitou.ppp.service.impl.UpgradeServiceImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
-        <property name="confDir" value="d://temp//ppp//conf"/>
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="confDir" value="d://ppp//conf"/>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
+        <property name="shopManager" ref="shopManager"/>
+        <property name="shopPayManager" ref="shopPayManager"/>
+        <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
     </bean>
 
     <bean id="localRegistryService" class="kaitou.ppp.service.impl.LocalRegistryServiceImpl">
@@ -79,7 +93,7 @@
     </bean>
 
     <bean id="localDBVersionService" class="kaitou.ppp.service.impl.LocalDBVersionServiceImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
         <property name="localDBVersionManager" ref="localDBVersionManager"/>
     </bean>
 
@@ -88,11 +102,37 @@
     </bean>
 
     <bean id="warrantyService" class="kaitou.ppp.service.impl.WarrantyServiceImpl">
+        <property name="shopManager" ref="shopManager"/>
         <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
         <property name="warrantyPartsManager" ref="warrantyPartsManager"/>
-        <property name="shopManager" ref="shopManager"/>
+        <property name="warrantyPrintManager" ref="warrantyPrintManager"/>
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
+        <property name="warrantyConsumablesManager" ref="warrantyConsumablesManager"/>
+    </bean>
+
+    <bean id="techService" class="kaitou.ppp.service.impl.TechServiceImpl">
+        <property name="shopManager" ref="shopManager"/>
+        <property name="soidCodeManager" ref="soidCodeManager"/>
+        <property name="techSupportManager" ref="techSupportManager"/>
+        <property name="sdsPermissionManager" ref="sdsPermissionManager"/>
+        <property name="systemSettingsManager" ref="systemSettingsManager"/>
+        <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
+        <property name="installPermissionManager" ref="installPermissionManager"/>
+        <property name="manualPermissionsManager" ref="manualPermissionsManager"/>
+    </bean>
+
+    <bean id="tsService" class="kaitou.ppp.service.impl.TSServiceImpl">
+        <property name="tsTrainingManager" ref="tsTrainingManager"/>
+        <property name="toolRecipientsManager" ref="toolRecipientsManager"/>
+        <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
+        <property name="systemSettingsManager" ref="systemSettingsManager"/>
+        <property name="tsSDSPermissionManager" ref="tsSDSPermissionManager"/>
+        <property name="oldMachineRenewManager" ref="oldMachineRenewManager"/>
+        <property name="newMachineClaimManager" ref="newMachineClaimManager"/>
+        <property name="componentBorrowingManager" ref="componentBorrowingManager"/>
+        <property name="tsInstallPermissionManager" ref="tsInstallPermissionManager"/>
+        <property name="tsManualPermissionsManager" ref="tsManualPermissionsManager"/>
     </bean>
 
     <import resource="applicationContext-remote.xml"/>

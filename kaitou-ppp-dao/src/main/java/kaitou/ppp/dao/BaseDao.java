@@ -192,6 +192,15 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
     }
 
     /**
+     * 查询全部
+     *
+     * @return 实体列表
+     */
+    public List<T> queryAll() {
+        return query();
+    }
+
+    /**
      * 删除
      *
      * @param domains 待删除集合。支持一个或多个

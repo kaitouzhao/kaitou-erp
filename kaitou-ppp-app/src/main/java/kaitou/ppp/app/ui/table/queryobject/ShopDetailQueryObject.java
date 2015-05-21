@@ -8,10 +8,5 @@ import kaitou.ppp.domain.shop.ShopDetail;
  * Date: 2015/2/6
  * Time: 14:56
  */
-public class ShopDetailQueryObject extends BaseQueryObject {
-
-    @Override
-    public Class<ShopDetail> domainClass() {
-        return ShopDetail.class;
-    }
+public class ShopDetailQueryObject extends BaseQueryObject<ShopDetail> {
 }

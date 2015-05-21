@@ -1,9 +1,13 @@
 package kaitou.ppp.service.rmi;
 
+import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
+import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.manager.warranty.WarrantyConsumablesManager;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 import kaitou.ppp.manager.warranty.WarrantyPartsManager;
+import kaitou.ppp.manager.warranty.WarrantyPrintManager;
 import kaitou.ppp.rmi.service.RemoteWarrantyService;
 
 import java.rmi.RemoteException;
@@ -20,6 +24,16 @@ public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements Re
 
     private WarrantyFeeManager warrantyFeeManager;
     private WarrantyPartsManager warrantyPartsManager;
+    private WarrantyPrintManager warrantyPrintManager;
+    private WarrantyConsumablesManager warrantyConsumablesManager;
+
+    public void setWarrantyConsumablesManager(WarrantyConsumablesManager warrantyConsumablesManager) {
+        this.warrantyConsumablesManager = warrantyConsumablesManager;
+    }
+
+    public void setWarrantyPrintManager(WarrantyPrintManager warrantyPrintManager) {
+        this.warrantyPrintManager = warrantyPrintManager;
+    }
 
     public void setWarrantyPartsManager(WarrantyPartsManager warrantyPartsManager) {
         this.warrantyPartsManager = warrantyPartsManager;
@@ -51,5 +65,25 @@ public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements Re
     @Override
     public void deleteWarrantyParts(Object... warrantyParts) throws RemoteException {
         warrantyPartsManager.delete(warrantyParts);
+    }
+
+    @Override
+    public void saveWarrantyPrint(List<WarrantyPrint> warrantyPrint) throws RemoteException {
+        warrantyPrintManager.save(warrantyPrint);
+    }
+
+    @Override
+    public void deleteWarrantyPrint(Object... warrantyPrint) throws RemoteException {
+        warrantyPrintManager.delete(warrantyPrint);
+    }
+
+    @Override
+    public void saveWarrantyConsumables(List<WarrantyConsumables> warrantyConsumables) throws RemoteException {
+        warrantyConsumablesManager.save(warrantyConsumables);
+    }
+
+    @Override
+    public void deleteWarrantyConsumables(Object... warrantyConsumables) throws RemoteException {
+        warrantyConsumablesManager.delete(warrantyConsumables);
     }
 }

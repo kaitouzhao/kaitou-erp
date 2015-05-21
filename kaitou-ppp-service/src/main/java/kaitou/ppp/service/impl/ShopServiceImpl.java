@@ -5,12 +5,10 @@ import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.shop.*;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
-import kaitou.ppp.manager.shop.ShopDetailManager;
-import kaitou.ppp.manager.shop.ShopManager;
-import kaitou.ppp.manager.shop.ShopPayManager;
-import kaitou.ppp.manager.shop.ShopRTSManager;
+import kaitou.ppp.manager.shop.*;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
+import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteShopService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.ShopService;
@@ -36,10 +34,20 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
     private ShopRTSManager shopRTSManager;
     private ShopPayManager shopPayManager;
     private ShopDetailManager shopDetailManager;
+    private ShopContractManager shopContractManager;
+    private PartsLibraryManager partsLibraryManager;
     private SystemSettingsManager systemSettingsManager;
     private RemoteRegistryManager remoteRegistryManager;
     private List<ShopUpdateListener> shopUpdateListeners;
     private CardApplicationRecordManager cardApplicationRecordManager;
+
+    public void setPartsLibraryManager(PartsLibraryManager partsLibraryManager) {
+        this.partsLibraryManager = partsLibraryManager;
+    }
+
+    public void setShopContractManager(ShopContractManager shopContractManager) {
+        this.shopContractManager = shopContractManager;
+    }
 
     public void setSystemSettingsManager(SystemSettingsManager systemSettingsManager) {
         this.systemSettingsManager = systemSettingsManager;
@@ -417,5 +425,145 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
             }
         }
         export2Excel(counts, targetFile, ShopEquipmentCount.class);
+    }
+
+    @Override
+    public void importShopContracts(File srcFile) {
+        saveOrUpdateShopContracts(CollectionUtil.toArray(readFromExcel(srcFile, ShopContract.class), ShopContract.class));
+    }
+
+    @Override
+    public void exportShopContracts(File targetFile) {
+        export2Excel(shopContractManager.query(), targetFile, ShopContract.class);
+    }
+
+    @Override
+    public List<ShopContract> queryShopContracts() {
+        return shopContractManager.query();
+    }
+
+    @Override
+    public void saveOrUpdateShopContracts(ShopContract... shopContracts) {
+        if (CollectionUtil.isEmpty(shopContracts)) {
+            return;
+        }
+        final List<ShopContract> shopContractList = new ArrayList<ShopContract>();
+        for (ShopContract shopContract : shopContracts) {
+            shopContract.setShopId(shopManager.getCachedIdByName(shopContract.getShopName()));
+            shopContractList.add(shopContract);
+        }
+        logOperation("成功导入/更新认定店合同信息数：" + shopContractManager.save(shopContractList));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteShopService> remoteShopServices = ServiceClient.queryServicesOfListener(RemoteShopService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteShopServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新认定店合同信息");
+                for (RemoteShopService remoteShopService : remoteShopServices) {
+                    try {
+                        remoteShopService.saveShopContracts(shopContractList);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void deleteShopContract(final Object... shopContracts) {
+        if (CollectionUtil.isEmpty(shopContracts)) {
+            return;
+        }
+        logOperation("成功删除认定店合同信息数：" + shopContractManager.delete(shopContracts));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteShopService> remoteShopServices = ServiceClient.queryServicesOfListener(RemoteShopService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteShopServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新删除认定店合同信息");
+                for (RemoteShopService remoteShopService : remoteShopServices) {
+                    try {
+                        remoteShopService.deleteShopContracts(shopContracts);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void importPartsLibrary(File srcFile) {
+        saveOrUpdatePartsLibrary(CollectionUtil.toArray(readFromExcel(srcFile, PartsLibrary.class), PartsLibrary.class));
+    }
+
+    @Override
+    public void exportPartsLibrary(File targetFile) {
+        export2Excel(partsLibraryManager.query(), targetFile, PartsLibrary.class);
+    }
+
+    @Override
+    public List<PartsLibrary> queryPartsLibrary() {
+        return partsLibraryManager.query();
+    }
+
+    @Override
+    public void saveOrUpdatePartsLibrary(PartsLibrary... partsLibraries) {
+        if (CollectionUtil.isEmpty(partsLibraries)) {
+            return;
+        }
+        final List<PartsLibrary> partsLibraryArrayList = new ArrayList<PartsLibrary>();
+        for (PartsLibrary partLibrary : partsLibraries) {
+            partLibrary.setShopId(shopManager.getCachedIdByName(partLibrary.getShopName()));
+            partsLibraryArrayList.add(partLibrary);
+        }
+        logOperation("成功导入/更新零件备库数：" + partsLibraryManager.save(partsLibraryArrayList));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteShopService> remoteShopServices = ServiceClient.queryServicesOfListener(RemoteShopService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteShopServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新零件备库信息");
+                for (RemoteShopService remoteShopService : remoteShopServices) {
+                    try {
+                        remoteShopService.savePartsLibrary(partsLibraryArrayList);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public void deletePartsLibrary(final Object... partsLibraries) {
+        if (CollectionUtil.isEmpty(partsLibraries)) {
+            return;
+        }
+        logOperation("成功删除零件备库数：" + partsLibraryManager.delete(partsLibraries));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                List<RemoteShopService> remoteShopServices = ServiceClient.queryServicesOfListener(RemoteShopService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
+                if (CollectionUtil.isEmpty(remoteShopServices)) {
+                    return;
+                }
+                logOperation("通知已注册的远程服务更新删除零件备库");
+                for (RemoteShopService remoteShopService : remoteShopServices) {
+                    try {
+                        remoteShopService.deletePartsLibrary(partsLibraries);
+                    } catch (RemoteException e) {
+                        logSystemEx(e);
+                    }
+                }
+            }
+        }).start();
     }
 }

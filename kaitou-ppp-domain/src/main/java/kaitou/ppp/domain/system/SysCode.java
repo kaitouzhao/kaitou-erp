@@ -1,5 +1,9 @@
 package kaitou.ppp.domain.system;
 
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+
 /**
  * 系统变量.
  * User: 赵立伟
@@ -7,6 +11,117 @@ package kaitou.ppp.domain.system;
  * Time: 10:45
  */
 public abstract class SysCode {
+    /**
+     * 保修状态
+     */
+    public static enum WarrantyStatus {
+        IN_WARRANTY("保修中"), OUT_WARRANTY("过保"), JUST_OUT_WARRANTY("刚刚过保，需要申请保养费");
+        /**
+         * 保修有效期（天）
+         */
+        private static final int IN_WARRANTY_DAYS = 364;
+        /**
+         * 刚刚过保期（月）
+         */
+        private static final int JUST_OUT_WARRANTY_MONTHS = 3;
+        /**
+         * 标准日期格式
+         */
+        public static final String DATE_FORMAT_YYYY_MM_DD = "yyyy/MM/dd";
+        /**
+         * 可以支持的日期格式
+         */
+        private static final String DATE_FORMAT_YYYY_MM_DD1 = "yyyy年MM月dd日";
+        private String value;
+
+        WarrantyStatus(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        /**
+         * 根据装机日期获取保修状态
+         * <ul>
+         * <li>装机日期未超过364天，则为保修中</li>
+         * <li>装机日期过保三个月内，则为刚刚过保，需要申请保养费</li>
+         * <li>以上都不满足则为过保</li>
+         * </ul>
+         *
+         * @param installedDateStr 装机日期。格式支持：yyyy/MM/dd
+         * @return 保修状态
+         */
+        public static String getStatus(String installedDateStr) {
+            if (StringUtils.isEmpty(installedDateStr)) {
+                return "";
+            }
+            try {
+                DateTime endDate = getEndDate(installedDateStr);
+                if (endDate.isAfterNow()) {
+                    return IN_WARRANTY.getValue();
+                }
+                endDate = endDate.plusMonths(JUST_OUT_WARRANTY_MONTHS);
+                if (endDate.isAfterNow()) {
+                    return JUST_OUT_WARRANTY.getValue();
+                }
+                return OUT_WARRANTY.getValue();
+            } catch (Exception e) {
+                return "";
+            }
+        }
+
+        /**
+         * 获取到期日期
+         *
+         * @param installedDateStr 装机日期
+         * @return 到期日期
+         */
+        private static DateTime getEndDate(String installedDateStr) {
+            if (StringUtils.isEmpty(installedDateStr)) {
+                return null;
+            }
+            try {
+                DateTime installedDate = DateTime.parse(installedDateStr, DateTimeFormat.forPattern(DATE_FORMAT_YYYY_MM_DD));
+                return installedDate.plusDays(IN_WARRANTY_DAYS);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        /**
+         * 获取到期日期字符串
+         *
+         * @param installedDateStr 装机日期
+         * @return 到期日期字符串
+         */
+        public static String getEndDateStr(String installedDateStr) {
+            DateTime endDate = getEndDate(installedDateStr);
+            return endDate != null ? endDate.toString(DATE_FORMAT_YYYY_MM_DD) : "";
+        }
+
+        /**
+         * 校验装机日期
+         *
+         * @param installedDateStr 待校验字符串
+         * @return 校验通过的字符串
+         */
+        public static String convert2Standard(String installedDateStr) {
+            try {
+                DateTime.parse(installedDateStr, DateTimeFormat.forPattern(DATE_FORMAT_YYYY_MM_DD));
+                return installedDateStr;
+            } catch (Exception e) {
+                try {
+                    DateTime.parse(installedDateStr, DateTimeFormat.forPattern(DATE_FORMAT_YYYY_MM_DD1));
+                    return installedDateStr;
+                } catch (Exception e1) {
+                    return "";
+                }
+            }
+        }
+    }
+
     /**
      * 保修订单类型
      */
@@ -159,13 +274,13 @@ public abstract class SysCode {
     /**
      * 机型代码
      */
-    public enum Code {
+    public enum ModelCode {
         P("WFP", "TDS", "M"), T("WFP", "TDS", "M"), F("WFP", "TDS", "M"), A("WFP", "DGS", "M"), V("CPP", "DP", ""), C("WFP", "TDS", ""), I("CPP", "PGA", "");
         private String cardNoPref;
         private String models;
         private String readUnit;
 
-        Code(String cardNoPref, String models, String readUnit) {
+        ModelCode(String cardNoPref, String models, String readUnit) {
             this.cardNoPref = cardNoPref;
             this.models = models;
             this.readUnit = readUnit;
@@ -183,8 +298,8 @@ public abstract class SysCode {
             return readUnit;
         }
 
-        public static Code getCode(String value) {
-            for (Code code : Code.values()) {
+        public static ModelCode getCode(String value) {
+            for (ModelCode code : ModelCode.values()) {
                 if (code.name().equals(value)) {
                     return code;
                 }

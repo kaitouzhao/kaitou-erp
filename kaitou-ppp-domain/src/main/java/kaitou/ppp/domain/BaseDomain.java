@@ -2,6 +2,7 @@ package kaitou.ppp.domain;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -44,7 +45,9 @@ public abstract class BaseDomain implements Serializable {
     /**
      * 数据校验
      */
-    public abstract void check();
+    public void check() {
+
+    }
 
     /**
      * 生成数据文件名
@@ -111,5 +114,14 @@ public abstract class BaseDomain implements Serializable {
             }
         }
         return CollectionUtil.toArray(result, Object.class);
+    }
+
+    /**
+     * 表格中当前记录行颜色
+     *
+     * @return 颜色。默认为无色
+     */
+    public Color tableRowColor() {
+        return null;
     }
 }

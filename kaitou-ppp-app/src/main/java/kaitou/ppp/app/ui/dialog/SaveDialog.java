@@ -86,7 +86,7 @@ public class SaveDialog<T extends BaseDomain> extends JDialog {
         for (int i = 0; i < textFields.size(); i++) {
             setFieldValue(saveFieldNames[i], domain, textFields.get(i).getText());
         }
-        saveOrUpdate(queryObject.domainType(), domain);
+        saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(domain), queryObject.domainClass()));
         isOk = true;
         setVisible(false);
     }
