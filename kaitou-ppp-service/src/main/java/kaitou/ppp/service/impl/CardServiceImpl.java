@@ -1,6 +1,8 @@
 package kaitou.ppp.service.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.card.CardApplication;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
@@ -12,7 +14,6 @@ import kaitou.ppp.rmi.service.RemoteCardService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.CardService;
 import net.sf.jxls.transformer.XLSTransformer;
-import org.apache.commons.lang.StringUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -44,6 +45,7 @@ import static kaitou.ppp.domain.system.SysCode.*;
  */
 public class CardServiceImpl extends BaseExcelService implements CardService {
 
+    private static final String APPLICATION_SHEET_NAME = "申请表";
     private String workspace;
     private String complete;
     private String output;
@@ -114,37 +116,34 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
         List<CardApplicationRecord> cardApplicationRecords = new ArrayList<CardApplicationRecord>();
         for (File appFile : appFiles) {
             Workbook workbook = create(appFile);
-            int numberOfSheets = workbook.getNumberOfSheets();
-            for (int j = 1; j < numberOfSheets; j++) {
-                Sheet sheet = workbook.getSheetAt(j);
-                CardApplication application = new CardApplication();
-                application.fill(sheet);
-                ModelCode code = ModelCode.getCode(application.getModels().substring(0, 1));
-                String lastWarrantyCard = getLastRowCellStrValue(log, code.getCardNoPref(), 3, CellType.STRING);
-                long warrantyCardIndex = 0;
-                if (lastWarrantyCard != null && !"".equals(lastWarrantyCard.trim())) {
-                    warrantyCardIndex = Long.valueOf(lastWarrantyCard.substring(5));
-                }
-                application.setWarrantyCard(code.getCardNoPref() + "-A" + df.format(++warrantyCardIndex));
-                application.setApplyDate(now.toString(WarrantyStatus.DATE_FORMAT_YYYY_MM_DD));
-                application.setInstalledDate(WarrantyStatus.convert2Standard(application.getInstalledDate()));
-                application.setEndDate(WarrantyStatus.getEndDateStr(application.getInstalledDate()));
-                application.setStatus(WarrantyStatus.getStatus(application.getInstalledDate()));
-                application.setAllModels(code.getModels());
-                application.setInitData(application.getInitData() + code.getReadUnit());
-                logSystemInfo(application.toString());
-                applications.add(application);
-                CardApplicationRecord cardApplicationRecord = new CardApplicationRecord();
-                copyBean(application, cardApplicationRecord);
-                String shopName = application.getServiceCompanyName();
-                cardApplicationRecord.setShopName(shopName);
-                cardApplicationRecord.setShopId(shopManager.getCachedIdByName(shopName));
-                cardApplicationRecords.add(cardApplicationRecord);
-                rowDataList.add(application.getAllRowData());
-                sheetDataList.add(application.getRowData());
-                add2Sheet(log, code.getCardNoPref(), sheetDataList);
-                sheetDataList.clear();
+            Sheet sheet = workbook.getSheet(APPLICATION_SHEET_NAME);
+            CardApplication application = new CardApplication();
+            application.fill(sheet);
+            ModelCode code = ModelCode.getCode(application.getModels().substring(0, 1));
+            String lastWarrantyCard = getLastRowCellStrValue(log, code.getCardNoPref(), 3, CellType.STRING);
+            long warrantyCardIndex = 0;
+            if (lastWarrantyCard != null && !"".equals(lastWarrantyCard.trim())) {
+                warrantyCardIndex = Long.valueOf(lastWarrantyCard.substring(5));
             }
+            application.setWarrantyCard(code.getCardNoPref() + "-A" + df.format(++warrantyCardIndex));
+            application.setApplyDate(now.toString(WarrantyStatus.DATE_FORMAT_YYYY_MM_DD));
+            application.setInstalledDate(WarrantyStatus.convert2Standard(application.getInstalledDate()));
+            application.setEndDate(WarrantyStatus.getEndDateStr(application.getInstalledDate()));
+            application.setStatus(WarrantyStatus.getStatus(application.getInstalledDate()));
+            application.setAllModels(code.getModels());
+            application.setInitData(application.getInitData() + code.getReadUnit());
+            logSystemInfo(application.toString());
+            applications.add(application);
+            CardApplicationRecord cardApplicationRecord = new CardApplicationRecord();
+            copyBean(application, cardApplicationRecord);
+            String shopName = application.getServiceCompanyName();
+            cardApplicationRecord.setShopName(shopName);
+            cardApplicationRecord.setShopId(shopManager.getCachedIdByName(shopName));
+            cardApplicationRecords.add(cardApplicationRecord);
+            rowDataList.add(application.getAllRowData());
+            sheetDataList.add(application.getRowData());
+            add2Sheet(log, code.getCardNoPref(), sheetDataList);
+            sheetDataList.clear();
             boolean b = appFile.renameTo(new File(completePath + appFile.getName()));
             if (!b) {
                 throw new RuntimeException("生成保修卡失败");
@@ -329,7 +328,10 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
 
     @Override
     public void importCardApplicationRecords(File srcFile) {
-        saveOrUpdateCardApplicationRecord(CollectionUtil.toArray(readFromExcel(srcFile, CardApplicationRecord.class), CardApplicationRecord.class));
+        debugTime("开始导入");
+        List<CardApplicationRecord> cardApplicationRecords = readFromExcel(srcFile, CardApplicationRecord.class);
+        debugTime("获取数据");
+        saveOrUpdateCardApplicationRecord(CollectionUtil.toArray(cardApplicationRecords, CardApplicationRecord.class));
     }
 
     @Override
@@ -351,14 +353,12 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     public void saveOrUpdateCardApplicationRecord(final CardApplicationRecord... cardApplicationRecords) {
         final List<CardApplicationRecord> cardApplicationRecordList = new ArrayList<CardApplicationRecord>();
         for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
-            cardApplicationRecord.noDoubt();
             cardApplicationRecord.setShopId(shopManager.getCachedIdByName(cardApplicationRecord.getShopName()));
-            if (StringUtils.isEmpty(cardApplicationRecord.getShopId())) {
-                cardApplicationRecord.doInDoubt();
-            }
             cardApplicationRecordList.add(cardApplicationRecord);
         }
+        debugTime("填充认定店编号");
         logOperation("成功导入/更新保修卡生成记录数：" + cardApplicationRecordManager.save(cardApplicationRecordList));
+        debugTime("保存保修卡");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -398,5 +398,10 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public Pager<CardApplicationRecord> queryPager(int currentPage, List<Condition> conditions) {
+        return cardApplicationRecordManager.queryPager(currentPage, conditions);
     }
 }

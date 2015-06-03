@@ -9,4 +9,5 @@ import kaitou.ppp.dao.shop.impl.ShopPayDaoImpl;
  * Time: 21:54
  */
 public class MockShopPayDaoImpl extends ShopPayDaoImpl {
+
 }

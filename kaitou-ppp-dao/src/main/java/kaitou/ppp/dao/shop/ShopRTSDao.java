@@ -25,7 +25,7 @@ public interface ShopRTSDao {
      *
      * @return RTS列表
      */
-    public List<ShopRTS> query();
+    public List<ShopRTS> queryAll();
 
     /**
      * 删除

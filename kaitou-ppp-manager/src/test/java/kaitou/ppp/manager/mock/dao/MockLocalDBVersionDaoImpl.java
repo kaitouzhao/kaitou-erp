@@ -9,4 +9,5 @@ import kaitou.ppp.dao.system.impl.LocalDBVersionDaoImpl;
  * Time: 21:11
  */
 public class MockLocalDBVersionDaoImpl extends LocalDBVersionDaoImpl {
+
 }

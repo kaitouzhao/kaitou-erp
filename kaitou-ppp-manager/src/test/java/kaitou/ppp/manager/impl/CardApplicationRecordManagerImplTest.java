@@ -66,7 +66,7 @@ public class CardApplicationRecordManagerImplTest extends AbstractManagerTest {
         mockCardApplicationRecordManager.save(records);
         queryData = mockCardApplicationRecordManager.query();
         assertEquals(3, queryData.size());
-        assertEquals("", queryData.get(2).getFuselage());
+        assertEquals("001", queryData.get(2).getFuselage());
         assertEquals("true", queryData.get(2).getInDoubt());
     }
 }

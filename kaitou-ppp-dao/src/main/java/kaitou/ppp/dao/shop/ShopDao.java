@@ -24,7 +24,7 @@ public interface ShopDao {
      *
      * @return 认定店列表
      */
-    public List<Shop> query();
+    public List<Shop> queryAll();
 
     /**
      * 删除

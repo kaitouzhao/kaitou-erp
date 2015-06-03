@@ -25,7 +25,7 @@ public interface ManualPermissionsDao {
      *
      * @return 手册权限
      */
-    public List<TechManualPermissions> query();
+    public List<TechManualPermissions> queryAll();
 
     /**
      * 删除

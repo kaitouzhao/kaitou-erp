@@ -128,6 +128,23 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         setVisible(true);
     }
 
+    public QueryFrame(IQueryObject<T> queryObject) {
+        this.queryObject = queryObject;
+        String[] tableTitles = this.queryObject.tableTitles();
+        if (OP_COLUMN_TITLE.equals(tableTitles[tableTitles.length - 1])) {
+            opColumnIndex = tableTitles.length - 1;
+        }
+        this.datas = OPManager.query(this.queryObject.domainType());
+        shownDatas.addAll(datas);
+        initComponents();
+        initTableData();
+        select();
+        initQueryArea();
+        setTitle(queryObject.title());
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setVisible(true);
+    }
+
     /**
      * 初始化表格参数
      */
@@ -172,7 +189,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      */
     @SuppressWarnings(value = "unchecked")
     private void select() {
-        List currentList = new ArrayList();
+        List<T> currentList = new ArrayList<T>();
         for (int i = (currentPageIndex - 1) * countPerPage; i < currentPageIndex * countPerPage && i < recordCount; i++) {
             currentList.add(shownDatas.get(i));
         }
@@ -251,6 +268,11 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
 
     private void thisWindowClosed(WindowEvent e) {
         setVisible(false);
+        // TODO 待优化
+//        datas = null;
+//        shownDatas = null;
+//        dataTable = null;
+//        dispose();
     }
 
     @SuppressWarnings(value = "unchecked")
@@ -603,6 +625,26 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
+    private void allSelectedBtnActionPerformed(ActionEvent e) {
+        changeCheckboxStatus(Boolean.TRUE);
+    }
+
+    /**
+     * 改变当前页全部复选框选择状态
+     *
+     * @param isSelected 是否选中
+     */
+    private void changeCheckboxStatus(Boolean isSelected) {
+        for (int row = 0; row < dataTable.getRowCount(); row++) {
+            dataTable.setValueAt(isSelected, row, SELECT_COLUMN_INDEX);
+        }
+        dataTable.repaint();
+    }
+
+    private void noSelectedBtnActionPerformed(ActionEvent e) {
+        changeCheckboxStatus(Boolean.FALSE);
+    }
+
     /**
      * 初始化界面
      */
@@ -623,6 +665,8 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         saveBtn = new JButton();
         exportBtn = new JButton();
         sendBtn = new JButton();
+        allSelectedBtn = new JButton();
+        noSelectedBtn = new JButton();
 
         //======== this ========
         addWindowListener(new WindowAdapter() {
@@ -655,7 +699,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             resultArea.setViewportView(dataTable);
         }
         contentPane.add(resultArea);
-        resultArea.setBounds(0, 145, 1366, 485);
+        resultArea.setBounds(0, 175, 1366, 455);
 
         //---- firstPageBtn ----
         firstPageBtn.setText("\u9996\u9875");
@@ -772,7 +816,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             }
         });
         contentPane.add(saveBtn);
-        saveBtn.setBounds(new Rectangle(new Point(290, 110), saveBtn.getPreferredSize()));
+        saveBtn.setBounds(new Rectangle(new Point(255, 110), saveBtn.getPreferredSize()));
 
         //---- exportBtn ----
         exportBtn.setText("\u5bfc\u51fa");
@@ -783,7 +827,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             }
         });
         contentPane.add(exportBtn);
-        exportBtn.setBounds(new Rectangle(new Point(220, 110), exportBtn.getPreferredSize()));
+        exportBtn.setBounds(new Rectangle(new Point(190, 110), exportBtn.getPreferredSize()));
 
         //---- sendBtn ----
         sendBtn.setText("\u53d1\u9001\u6570\u636e\u7ed9\u4ed6\u4eba");
@@ -795,6 +839,28 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         });
         contentPane.add(sendBtn);
         sendBtn.setBounds(new Rectangle(new Point(635, 635), sendBtn.getPreferredSize()));
+
+        //---- allSelectedBtn ----
+        allSelectedBtn.setText("\u5168\u9009");
+        allSelectedBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                allSelectedBtnActionPerformed(e);
+            }
+        });
+        contentPane.add(allSelectedBtn);
+        allSelectedBtn.setBounds(new Rectangle(new Point(5, 145), allSelectedBtn.getPreferredSize()));
+
+        //---- noSelectedBtn ----
+        noSelectedBtn.setText("\u53cd\u9009");
+        noSelectedBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                noSelectedBtnActionPerformed(e);
+            }
+        });
+        contentPane.add(noSelectedBtn);
+        noSelectedBtn.setBounds(new Rectangle(new Point(70, 145), noSelectedBtn.getPreferredSize()));
 
         contentPane.setPreferredSize(new Dimension(920, 695));
         setSize(920, 695);
@@ -876,5 +942,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     private JButton saveBtn;
     private JButton exportBtn;
     private JButton sendBtn;
+    private JButton allSelectedBtn;
+    private JButton noSelectedBtn;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

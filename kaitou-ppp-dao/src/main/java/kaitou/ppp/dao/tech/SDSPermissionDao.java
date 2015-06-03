@@ -25,7 +25,7 @@ public interface SDSPermissionDao {
      *
      * @return SDS权限管理
      */
-    public List<TechSDSPermission> query();
+    public List<TechSDSPermission> queryAll();
 
     /**
      * 删除

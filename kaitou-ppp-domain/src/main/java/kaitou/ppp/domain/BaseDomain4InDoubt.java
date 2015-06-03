@@ -1,6 +1,5 @@
 package kaitou.ppp.domain;
 
-import org.apache.commons.lang.math.RandomUtils;
 import org.joda.time.DateTime;
 
 /**
@@ -14,6 +13,10 @@ public abstract class BaseDomain4InDoubt extends BaseDomain {
     private static final String NO_DOUBT = "false";
     private static final String IN_DOUBT = "true";
     /**
+     * 自增序列号
+     */
+    private static int autoIncrement = 1;
+    /**
      * 流水号
      */
     protected long serialNo = -1;
@@ -24,7 +27,6 @@ public abstract class BaseDomain4InDoubt extends BaseDomain {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         BaseDomain4InDoubt that = (BaseDomain4InDoubt) o;
@@ -41,10 +43,11 @@ public abstract class BaseDomain4InDoubt extends BaseDomain {
 
     /**
      * 生成流水号
-     * <p>时间戳+随机数</p>
+     * <p>时间戳+自增序列号</p>
      */
     public void generateSerialNo() {
-        serialNo = new DateTime().getMillis() + RandomUtils.nextInt(1000);
+        String serialNoStr = String.valueOf(new DateTime().getMillis()) + String.valueOf(autoIncrement++);
+        serialNo = Long.valueOf(serialNoStr);
     }
 
     public long getSerialNo() {

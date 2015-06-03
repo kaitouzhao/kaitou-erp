@@ -17,6 +17,7 @@ import java.util.List;
  * Time: 14:58
  */
 public class WarrantyFeeManagerImpl extends BaseFileDaoManager<WarrantyFee> implements WarrantyFeeManager, ShopUpdateListener {
+
     @Override
     public Class<WarrantyFee> domainClass() {
         return WarrantyFee.class;

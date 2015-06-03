@@ -29,6 +29,8 @@
             <id>local</id>
             <properties>
                 <base.dir>d://temp//ppp</base.dir>
+                <log.level>DEBUG</log.level>
+                <log.ref>CONSOLE</log.ref>
             </properties>
         </profile>
 
@@ -36,6 +38,8 @@
             <id>pro</id>
             <properties>
                 <base.dir>d://ppp</base.dir>
+                <log.level>ERROR</log.level>
+                <log.ref>SYSTEM-LOG</log.ref>
             </properties>
         </profile>
     </profiles>

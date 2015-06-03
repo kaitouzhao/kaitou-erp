@@ -3,6 +3,7 @@ package kaitou.ppp.manager.card.impl;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,6 +16,7 @@ import java.util.List;
  * Time: 21:41
  */
 public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApplicationRecord> implements CardApplicationRecordManager {
+
     @Override
     public Class<CardApplicationRecord> domainClass() {
         return CardApplicationRecord.class;
@@ -26,11 +28,10 @@ public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApp
         Collections.sort(cardApplicationRecords, new Comparator<CardApplicationRecord>() {
             @Override
             public int compare(CardApplicationRecord o1, CardApplicationRecord o2) {
-                try {
-                    return Long.valueOf(o1.getWarrantyCard().substring(5)).compareTo(Long.valueOf(o2.getWarrantyCard().substring(5)));
-                } catch (Exception e) {
-                    return 0;
+                if (StringUtils.isEmpty(o1.getFuselage()) || StringUtils.isEmpty(o2.getFuselage())) {
+                    return -1;
                 }
+                return o1.getFuselage().equals(o2.getFuselage()) ? 0 : -1;
             }
         });
         return cardApplicationRecords;

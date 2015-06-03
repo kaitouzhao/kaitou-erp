@@ -2,6 +2,8 @@ package kaitou.ppp.manager;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.dao.BaseDao;
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.BaseDomain;
 
 import java.util.List;
@@ -67,5 +69,16 @@ public abstract class BaseFileDaoManager<T extends BaseDomain> extends FileDaoMa
      */
     public int delete(Object... domains) {
         return dao.delete(domains);
+    }
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<T> queryPager(int currentPage, List<Condition> conditions) {
+        return dao.queryPager(currentPage, conditions);
     }
 }

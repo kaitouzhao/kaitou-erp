@@ -25,7 +25,7 @@ public interface SOIDCodeDao {
      *
      * @return SOID识别码
      */
-    public List<SOIDCode> query();
+    public List<SOIDCode> queryAll();
 
     /**
      * 删除

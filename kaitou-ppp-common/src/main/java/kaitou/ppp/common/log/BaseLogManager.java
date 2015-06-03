@@ -2,6 +2,7 @@ package kaitou.ppp.common.log;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.DateTime;
 
 /**
  * 日志操作管理基类.
@@ -18,6 +19,14 @@ public abstract class BaseLogManager {
      * 系统记录日志
      */
     protected static final Log SYSTEM_LOG = LogFactory.getLog("kaitou.ppp");
+    /**
+     * 调试时间格式
+     */
+    private static final String DATE_FORMAT_MM_SS_SSS = "mm:ss SSS";
+    /**
+     * 调试时间分隔符
+     */
+    private static final char DEBUG_TIME_SPLIT = ':';
 
     /**
      * 记录系统日志
@@ -51,7 +60,7 @@ public abstract class BaseLogManager {
      *
      * @param info 日志
      */
-    protected static void logSystemInfo(String info) {
+    public static void logSystemInfo(String info) {
         if (SYSTEM_LOG.isDebugEnabled()) {
             SYSTEM_LOG.debug(info);
             return;
@@ -59,6 +68,15 @@ public abstract class BaseLogManager {
         if (SYSTEM_LOG.isInfoEnabled()) {
             SYSTEM_LOG.info(info);
         }
+    }
+
+    /**
+     * 调试时间
+     *
+     * @param info 步骤名称
+     */
+    public static void debugTime(String info) {
+        logSystemInfo(info + DEBUG_TIME_SPLIT + new DateTime().toString(DATE_FORMAT_MM_SS_SSS));
     }
 
     /**

@@ -93,7 +93,7 @@ public class WarrantyFee extends BaseDomain4InDoubt {
         if (StringUtils.isEmpty(numberOfYear)) {
             throw new RuntimeException("年份为空");
         }
-        if (StringUtils.isEmpty(fuselage)) {
+        if (StringUtils.isEmpty(shopId) || StringUtils.isEmpty(fuselage)) {
             doInDoubt();
         }
     }
@@ -134,9 +134,7 @@ public class WarrantyFee extends BaseDomain4InDoubt {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
 
         WarrantyFee that = (WarrantyFee) o;
 

@@ -4,8 +4,6 @@ import kaitou.ppp.dao.BaseDao;
 import kaitou.ppp.dao.tech.ManualPermissionsDao;
 import kaitou.ppp.domain.tech.TechManualPermissions;
 
-import java.util.List;
-
 /**
  * 手册权限管理DAO实现.
  * User: 赵立伟
@@ -16,11 +14,5 @@ public class ManualPermissionsDaoImpl extends BaseDao<TechManualPermissions> imp
     @Override
     public Class<TechManualPermissions> getDomainClass() {
         return TechManualPermissions.class;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<TechManualPermissions> query() {
-        return super.query();
     }
 }

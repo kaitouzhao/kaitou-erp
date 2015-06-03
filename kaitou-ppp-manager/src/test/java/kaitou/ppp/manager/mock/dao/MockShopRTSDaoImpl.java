@@ -9,4 +9,5 @@ import kaitou.ppp.dao.shop.impl.ShopRTSDaoImpl;
  * Time: 21:53
  */
 public class MockShopRTSDaoImpl extends ShopRTSDaoImpl {
+
 }

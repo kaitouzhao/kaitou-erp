@@ -25,7 +25,7 @@ public interface ShopContractDao {
      *
      * @return 认定店合同信息
      */
-    public List<ShopContract> query();
+    public List<ShopContract> queryAll();
 
     /**
      * 删除

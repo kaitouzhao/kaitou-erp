@@ -4,8 +4,6 @@ import kaitou.ppp.dao.BaseDao;
 import kaitou.ppp.dao.shop.ShopContractDao;
 import kaitou.ppp.domain.shop.ShopContract;
 
-import java.util.List;
-
 /**
  * 认定店合同信息DAO实现.
  * User: 赵立伟
@@ -16,11 +14,5 @@ public class ShopContractDaoImpl extends BaseDao<ShopContract> implements ShopCo
     @Override
     public Class<ShopContract> getDomainClass() {
         return ShopContract.class;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ShopContract> query() {
-        return super.query();
     }
 }

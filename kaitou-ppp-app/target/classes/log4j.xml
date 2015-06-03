@@ -12,7 +12,7 @@
     <!--系统日志-->
     <appender name="SYSTEM-LOG" class="kaitou.ppp.common.log.DayRollingFileAppender">
         <param name="Append" value="true"/>
-        <param name="file" value="d://ppp//log/kaitou-ppp-system.log"/>
+        <param name="file" value="d://temp//ppp//log/kaitou-ppp-system.log"/>
         <param name="maxBackupIndex" value="3"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d [%p] %c.%M(%L) | %m%n"/>
@@ -21,27 +21,29 @@
     <!--操作日志-->
     <appender name="OPERATION-LOG" class="kaitou.ppp.common.log.DayRollingFileAppender">
         <param name="Append" value="true"/>
-        <param name="file" value="d://ppp//log/kaitou-ppp-operation.log"/>
+        <param name="file" value="d://temp//ppp//log/kaitou-ppp-operation.log"/>
         <param name="maxBackupIndex" value="7"/>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="%d | %m%n"/>
         </layout>
     </appender>
-
-    <logger name="kaitou.ppp" additivity="false">
-        <level value="ERROR"/>
-        <appender-ref ref="SYSTEM-LOG"/>
+    <!--系统日志-->
+    <logger name="kaitou.ppp">
+        <level value="DEBUG"/>
     </logger>
-
+    <!--操作日志-->
     <logger name="kaitou.operation" additivity="false">
         <level value="INFO"/>
         <appender-ref ref="OPERATION-LOG"/>
     </logger>
-
+    <!--EXCEL工具类调试日志-->
+    <logger name="ExcelUtil.Debug" additivity="false">
+        <level value="WARN"/>
+        <appender-ref ref="CONSOLE"/>
+    </logger>
     <root>
         <level value="ERROR"/>
-        <!--<appender-ref ref="CONSOLE"/>-->
-        <appender-ref ref="SYSTEM-LOG"/>
+        <appender-ref ref="CONSOLE"/>
     </root>
 
 </log4j:configuration>

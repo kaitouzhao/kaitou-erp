@@ -4,8 +4,6 @@ import kaitou.ppp.dao.BaseDao;
 import kaitou.ppp.dao.shop.PartsLibraryDao;
 import kaitou.ppp.domain.shop.PartsLibrary;
 
-import java.util.List;
-
 /**
  * 零件备库管理DAO实现.
  * User: 赵立伟
@@ -16,11 +14,5 @@ public class PartsLibraryDaoImpl extends BaseDao<PartsLibrary> implements PartsL
     @Override
     public Class<PartsLibrary> getDomainClass() {
         return PartsLibrary.class;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<PartsLibrary> query() {
-        return super.query();
     }
 }

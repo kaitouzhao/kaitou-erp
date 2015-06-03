@@ -28,6 +28,7 @@ public class OutboxDBVersionDaoImpl extends BaseDao<OutboxDBVersion> implements 
         return OutboxDBVersion.class;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<OutboxDBVersion> queryOutbox(String destIp) {
         List<OutboxDBVersion> result = CollectionUtil.newList();

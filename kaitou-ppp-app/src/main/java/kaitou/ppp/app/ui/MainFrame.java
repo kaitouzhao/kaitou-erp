@@ -10,7 +10,9 @@ import kaitou.ppp.app.ui.dialog.OnlineConfig;
 import kaitou.ppp.app.ui.dialog.OperationHint;
 import kaitou.ppp.app.ui.dialog.ReportErrorHint;
 import kaitou.ppp.app.ui.table.QueryFrame;
+import kaitou.ppp.app.ui.table.QueryFrameNew;
 import kaitou.ppp.app.ui.table.queryobject.*;
+import kaitou.ppp.common.utils.NetworkUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
 import kaitou.ppp.domain.engineer.EngineerTraining;
@@ -74,8 +76,6 @@ public class MainFrame extends JFrame {
      * @param args 参数
      */
     public static void main(String[] args) {
-        getUpgradeService().upgradeTo3Dot2();
-
         asynchronousInit();
 
         new MainFrame();
@@ -113,7 +113,10 @@ public class MainFrame extends JFrame {
             @Override
             public void run() {
                 try {
-                    String localIp = getSystemSettingsService().getLocalIp();
+                    String localIp = NetworkUtil.getLocalIp();
+                    if ("127.0.0.1".equals(localIp)) {
+                        localIp = getSystemSettingsService().getLocalIp();
+                    }
                     List<String> remoteRegistryIps = getLocalRegistryService().queryRegistryIps();
                     if (StringUtils.isEmpty(localIp) || CollectionUtil.isEmpty(remoteRegistryIps)) {
                         setTitleByOnlineStatus(OnlineStatus.OFFLINE_FLAG);
@@ -123,7 +126,10 @@ public class MainFrame extends JFrame {
                         setTitleByOnlineStatus(OnlineStatus.OFFLINE_FLAG);
                         return;
                     }
+                    logOp("IP：" + localIp);
                     logOp("已启动服务监听");
+                    getSystemSettingsService().updateLocalIp(localIp);
+                    getLocalRegistryService().updateRegistryIps(CollectionUtil.newList(localIp));
                     setTitleByOnlineStatus(OnlineStatus.ONLINE_FLAG);
                     for (String hostIp : remoteRegistryIps) {
                         if (localIp.equals(hostIp)) {
@@ -131,14 +137,15 @@ public class MainFrame extends JFrame {
                         }
                         RemoteRegistryService remoteRegistryService = ServiceClient.getRemoteService(RemoteRegistryService.class, hostIp);
                         if (remoteRegistryService == null) {
-                            return;
+                            continue;
                         }
                         List<String> registryIpsFromHost = remoteRegistryService.register(localIp);
                         logOp("远程注册成功，待更新IP列表：" + CollectionUtil.list2Str(registryIpsFromHost, ","));
                         getLocalRegistryService().updateRegistryIps(registryIpsFromHost);
                     }
                 } catch (RemoteException e) {
-                    handleEx(e);
+                    logSystemEx(e);
+                    setTitleByOnlineStatus(OnlineStatus.OFFLINE_FLAG);
                 }
             }
         }).start();
@@ -464,7 +471,9 @@ public class MainFrame extends JFrame {
     }
 
     private void queryCardApplicationRecordActionPerformed(ActionEvent e) {
-        new QueryFrame<CardApplicationRecord>(getCardService().queryCardApplicationRecords(), new CardApplicationRecordQueryObject());
+//        new QueryFrame<CardApplicationRecord>(getCardService().queryCardApplicationRecords(), new CardApplicationRecordQueryObject());
+//        new QueryFrame<CardApplicationRecord>(new CardApplicationRecordQueryObject());
+        new QueryFrameNew<CardApplicationRecord>(new CardApplicationRecordQueryObject());
     }
 
     private void exportCardApplicationRecordActionPerformed(ActionEvent e) {

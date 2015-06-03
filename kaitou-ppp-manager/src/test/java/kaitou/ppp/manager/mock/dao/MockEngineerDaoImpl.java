@@ -9,4 +9,5 @@ import kaitou.ppp.dao.engineer.impl.EngineerDaoImpl;
  * Time: 20:36
  */
 public class MockEngineerDaoImpl extends EngineerDaoImpl {
+
 }

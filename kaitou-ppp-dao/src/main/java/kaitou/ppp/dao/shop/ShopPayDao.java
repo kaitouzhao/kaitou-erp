@@ -25,7 +25,7 @@ public interface ShopPayDao {
      *
      * @return 付款信息
      */
-    public List<ShopPay> query();
+    public List<ShopPay> queryAll();
 
     /**
      * 删除

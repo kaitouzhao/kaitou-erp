@@ -9,4 +9,5 @@ import kaitou.ppp.dao.card.impl.CardApplicationRecordDaoImpl;
  * Time: 16:27
  */
 public class MockCardApplicationRecordDaoImpl extends CardApplicationRecordDaoImpl {
+
 }

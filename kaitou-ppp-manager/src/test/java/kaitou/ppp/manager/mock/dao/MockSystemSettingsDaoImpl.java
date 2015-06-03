@@ -9,4 +9,5 @@ import kaitou.ppp.dao.system.impl.SystemSettingsDaoImpl;
  * Time: 14:29
  */
 public class MockSystemSettingsDaoImpl extends SystemSettingsDaoImpl {
+
 }

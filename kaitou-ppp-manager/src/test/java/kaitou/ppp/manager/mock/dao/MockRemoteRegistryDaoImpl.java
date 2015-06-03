@@ -9,4 +9,5 @@ import kaitou.ppp.dao.system.impl.RemoteRegistryDaoImpl;
  * Time: 14:29
  */
 public class MockRemoteRegistryDaoImpl extends RemoteRegistryDaoImpl {
+
 }

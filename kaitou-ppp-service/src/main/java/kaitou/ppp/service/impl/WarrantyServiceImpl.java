@@ -16,7 +16,6 @@ import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteWarrantyService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.WarrantyService;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.rmi.RemoteException;
@@ -89,11 +88,7 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
         }
         final List<WarrantyFee> warrantyFees = new ArrayList<WarrantyFee>();
         for (WarrantyFee fee : warrantyFee) {
-            fee.noDoubt();
             fee.setShopId(shopManager.getCachedIdByName(fee.getShopName()));
-            if (StringUtils.isEmpty(fee.getShopId())) {
-                fee.doInDoubt();
-            }
             warrantyFees.add(fee);
         }
         logOperation("成功导入/更新保修费记录数：" + warrantyFeeManager.save(warrantyFees));

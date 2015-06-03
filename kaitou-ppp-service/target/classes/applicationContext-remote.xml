@@ -51,11 +51,11 @@
     <!--远程待发箱服务-->
     <bean id="remoteOutboxService" class="kaitou.ppp.service.rmi.RemoteOutboxServiceImpl">
         <property name="outboxDBVersionManager" ref="outboxDBVersionManager"/>
-        <property name="dbDir" value="d://ppp//db"/>
+        <property name="dbDir" value="d://temp//ppp//db"/>
     </bean>
     <!--远程DB版本库服务-->
     <bean id="remoteDBVersionService" class="kaitou.ppp.service.rmi.RemoteDBVersionServiceImpl">
-        <property name="dbDir" value="d://ppp//db"/>
+        <property name="dbDir" value="d://temp//ppp//db"/>
         <property name="localDBVersionManager" ref="localDBVersionManager"/>
     </bean>
     <!--远程保修卡服务-->

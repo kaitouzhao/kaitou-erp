@@ -1,6 +1,9 @@
 package kaitou.ppp.app.ui.table;
 
 import kaitou.ppp.app.SpringContextManager;
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
+import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
 import kaitou.ppp.domain.engineer.EngineerTraining;
@@ -365,5 +368,110 @@ public abstract class OPManager extends SpringContextManager {
             return;
         }
         throw new RuntimeException("尚未支持此类型删除：" + domainType);
+    }
+
+    /**
+     * 公共查询接口
+     *
+     * @param domainType 领域类型
+     * @param <T>        对象类型
+     * @return 对象列表
+     */
+    public static <T extends BaseDomain> List<T> query(String domainType) {
+        if (ComponentBorrowing.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryComponentBorrowing();
+        }
+        if (ToolRecipients.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryToolRecipients();
+        }
+        if (NewMachineClaim.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryNewMachineClaim();
+        }
+        if (OldMachineRenew.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryOldMachineRenew();
+        }
+        if (TSInstallPermission.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSInstallPermission();
+        }
+        if (TSSDSPermission.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSSDSPermission();
+        }
+        if (TSManualPermissions.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSManualPermission();
+        }
+        if (TSTraining.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSTraining();
+        }
+        if (TechInstallPermission.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().queryInstallPermission();
+        }
+        if (TechSupport.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().queryTechSupport();
+        }
+        if (TechSDSPermission.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().querySDSPermissions();
+        }
+        if (SOIDCode.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().querySOIDCode();
+        }
+        if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().queryManualPermissions();
+        }
+        if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryWarrantyConsumables();
+        }
+        if (WarrantyPrint.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryWarrantyPrint();
+        }
+        if (WarrantyParts.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryWarrantyParts();
+        }
+        if (WarrantyFee.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryWarrantyFee();
+        }
+        if (Shop.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getShopService().queryAllShops();
+        }
+        if (ShopDetail.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getShopService().queryAllDetails();
+        }
+        if (ShopRTS.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getShopService().queryAllRTSs();
+        }
+        if (ShopContract.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getShopService().queryShopContracts();
+        }
+        if (ShopPay.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getShopService().queryAllPays();
+        }
+        if (PartsLibrary.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getShopService().queryPartsLibrary();
+        }
+        if (Engineer.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getEngineerService().queryAllEngineers();
+        }
+        if (EngineerTraining.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getEngineerService().queryAllTrainings();
+        }
+        if (CardApplicationRecord.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getCardService().queryCardApplicationRecords();
+        }
+        throw new RuntimeException("尚未支持此类型导出：" + domainType);
+    }
+
+    /**
+     * 公共分页查询接口
+     *
+     * @param domainType  领域类型
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @param <T>         对象类型
+     * @return 封装后的分页对象
+     */
+    public static <T extends BaseDomain> Pager<T> queryPager(String domainType, int currentPage, List<Condition> conditions) {
+        if (CardApplicationRecord.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getCardService().queryPager(currentPage, conditions);
+        }
+        throw new RuntimeException("尚未支持此类型导出：" + domainType);
     }
 }

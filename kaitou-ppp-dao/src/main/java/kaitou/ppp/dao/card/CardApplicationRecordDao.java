@@ -1,5 +1,7 @@
 package kaitou.ppp.dao.card;
 
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 
 import java.util.List;
@@ -25,7 +27,7 @@ public interface CardApplicationRecordDao {
      *
      * @return 生成记录
      */
-    public List<CardApplicationRecord> query();
+    public List<CardApplicationRecord> queryAll();
 
     /**
      * 删除
@@ -34,4 +36,13 @@ public interface CardApplicationRecordDao {
      * @return 成功执行记录数
      */
     public int delete(Object... cardApplicationRecords);
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<CardApplicationRecord> queryPager(int currentPage, List<Condition> conditions);
 }

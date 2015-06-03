@@ -12,6 +12,11 @@ import org.joda.time.format.DateTimeFormat;
  */
 public abstract class SysCode {
     /**
+     * DB文件分隔符
+     */
+    public static final char DB_FILE_NAME_SPLIT = '_';
+
+    /**
      * 保修状态
      */
     public static enum WarrantyStatus {

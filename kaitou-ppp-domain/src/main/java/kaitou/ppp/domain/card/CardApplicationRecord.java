@@ -122,7 +122,6 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         CardApplicationRecord that = (CardApplicationRecord) o;

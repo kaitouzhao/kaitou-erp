@@ -37,5 +37,6 @@ public interface UpgradeService {
      * 升级至3.2操作
      * <ul><li>保修费分年份存储</li></ul>
      */
+    @Deprecated
     public void upgradeTo3Dot2();
 }

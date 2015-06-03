@@ -25,7 +25,7 @@ public interface PartsLibraryDao {
      *
      * @return 零件备库信息
      */
-    public List<PartsLibrary> query();
+    public List<PartsLibrary> queryAll();
 
     /**
      * 删除

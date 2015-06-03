@@ -11,10 +11,8 @@ import kaitou.ppp.domain.engineer.Engineer;
  * Time: 11:12
  */
 public class EngineerDaoImpl extends BaseDao<Engineer> implements EngineerDao {
-
     @Override
     public Class<Engineer> getDomainClass() {
         return Engineer.class;
     }
-
 }

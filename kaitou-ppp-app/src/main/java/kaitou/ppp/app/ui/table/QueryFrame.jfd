@@ -20,10 +20,10 @@ new FormModel {
 					addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "dataTableMouseClicked", true ) )
 				} )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"height": 485
+				"height": 455
 				"width": 1366
 				"x": 0
-				"y": 145
+				"y": 175
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
 				name: "firstPageBtn"
@@ -114,7 +114,7 @@ new FormModel {
 				"text": "添加"
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "saveBtnActionPerformed", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 290
+				"x": 255
 				"y": 110
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
@@ -122,7 +122,7 @@ new FormModel {
 				"text": "导出"
 				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportBtnActionPerformed", true ) )
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
-				"x": 220
+				"x": 190
 				"y": 110
 			} )
 			add( new FormComponent( "javax.swing.JButton" ) {
@@ -132,6 +132,22 @@ new FormModel {
 			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
 				"x": 635
 				"y": 635
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "allSelectedBtn"
+				"text": "全选"
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "allSelectedBtnActionPerformed", true ) )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 5
+				"y": 145
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "noSelectedBtn"
+				"text": "反选"
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "noSelectedBtnActionPerformed", true ) )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 70
+				"y": 145
 			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
