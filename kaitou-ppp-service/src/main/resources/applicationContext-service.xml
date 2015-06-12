@@ -16,8 +16,6 @@
         <property name="workspace" value="${card.workspace}"/>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
         <property name="shopManager" ref="shopManager"/>
-        <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
-        <property name="systemSettingsManager" ref="systemSettingsManager"/>
     </bean>
 
     <bean id="engineerService" class="kaitou.ppp.service.impl.EngineerServiceImpl">
@@ -29,8 +27,6 @@
                 <ref bean="engineerTrainingManager"/>
             </list>
         </property>
-        <property name="systemSettingsManager" ref="systemSettingsManager"/>
-        <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
     </bean>
 
     <bean id="shopService" class="kaitou.ppp.service.impl.ShopServiceImpl">
@@ -109,6 +105,11 @@
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
         <property name="warrantyConsumablesManager" ref="warrantyConsumablesManager"/>
+        <property name="warrantyUpdateListeners">
+            <list>
+                <ref bean="cardApplicationRecordManager"/>
+            </list>
+        </property>
     </bean>
 
     <bean id="techService" class="kaitou.ppp.service.impl.TechServiceImpl">

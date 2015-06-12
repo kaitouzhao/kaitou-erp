@@ -1,8 +1,12 @@
 package kaitou.ppp.manager.card.impl;
 
+import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
+import kaitou.ppp.domain.system.SysCode;
+import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
+import kaitou.ppp.manager.listener.WarrantyUpdateListener;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
@@ -15,7 +19,7 @@ import java.util.List;
  * Date: 2015/3/7
  * Time: 21:41
  */
-public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApplicationRecord> implements CardApplicationRecordManager {
+public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApplicationRecord> implements CardApplicationRecordManager, WarrantyUpdateListener {
 
     @Override
     public Class<CardApplicationRecord> domainClass() {
@@ -35,5 +39,32 @@ public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApp
             }
         });
         return cardApplicationRecords;
+    }
+
+    @Override
+    public void updateWarrantyFeeEvent(WarrantyFee... warrantyFees) {
+        if (CollectionUtil.isEmpty(warrantyFees)) {
+            return;
+        }
+        List<CardApplicationRecord> cardApplicationRecords = query();
+        for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
+            for (WarrantyFee warrantyFee : warrantyFees) {
+                if (cardApplicationRecord.getFuselage().equals(warrantyFee.getFuselage())) {
+                    try {
+                        if (Double.valueOf(warrantyFee.getInstalledFee()) > 0) {
+                            cardApplicationRecord.setIsBack("是");
+                        }
+                    } catch (NumberFormatException e) {
+                    }
+                    try {
+                        if (Double.valueOf(warrantyFee.getMaintenanceFee()) > 0) {
+                            cardApplicationRecord.setStatus(SysCode.WarrantyStatus.OUT_WARRANTY.getValue());
+                        }
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+        }
+        save(cardApplicationRecords);
     }
 }

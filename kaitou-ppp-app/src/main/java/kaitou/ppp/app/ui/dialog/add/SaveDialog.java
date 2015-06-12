@@ -2,9 +2,10 @@
  * Created by JFormDesigner on Tue Feb 10 11:47:12 CST 2015
  */
 
-package kaitou.ppp.app.ui.dialog;
+package kaitou.ppp.app.ui.dialog.add;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
 import kaitou.ppp.app.ui.table.IQueryObject;
 import kaitou.ppp.domain.BaseDomain;
 
@@ -13,44 +14,22 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
-
-import static kaitou.ppp.app.ui.table.OPManager.saveOrUpdate;
-import static kaitou.ppp.common.utils.ReflectionUtil.newInstance;
-import static kaitou.ppp.common.utils.ReflectionUtil.setFieldValue;
 
 /**
  * 保存实体对话框
  *
  * @author 赵立伟
  */
-public class SaveDialog<T extends BaseDomain> extends JDialog {
-    /**
-     * 是否保存
-     */
-    private boolean isOk;
-    /**
-     * 查询对象
-     */
-    private IQueryObject<T> queryObject;
-    /**
-     * 输入框列表
-     */
-    private List<JTextField> textFields = new ArrayList<JTextField>();
-    /**
-     * 保存的实体
-     */
-    private T domain;
-
+public class SaveDialog<T extends BaseDomain> extends BaseSaveDialog {
     /**
      * 创建对话框
      *
      * @param owner       父窗体
      * @param queryObject 查询对象
      */
-    public SaveDialog(Frame owner, IQueryObject<T> queryObject) {
+    public SaveDialog(JFrame owner, IQueryObject<T> queryObject) {
         super(owner);
+        parentFrame = owner;
         this.queryObject = queryObject;
         initComponents();
         initInputArea();
@@ -77,30 +56,11 @@ public class SaveDialog<T extends BaseDomain> extends JDialog {
     }
 
     private void okButtonActionPerformed(ActionEvent e) {
-        ConfirmHint confirmHint = new ConfirmHint(this, "确定添加吗？");
-        if (!confirmHint.isOk()) {
-            return;
-        }
-        domain = newInstance(queryObject.domainClass());
-        String[] saveFieldNames = queryObject.saveFieldNames();
-        for (int i = 0; i < textFields.size(); i++) {
-            setFieldValue(saveFieldNames[i], domain, textFields.get(i).getText());
-        }
-        saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(domain), queryObject.domainClass()));
-        isOk = true;
-        setVisible(false);
-    }
-
-    public T getDomain() {
-        return domain;
-    }
-
-    public boolean isOk() {
-        return isOk;
+        ok();
     }
 
     private void cancelButtonActionPerformed(ActionEvent e) {
-        setVisible(false);
+        cancel();
     }
 
     private void initComponents() {

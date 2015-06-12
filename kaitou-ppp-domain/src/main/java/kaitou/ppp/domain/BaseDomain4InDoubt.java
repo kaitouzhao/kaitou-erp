@@ -19,7 +19,7 @@ public abstract class BaseDomain4InDoubt extends BaseDomain {
     /**
      * 流水号
      */
-    protected long serialNo = -1;
+    public long serialNo = -1;
     /**
      * 存疑。默认为false，即不存疑
      */

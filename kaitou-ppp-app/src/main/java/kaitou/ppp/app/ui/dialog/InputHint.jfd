@@ -13,11 +13,19 @@ new FormModel {
 			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.BorderLayout ) ) {
 				name: "dialogPane"
 				"border": new javax.swing.border.EmptyBorder( 12, 12, 12, 12 )
-				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+					"$columnSpecs": "default"
+					"$rowSpecs": "fill:default"
+				} ) {
 					name: "contentPanel"
-					addEvent( new FormEvent( "java.awt.event.KeyListener", "keyPressed", "contentPanelKeyPressed", true ) )
-					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class java.awt.FlowLayout ) ) {
+					add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jgoodies.forms.layout.FormLayout ) {
+						"$columnSpecs": "default"
+						"$rowSpecs": "fill:default"
+					} ) {
 						name: "inputArea"
+					}, new FormLayoutConstraints( class com.jgoodies.forms.layout.CellConstraints ) {
+						"gridX": 1
+						"gridY": 1
 					} )
 				}, new FormLayoutConstraints( class java.lang.String ) {
 					"value": "Center"

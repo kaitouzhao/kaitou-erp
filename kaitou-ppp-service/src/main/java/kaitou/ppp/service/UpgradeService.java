@@ -39,4 +39,14 @@ public interface UpgradeService {
      */
     @Deprecated
     public void upgradeTo3Dot2();
+
+    /**
+     * 升级至3.3操作
+     * <ul>
+     * <li>
+     * 保修卡增加区域列
+     * </li>
+     * </ul>
+     */
+    public void upgradeTo3Dot3();
 }

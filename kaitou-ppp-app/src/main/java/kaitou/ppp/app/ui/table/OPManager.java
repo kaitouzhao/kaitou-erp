@@ -1,6 +1,11 @@
 package kaitou.ppp.app.ui.table;
 
 import kaitou.ppp.app.SpringContextManager;
+import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
+import kaitou.ppp.app.ui.dialog.OperationHint;
+import kaitou.ppp.app.ui.dialog.add.SaveDialog;
+import kaitou.ppp.app.ui.dialog.add.TechInstallPermissionSaveDialog;
+import kaitou.ppp.app.ui.table.queryobject.InstallPermissionQueryObject;
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.BaseDomain;
@@ -15,9 +20,14 @@ import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
 import kaitou.ppp.domain.warranty.WarrantyPrint;
 import kaitou.ppp.service.BaseExcelService;
+import org.apache.commons.lang.StringUtils;
 
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.util.List;
+
+import static kaitou.ppp.app.ui.UIUtil.handleEx;
 
 /**
  * 操作管理.
@@ -26,6 +36,26 @@ import java.util.List;
  * Time: 11:38
  */
 public abstract class OPManager extends SpringContextManager {
+
+    /**
+     * 保存界面
+     * <p>
+     * 可以自定义。默认是SaveDialog
+     * </p>
+     *
+     * @param queryObject 查询对象
+     * @param frame       窗体
+     * @return 保存界面
+     * @see kaitou.ppp.app.ui.dialog.BaseSaveDialog
+     * @see kaitou.ppp.app.ui.dialog.add.SaveDialog
+     */
+    public static <T extends BaseDomain> BaseSaveDialog<T> wannaSave(IQueryObject<T> queryObject, JFrame frame) {
+        if (TechInstallPermission.class.getSimpleName().equals(queryObject.domainType())) {
+            return (BaseSaveDialog<T>) new TechInstallPermissionSaveDialog(frame, (InstallPermissionQueryObject) queryObject);
+        }
+        return new SaveDialog<T>(frame, queryObject);
+    }
+
     /**
      * 公共保存/更新接口
      *
@@ -473,5 +503,52 @@ public abstract class OPManager extends SpringContextManager {
             return (Pager<T>) getCardService().queryPager(currentPage, conditions);
         }
         throw new RuntimeException("尚未支持此类型导出：" + domainType);
+    }
+
+    /**
+     * 带统一的异常处理的执行
+     *
+     * @param frame    窗体
+     * @param runnable 执行体
+     */
+    public static void doRunWithExHandler(JFrame frame, OpRunnable runnable) {
+        try {
+            runnable.run();
+        } catch (Exception ex) {
+            handleEx(ex, frame);
+        }
+    }
+
+    /**
+     * 带等待提示的执行
+     *
+     * @param frame       窗体
+     * @param runnable    执行体
+     * @param successHint 成功提示。为空则不提示
+     */
+    public static void doRunWithWaiting(JFrame frame, OpRunnable runnable, String successHint) {
+        String title = frame.getTitle();
+        frame.setTitle(title + " 正在操作，请稍候......");
+        frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        try {
+            runnable.run();
+            if (StringUtils.isNotEmpty(successHint)) {
+                new OperationHint(frame, successHint);
+            }
+        } catch (Exception e) {
+            handleEx(e, frame);
+        }
+        frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        frame.setTitle(title);
+    }
+
+    /**
+     * 执行体
+     */
+    public interface OpRunnable {
+        /**
+         * 执行逻辑
+         */
+        public abstract void run();
     }
 }

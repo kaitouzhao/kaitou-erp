@@ -149,6 +149,14 @@ new FormModel {
 				"x": 70
 				"y": 145
 			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "editableHint"
+				"text": "*是可以修改的列"
+				"foreground": sfield java.awt.Color red
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 195
+				"y": 150
+			} )
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
 			"size": new java.awt.Dimension( 920, 695 )

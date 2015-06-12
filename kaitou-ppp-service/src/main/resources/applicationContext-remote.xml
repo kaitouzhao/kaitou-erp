@@ -68,6 +68,11 @@
         <property name="warrantyPartsManager" ref="warrantyPartsManager"/>
         <property name="warrantyPrintManager" ref="warrantyPrintManager"/>
         <property name="warrantyConsumablesManager" ref="warrantyConsumablesManager"/>
+        <property name="warrantyUpdateListeners">
+            <list>
+                <ref bean="cardApplicationRecordManager"/>
+            </list>
+        </property>
     </bean>
     <!--远程技术管理服务-->
     <bean id="remoteTechService" class="kaitou.ppp.service.rmi.RemoteTechServiceImpl">

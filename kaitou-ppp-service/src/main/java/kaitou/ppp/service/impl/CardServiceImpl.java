@@ -7,13 +7,11 @@ import kaitou.ppp.domain.card.CardApplication;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.shop.ShopManager;
-import kaitou.ppp.manager.system.RemoteRegistryManager;
-import kaitou.ppp.manager.system.SystemSettingsManager;
-import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteCardService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.CardService;
 import net.sf.jxls.transformer.XLSTransformer;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.POIXMLDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -36,6 +34,7 @@ import java.util.Map;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
 import static kaitou.ppp.domain.system.SysCode.*;
+import static kaitou.ppp.service.ServiceInvokeManager.*;
 
 /**
  * 保修卡处理业务层实现.
@@ -46,6 +45,7 @@ import static kaitou.ppp.domain.system.SysCode.*;
 public class CardServiceImpl extends BaseExcelService implements CardService {
 
     private static final String APPLICATION_SHEET_NAME = "申请表";
+
     private String workspace;
     private String complete;
     private String output;
@@ -53,18 +53,8 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     private String templateName;
     private String template;
 
-    private CardApplicationRecordManager cardApplicationRecordManager;
     private ShopManager shopManager;
-    private SystemSettingsManager systemSettingsManager;
-    private RemoteRegistryManager remoteRegistryManager;
-
-    public void setSystemSettingsManager(SystemSettingsManager systemSettingsManager) {
-        this.systemSettingsManager = systemSettingsManager;
-    }
-
-    public void setRemoteRegistryManager(RemoteRegistryManager remoteRegistryManager) {
-        this.remoteRegistryManager = remoteRegistryManager;
-    }
+    private CardApplicationRecordManager cardApplicationRecordManager;
 
     public void setShopManager(ShopManager shopManager) {
         this.shopManager = shopManager;
@@ -353,55 +343,53 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     public void saveOrUpdateCardApplicationRecord(final CardApplicationRecord... cardApplicationRecords) {
         final List<CardApplicationRecord> cardApplicationRecordList = new ArrayList<CardApplicationRecord>();
         for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
-            cardApplicationRecord.setShopId(shopManager.getCachedIdByName(cardApplicationRecord.getShopName()));
+            String shopId = shopManager.getCachedIdByName(cardApplicationRecord.getShopName());
+            if (StringUtils.isNotEmpty(shopId)) {
+                cardApplicationRecord.setShopId(shopId);
+                cardApplicationRecord.setSaleRegion(shopManager.getCachedShop(shopId).getSaleRegion());
+            }
             cardApplicationRecordList.add(cardApplicationRecord);
         }
         debugTime("填充认定店编号");
         logOperation("成功导入/更新保修卡生成记录数：" + cardApplicationRecordManager.save(cardApplicationRecordList));
         debugTime("保存保修卡");
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteCardService> remoteCardServices = ServiceClient.queryServicesOfListener(RemoteCardService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteCardServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteCardService> remoteCardServices = queryRemoteService(RemoteCardService.class);
                 logOperation("通知已注册的远程服务更新保修卡记录");
                 for (RemoteCardService remoteCardService : remoteCardServices) {
-                    try {
-                        remoteCardService.saveCardApplicationRecord(cardApplicationRecordList);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteCardService.saveCardApplicationRecord(cardApplicationRecordList);
                 }
             }
-        }).start();
+        });
     }
 
     @Override
     public void deleteCardApplicationRecords(final Object... cardApplicationRecords) {
         logOperation("成功删除保修卡生成记录个数：" + cardApplicationRecordManager.delete(cardApplicationRecords));
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteCardService> remoteCardServices = ServiceClient.queryServicesOfListener(RemoteCardService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteCardServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteCardService> remoteCardServices = queryRemoteService(RemoteCardService.class);
                 logOperation("通知已注册的远程服务更新删除保修卡记录");
                 for (RemoteCardService remoteCardService : remoteCardServices) {
-                    try {
-                        remoteCardService.deleteCardApplicationRecord(cardApplicationRecords);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteCardService.deleteCardApplicationRecord(cardApplicationRecords);
                 }
             }
-        }).start();
+        });
     }
 
     @Override
     public Pager<CardApplicationRecord> queryPager(int currentPage, List<Condition> conditions) {
-        return cardApplicationRecordManager.queryPager(currentPage, conditions);
+        Pager<CardApplicationRecord> pager = cardApplicationRecordManager.queryPager(currentPage, conditions);
+        List<CardApplicationRecord> cardApplicationRecords = pager.getResult();
+        for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
+            if (WarrantyStatus.OUT_WARRANTY.getValue().equals(cardApplicationRecord.getStatus())) {
+                continue;
+            }
+            cardApplicationRecord.setStatus(WarrantyStatus.getStatus(cardApplicationRecord.getInstalledDate()));
+        }
+        return pager;
     }
 }

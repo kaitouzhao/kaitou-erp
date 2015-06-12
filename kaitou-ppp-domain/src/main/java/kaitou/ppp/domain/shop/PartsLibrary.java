@@ -2,6 +2,7 @@ package kaitou.ppp.domain.shop;
 
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.system.SysCode;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * 零件备库管理.
@@ -10,6 +11,10 @@ import kaitou.ppp.domain.system.SysCode;
  * Time: 22:05
  */
 public class PartsLibrary extends BaseDomain {
+    /**
+     * 年份
+     */
+    private String numberOfYear;
     /**
      * 月份
      */
@@ -67,23 +72,26 @@ public class PartsLibrary extends BaseDomain {
 
     @Override
     public void check() {
-
+        if (StringUtils.isEmpty(numberOfYear)) {
+            throw new RuntimeException("年份为空");
+        }
     }
 
     @Override
     public String dbFileName() {
-        return dbFileSuffix();
+        return numberOfYear + dbFileSuffix();
     }
 
     @Override
     public String dbFileSuffix() {
-        return getClass().getSimpleName() + DB_SUFFIX;
+        return '_' + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
     public String toString() {
         return "PartsLibrary{" +
-                "numberOfMonth='" + numberOfMonth + '\'' +
+                "numberOfYear='" + numberOfYear + '\'' +
+                ", numberOfMonth='" + numberOfMonth + '\'' +
                 ", productLine='" + productLine + '\'' +
                 ", saleRegion='" + saleRegion + '\'' +
                 ", camgCode='" + camgCode + '\'' +
@@ -114,6 +122,7 @@ public class PartsLibrary extends BaseDomain {
         if (note != null ? !note.equals(that.note) : that.note != null) return false;
         if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
             return false;
+        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
         if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
         if (price != null ? !price.equals(that.price) : that.price != null) return false;
         if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
@@ -127,7 +136,8 @@ public class PartsLibrary extends BaseDomain {
 
     @Override
     public int hashCode() {
-        int result = numberOfMonth != null ? numberOfMonth.hashCode() : 0;
+        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
+        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
         result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
         result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
         result = 31 * result + (camgCode != null ? camgCode.hashCode() : 0);
@@ -141,6 +151,14 @@ public class PartsLibrary extends BaseDomain {
         result = 31 * result + (price != null ? price.hashCode() : 0);
         result = 31 * result + (note != null ? note.hashCode() : 0);
         return result;
+    }
+
+    public String getNumberOfYear() {
+        return numberOfYear;
+    }
+
+    public void setNumberOfYear(String numberOfYear) {
+        this.numberOfYear = numberOfYear;
     }
 
     public String getNumberOfMonth() {

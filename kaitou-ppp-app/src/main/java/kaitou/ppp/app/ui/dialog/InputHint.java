@@ -4,6 +4,8 @@
 
 package kaitou.ppp.app.ui.dialog;
 
+import com.jgoodies.forms.layout.CellConstraints;
+import com.jgoodies.forms.layout.FormLayout;
 import com.womai.bsp.tool.utils.CollectionUtil;
 
 import javax.swing.*;
@@ -30,6 +32,10 @@ public class InputHint extends JDialog {
 
     public InputHint(Frame owner, String[] fields) {
         super(owner);
+        build(fields);
+    }
+
+    private void build(String[] fields) {
         initComponents();
         initInputArea(fields);
         setVisible(true);
@@ -52,18 +58,6 @@ public class InputHint extends JDialog {
                 textFields.add(textField);
             }
         }
-    }
-
-    private InputHint(Dialog owner, String[] fields) {
-        super(owner);
-        initComponents();
-        initInputArea(fields);
-        setVisible(true);
-    }
-
-    private void okButtonActionPerformed() {
-        isOk = true;
-        setVisible(false);
     }
 
     /**
@@ -89,6 +83,11 @@ public class InputHint extends JDialog {
         return isOk;
     }
 
+    private void okButtonActionPerformed(ActionEvent e) {
+        isOk = true;
+        setVisible(false);
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         dialogPane = new JPanel();
@@ -96,6 +95,7 @@ public class InputHint extends JDialog {
         inputArea = new JPanel();
         buttonBar = new JPanel();
         okButton = new JButton();
+        CellConstraints cc = new CellConstraints();
 
         //======== this ========
         setTitle("\u8bf7\u8f93\u5165");
@@ -110,13 +110,17 @@ public class InputHint extends JDialog {
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FlowLayout());
+                contentPanel.setLayout(new FormLayout(
+                    "default",
+                    "fill:default"));
 
                 //======== inputArea ========
                 {
-                    inputArea.setLayout(new FlowLayout());
+                    inputArea.setLayout(new FormLayout(
+                        "default",
+                        "fill:default"));
                 }
-                contentPanel.add(inputArea);
+                contentPanel.add(inputArea, cc.xy(1, 1));
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
 
@@ -132,7 +136,7 @@ public class InputHint extends JDialog {
                 okButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        okButtonActionPerformed();
+                        okButtonActionPerformed(e);
                     }
                 });
                 buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,

@@ -21,6 +21,7 @@ import java.util.List;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
 import static kaitou.ppp.rmi.ServiceClient.queryServicesOfListener;
+import static kaitou.ppp.service.ServiceInvokeManager.*;
 
 /**
  * 认定店业务处理层实现.
@@ -256,42 +257,32 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void saveOrUpdateShop(Shop... shop) {
+    public void saveOrUpdateShop(final Shop... shop) {
         final List<Shop> shops = CollectionUtil.newList(shop);
         int successCount = shopManager.save(shops);
         logOperation("成功导入/更新认定店数：" + successCount);
         if (successCount <= 0) {
             return;
         }
-        if (CollectionUtil.isEmpty(shopUpdateListeners)) {
-            return;
-        }
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
+            public void run() throws RemoteException {
                 logOperation("联动更新与认定店基本信息相关的数据");
                 for (ShopUpdateListener listener : shopUpdateListeners) {
-                    listener.updateShopEvent(CollectionUtil.toArray(shops, Shop.class));
+                    listener.updateShopEvent(shop);
                 }
             }
-        }).start();
-        new Thread(new Runnable() {
+        });
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteShopService> remoteShopServices = queryServicesOfListener(RemoteShopService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteShopServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteShopService> remoteShopServices = queryRemoteService(RemoteShopService.class);
                 logOperation("通知已注册的远程服务更新认定店基本信息");
                 for (RemoteShopService remoteShopService : remoteShopServices) {
-                    try {
-                        remoteShopService.saveShops(shops);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteShopService.saveShops(shops);
                 }
             }
-        }).start();
+        });
     }
 
     @Override
@@ -312,34 +303,24 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
         if (successCount <= 0) {
             return;
         }
-        if (CollectionUtil.isEmpty(shopUpdateListeners)) {
-            return;
-        }
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
+            public void run() throws RemoteException {
                 for (ShopUpdateListener listener : shopUpdateListeners) {
                     listener.updateShopDetailEvent(CollectionUtil.toArray(shopDetails, ShopDetail.class));
                 }
             }
-        }).start();
-        new Thread(new Runnable() {
+        });
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteShopService> remoteShopServices = queryServicesOfListener(RemoteShopService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteShopServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteShopService> remoteShopServices = queryRemoteService(RemoteShopService.class);
                 logOperation("通知已注册的远程服务更新认定店认定级别");
                 for (RemoteShopService remoteShopService : remoteShopServices) {
-                    try {
-                        remoteShopService.saveShopDetails(shopDetails);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteShopService.saveShopDetails(shopDetails);
                 }
             }
-        }).start();
+        });
     }
 
     @Override

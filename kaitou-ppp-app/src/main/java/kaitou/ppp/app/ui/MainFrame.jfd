@@ -9,7 +9,6 @@ new FormModel {
 			name: "this"
 			"$sizePolicy": 0
 			"title": "PPP-ERP主界面"
-			addEvent( new FormEvent( "java.awt.event.MouseListener", "mouseClicked", "thisMouseClicked", true ) )
 			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
 				name: "managerMenuBar"
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {

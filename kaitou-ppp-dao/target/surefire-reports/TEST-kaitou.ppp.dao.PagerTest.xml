@@ -20,7 +20,7 @@
     <property name="basedir" value="D:\work\11exercise\kaitou-ppp\trunk\kaitou-ppp-dao"/>
     <property name="java.endorsed.dirs" value="D:\Java\jdk1.7.0_07\jre\lib\endorsed"/>
     <property name="os.arch" value="x86"/>
-    <property name="surefire.real.class.path" value="C:\Users\zhao\AppData\Local\Temp\surefirebooter5578887118658154833.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\zhao\AppData\Local\Temp\surefirebooter4974704305704192611.jar"/>
     <property name="java.io.tmpdir" value="C:\Users\zhao\AppData\Local\Temp\"/>
     <property name="line.separator" value="
 "/>
@@ -44,7 +44,7 @@
     <property name="java.vm.specification.version" value="1.7"/>
     <property name="sun.arch.data.model" value="32"/>
     <property name="java.home" value="D:\Java\jdk1.7.0_07\jre"/>
-    <property name="sun.java.command" value="C:\Users\zhao\AppData\Local\Temp\surefirebooter5578887118658154833.jar C:\Users\zhao\AppData\Local\Temp\surefire8789336718922780864tmp C:\Users\zhao\AppData\Local\Temp\surefire6487795599819526717tmp"/>
+    <property name="sun.java.command" value="C:\Users\zhao\AppData\Local\Temp\surefirebooter4974704305704192611.jar C:\Users\zhao\AppData\Local\Temp\surefire5407009032560715467tmp C:\Users\zhao\AppData\Local\Temp\surefire4532457397513145333tmp"/>
     <property name="java.specification.vendor" value="Oracle Corporation"/>
     <property name="user.language" value="zh"/>
     <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>

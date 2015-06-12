@@ -133,7 +133,7 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
      * @return 待保存的实体集合
      */
     @SuppressWarnings("unchecked")
-    public Object[] preSave(Object... domains) {
+    protected Object[] preSave(Object... domains) {
         return CollectionUtil.toArray(CollectionUtil.newList(domains), Object.class);
     }
 
@@ -220,7 +220,7 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
                 boolean isSelected = true;
                 for (Condition condition : conditions) {
                     String fieldValue = JsonUtil.getFieldValue(db, condition.getFieldName());
-                    if (!fieldValue.contains(String.valueOf(condition.getFieldValue()))) {
+                    if (!fieldValue.toLowerCase().contains(String.valueOf(condition.getFieldValue()).toLowerCase().trim())) {
                         isSelected = false;
                         break;
                     }
@@ -292,6 +292,7 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
         Map<String, List<T>> domainMap = new HashMap<String, List<T>>();
         int updateIndex = -1;
         int successCount = 0;
+        List<T> specialHandlingDomains = afterDelete(domains);
         for (Object domain1 : domains) {
             T domain = (T) domain1;
             String backDbFileName = domain.backDbFileName();
@@ -315,6 +316,32 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
                 successCount++;
             }
         }
+        updateIndex = -1;
+        for (T specialHandlingDomain : specialHandlingDomains) {
+            String backDbFileName = specialHandlingDomain.backDbFileName();
+            List<T> domainList = domainMap.get(backDbFileName);
+            if (domainList == null) {
+                domainList = query(specialHandlingDomain.dbFileName());
+                if (CollectionUtil.isEmpty(domainList)) {
+                    domainList = new ArrayList<T>();
+                }
+                domainMap.put(backDbFileName, domainList);
+            }
+            if (CollectionUtil.isEmpty(domainList)) {
+                domainList.add(specialHandlingDomain);
+                continue;
+            }
+            for (int j = 0; j < domainList.size(); j++) {
+                if (specialHandlingDomain.equals(domainList.get(j))) {
+                    updateIndex = j;
+                }
+            }
+            if (updateIndex > -1) {
+                domainList.remove(updateIndex);
+                domainList.add(updateIndex, specialHandlingDomain);
+                updateIndex = -1;
+            }
+        }
         for (Map.Entry<String, List<T>> item : domainMap.entrySet()) {
             List<T> domainList = item.getValue();
             List<String> eJsonList = new ArrayList<String>();
@@ -328,6 +355,19 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
             }
         }
         return successCount;
+    }
+
+    /**
+     * 删除后执行逻辑
+     * <p>
+     * 删除后如有特殊操作，请自行覆盖
+     * </p>
+     *
+     * @param domains 待删除实体集合
+     * @return 需要特殊处理的实体集合。默认为空
+     */
+    protected List<T> afterDelete(Object... domains) {
+        return CollectionUtil.newList();
     }
 
     /**

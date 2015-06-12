@@ -13,15 +13,19 @@ import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.shop.ShopPayManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
+import kaitou.ppp.service.ServiceInvokeManager;
 import kaitou.ppp.service.UpgradeService;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.rmi.RemoteException;
 import java.util.List;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
 import static kaitou.ppp.common.utils.FileUtil.copy;
 import static kaitou.ppp.common.utils.FileUtil.delete;
+import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
 
 /**
  * 版本升级操作实现.
@@ -150,5 +154,26 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
         }
         warrantyFeeManager.save(warrantyFees);
         FileUtil.delete(dbDir + File.separatorChar + "WarrantyFee.kdb");
+    }
+
+    @Override
+    public void upgradeTo3Dot3() {
+        if ("3.3".equals(systemSettingsManager.getSystemSetting(SysCode.LATEST_VERSION_KEY))) {
+            return;
+        }
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<CardApplicationRecord> cardApplicationRecords = cardApplicationRecordManager.query();
+                for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
+                    String shopId = shopManager.getCachedIdByName(cardApplicationRecord.getShopName());
+                    if (StringUtils.isNotEmpty(shopId)) {
+                        cardApplicationRecord.setShopId(shopId);
+                        cardApplicationRecord.setSaleRegion(shopManager.getCachedShop(shopId).getSaleRegion());
+                    }
+                }
+                logOperation("成功导入/更新保修卡生成记录数：" + cardApplicationRecordManager.save(cardApplicationRecords));
+            }
+        });
     }
 }

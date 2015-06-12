@@ -12,9 +12,6 @@ import kaitou.ppp.manager.engineer.EngineerManager;
 import kaitou.ppp.manager.engineer.EngineerTrainingManager;
 import kaitou.ppp.manager.listener.EngineerUpdateListener;
 import kaitou.ppp.manager.shop.ShopManager;
-import kaitou.ppp.manager.system.RemoteRegistryManager;
-import kaitou.ppp.manager.system.SystemSettingsManager;
-import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteEngineerService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.EngineerService;
@@ -26,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
+import static kaitou.ppp.service.ServiceInvokeManager.*;
 
 /**
  * 工程师业务处理层实现.
@@ -37,18 +35,8 @@ public class EngineerServiceImpl extends BaseExcelService implements EngineerSer
 
     private ShopManager shopManager;
     private EngineerManager engineerManager;
-    private SystemSettingsManager systemSettingsManager;
-    private RemoteRegistryManager remoteRegistryManager;
     private EngineerTrainingManager engineerTrainingManager;
     private List<EngineerUpdateListener> engineerUpdateListeners;
-
-    public void setSystemSettingsManager(SystemSettingsManager systemSettingsManager) {
-        this.systemSettingsManager = systemSettingsManager;
-    }
-
-    public void setRemoteRegistryManager(RemoteRegistryManager remoteRegistryManager) {
-        this.remoteRegistryManager = remoteRegistryManager;
-    }
 
     public void setEngineerUpdateListeners(List<EngineerUpdateListener> engineerUpdateListeners) {
         this.engineerUpdateListeners = engineerUpdateListeners;
@@ -89,45 +77,31 @@ public class EngineerServiceImpl extends BaseExcelService implements EngineerSer
     @Override
     public void deleteEngineers(final Object... engineers) {
         logOperation("已删除工程师个数：" + engineerManager.delete(engineers));
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteEngineerService> remoteEngineerServices = ServiceClient.queryServicesOfListener(RemoteEngineerService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteEngineerServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteEngineerService> remoteEngineerServices = queryRemoteService(RemoteEngineerService.class);
                 logOperation("通知已注册的远程服务删除工程师基本信息");
                 for (RemoteEngineerService remoteEngineerService : remoteEngineerServices) {
-                    try {
-                        remoteEngineerService.deleteEngineer(engineers);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteEngineerService.deleteEngineer(engineers);
                 }
             }
-        }).start();
+        });
     }
 
     @Override
     public void deleteEngineerTrainings(final Object... trainings) {
         logOperation("已删除工程师发展信息个数：" + engineerTrainingManager.delete(trainings));
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteEngineerService> remoteEngineerServices = ServiceClient.queryServicesOfListener(RemoteEngineerService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteEngineerServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteEngineerService> remoteEngineerServices = queryRemoteService(RemoteEngineerService.class);
                 logOperation("通知已注册的远程服务删除工程师发展信息");
                 for (RemoteEngineerService remoteEngineerService : remoteEngineerServices) {
-                    try {
-                        remoteEngineerService.deleteEngineerTrainings(trainings);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteEngineerService.deleteEngineerTrainings(trainings);
                 }
             }
-        }).start();
+        });
     }
 
     @Override
@@ -219,34 +193,24 @@ public class EngineerServiceImpl extends BaseExcelService implements EngineerSer
         if (successCount <= 0) {
             return;
         }
-        if (CollectionUtil.isEmpty(engineerUpdateListeners)) {
-            return;
-        }
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
+            public void run() throws RemoteException {
                 for (EngineerUpdateListener listener : engineerUpdateListeners) {
                     listener.updateEngineerEvent(CollectionUtil.toArray(engineerList, Engineer.class));
                 }
             }
-        }).start();
-        new Thread(new Runnable() {
+        });
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteEngineerService> remoteEngineerServices = ServiceClient.queryServicesOfListener(RemoteEngineerService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteEngineerServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteEngineerService> remoteEngineerServices = queryRemoteService(RemoteEngineerService.class);
                 logOperation("通知已注册的远程服务更新工程师基本信息");
                 for (RemoteEngineerService remoteEngineerService : remoteEngineerServices) {
-                    try {
-                        remoteEngineerService.saveEngineers(engineerList);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteEngineerService.saveEngineers(engineerList);
                 }
             }
-        }).start();
+        });
     }
 
     @Override
@@ -270,22 +234,15 @@ public class EngineerServiceImpl extends BaseExcelService implements EngineerSer
         }
         successCount = engineerTrainingManager.save(trainingList);
         logOperation("成功导入/更新工程师培训信息数：" + successCount);
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteEngineerService> remoteEngineerServices = ServiceClient.queryServicesOfListener(RemoteEngineerService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteEngineerServices)) {
-                    return;
-                }
+            public void run() throws RemoteException {
+                List<RemoteEngineerService> remoteEngineerServices = queryRemoteService(RemoteEngineerService.class);
                 logOperation("通知已注册的远程服务更新工程师发展信息");
                 for (RemoteEngineerService remoteEngineerService : remoteEngineerServices) {
-                    try {
-                        remoteEngineerService.saveEngineerTrainings(trainingList);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+                    remoteEngineerService.saveEngineerTrainings(trainingList);
                 }
             }
-        }).start();
+        });
     }
 }

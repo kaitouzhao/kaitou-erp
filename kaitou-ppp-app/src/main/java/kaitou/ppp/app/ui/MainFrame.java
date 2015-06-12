@@ -16,7 +16,10 @@ import kaitou.ppp.common.utils.NetworkUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
 import kaitou.ppp.domain.engineer.EngineerTraining;
-import kaitou.ppp.domain.shop.*;
+import kaitou.ppp.domain.shop.PartsLibrary;
+import kaitou.ppp.domain.shop.Shop;
+import kaitou.ppp.domain.shop.ShopContract;
+import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.domain.system.DBVersion;
 import kaitou.ppp.domain.tech.*;
 import kaitou.ppp.domain.ts.*;
@@ -34,8 +37,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.List;
@@ -44,6 +45,8 @@ import java.util.Map;
 import static com.womai.bsp.tool.utils.PropertyUtil.getValue;
 import static kaitou.ppp.app.SpringContextManager.*;
 import static kaitou.ppp.app.ui.UIUtil.*;
+import static kaitou.ppp.app.ui.table.OPManager.OpRunnable;
+import static kaitou.ppp.app.ui.table.OPManager.doRunWithExHandler;
 
 /**
  * 主界面
@@ -51,7 +54,7 @@ import static kaitou.ppp.app.ui.UIUtil.*;
  * @author 赵立伟
  */
 public class MainFrame extends JFrame {
-
+    private JFrame self = this;
     private static final String FRAME_TITLE = "PPP-ERP主界面";
     private static final int UPGRADE_DB_VERSIONS_WAIT_TIME = 3000;
     private static boolean isOnline = false;
@@ -76,6 +79,8 @@ public class MainFrame extends JFrame {
      * @param args 参数
      */
     public static void main(String[] args) {
+        getUpgradeService().upgradeTo3Dot3();
+
         asynchronousInit();
 
         new MainFrame();
@@ -219,25 +224,27 @@ public class MainFrame extends JFrame {
     }
 
     private void importShopBasicActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getShopService().importShops(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                getShopService().importShops(srcFile);
+                new OperationHint(self, "导入成功");
+            }
+        });
     }
 
     private void exportShopBasicActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getShopService().exportShops(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getShopService().exportShops(targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     private void queryShopBasicActionPerformed(ActionEvent e) {
@@ -253,58 +260,63 @@ public class MainFrame extends JFrame {
     }
 
     private void backupDBActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("压缩文件", "zip");
-            if (targetFile == null) return;
-            getDbService().backupDB(targetFile.getPath());
-            new OperationHint(this, "备份成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("压缩文件", "zip");
+                if (targetFile == null) return;
+                getDbService().backupDB(targetFile.getPath());
+                new OperationHint(self, "备份成功");
+            }
+        });
     }
 
     private void recoveryDBActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("压缩文件", "zip");
-            if (srcFile == null) return;
-            getDbService().recovery(srcFile.getPath());
-            new OperationHint(this, "恢复成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File srcFile = chooseImportFile("压缩文件", "zip");
+                if (srcFile == null) return;
+                getDbService().recovery(srcFile.getPath());
+                new OperationHint(self, "恢复成功");
+            }
+        });
     }
 
     private void importEngineerBasicActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getEngineerService().importEngineers(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                getEngineerService().importEngineers(srcFile);
+                new OperationHint(self, "导入成功");
+            }
+        });
     }
 
     private void exportEngineerBasicActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getEngineerService().exportEngineers(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getEngineerService().exportEngineers(targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     private void importEngineerTrainingActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getEngineerService().importEngineerTrainings(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                getEngineerService().importEngineerTrainings(srcFile);
+                new OperationHint(self, "导入成功");
+            }
+        });
     }
 
     private void queryEngineerTrainingActionPerformed(ActionEvent e) {
@@ -312,52 +324,56 @@ public class MainFrame extends JFrame {
     }
 
     private void exportEngineerTrainingActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getEngineerService().exportTrainings(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getEngineerService().exportTrainings(targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     private void countEngineerByProductLineActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getEngineerService().countEngineersByProductLine(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getEngineerService().countEngineersByProductLine(targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     private void countEngineerByShopActionPerformed(ActionEvent e) {
-        try {
-            InputHint inputHint = new InputHint(this, new String[]{"请选择产品线"});
-            if (!inputHint.isOk()) {
-                return;
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                InputHint inputHint = new InputHint(self, new String[]{"请选择产品线"});
+                if (!inputHint.isOk()) {
+                    return;
+                }
+                String productLine = inputHint.getInputResult()[0];
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getEngineerService().countEngineersByShop(productLine, targetFile);
+                new OperationHint(self, "导出成功");
             }
-            String productLine = inputHint.getInputResult()[0];
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getEngineerService().countEngineersByShop(productLine, targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        });
     }
 
     private void importShopDetailActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getShopService().importShopDetails(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                getShopService().importShopDetails(srcFile);
+                new OperationHint(self, "导入成功");
+            }
+        });
     }
 
     private void queryShopDetailActionPerformed(ActionEvent e) {
@@ -365,126 +381,74 @@ public class MainFrame extends JFrame {
     }
 
     private void exportShopDetailActionPerformed(ActionEvent e) {
-        try {
-            InputHint inputHint = new InputHint(this, new String[]{"导出认定年份"});
-            if (!inputHint.isOk()) {
-                return;
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                InputHint inputHint = new InputHint(self, new String[]{"导出认定年份"});
+                if (!inputHint.isOk()) {
+                    return;
+                }
+                String numberOfYear = inputHint.getInputResult()[0];
+                File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                if (StringUtils.isEmpty(numberOfYear)) {
+                    getExportService().exportShopDetails(targetFile);
+                } else {
+                    getExportService().exportShopDetails(targetFile, numberOfYear);
+                }
+                new OperationHint(self, "导出成功");
             }
-            String numberOfYear = inputHint.getInputResult()[0];
-            File targetFile = chooseExportFile("excel文件", "xls");
-            if (targetFile == null) return;
-            if (StringUtils.isEmpty(numberOfYear)) {
-                getExportService().exportShopDetails(targetFile);
-            } else {
-                getExportService().exportShopDetails(targetFile, numberOfYear);
-            }
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
-    }
-
-    private void importShopRTSActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getShopService().importRTSs(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
-    }
-
-    private void queryShopRTSActionPerformed(ActionEvent e) {
-        new QueryFrame<ShopRTS>(getShopService().queryAllRTSs(), new ShopRTSQueryObject());
-    }
-
-    private void exportShopRTSActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getShopService().exportRTSs(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
-    }
-
-    private void importShopPayActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getShopService().importPays(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
-    }
-
-    private void queryShopPayActionPerformed(ActionEvent e) {
-        new QueryFrame<ShopPay>(getShopService().queryAllPays(), new ShopPayQueryObject());
-    }
-
-    private void exportShopPayActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getShopService().exportPays(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        });
     }
 
     private void exportAllActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getShopService().exportAll(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getShopService().exportAll(targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     private void genCardMenuActionPerformed(ActionEvent e) {
-        try {
-            getCardService().generateCards();
-            new OperationHint(this, "生成成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
-    }
-
-    private void thisMouseClicked(MouseEvent e) {
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                getCardService().generateCards();
+                new OperationHint(self, "生成成功");
+            }
+        });
     }
 
     private void importCardApplicationRecordActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getCardService().importCardApplicationRecords(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                getCardService().importCardApplicationRecords(srcFile);
+                new OperationHint(self, "导入成功");
+            }
+        });
     }
 
     private void queryCardApplicationRecordActionPerformed(ActionEvent e) {
-//        new QueryFrame<CardApplicationRecord>(getCardService().queryCardApplicationRecords(), new CardApplicationRecordQueryObject());
-//        new QueryFrame<CardApplicationRecord>(new CardApplicationRecordQueryObject());
         new QueryFrameNew<CardApplicationRecord>(new CardApplicationRecordQueryObject());
     }
 
     private void exportCardApplicationRecordActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getCardService().exportCardApplicationRecords(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(this, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                getCardService().exportCardApplicationRecords(targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     private void countShopEquipmentActionPerformed(ActionEvent e) {
@@ -1241,12 +1205,6 @@ public class MainFrame extends JFrame {
 
         //======== this ========
         setTitle("PPP-ERP\u4e3b\u754c\u9762");
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                thisMouseClicked(e);
-            }
-        });
         Container contentPane = getContentPane();
         contentPane.setLayout(null);
 

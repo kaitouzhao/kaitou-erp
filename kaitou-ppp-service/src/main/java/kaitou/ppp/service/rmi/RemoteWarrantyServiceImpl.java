@@ -1,18 +1,23 @@
 package kaitou.ppp.service.rmi;
 
+import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
 import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.manager.listener.WarrantyUpdateListener;
 import kaitou.ppp.manager.warranty.WarrantyConsumablesManager;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 import kaitou.ppp.manager.warranty.WarrantyPartsManager;
 import kaitou.ppp.manager.warranty.WarrantyPrintManager;
 import kaitou.ppp.rmi.service.RemoteWarrantyService;
+import kaitou.ppp.service.ServiceInvokeManager;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+
+import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
 
 /**
  * 远程保修管理服务实现.
@@ -26,6 +31,11 @@ public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements Re
     private WarrantyPartsManager warrantyPartsManager;
     private WarrantyPrintManager warrantyPrintManager;
     private WarrantyConsumablesManager warrantyConsumablesManager;
+    private List<WarrantyUpdateListener> warrantyUpdateListeners;
+
+    public void setWarrantyUpdateListeners(List<WarrantyUpdateListener> warrantyUpdateListeners) {
+        this.warrantyUpdateListeners = warrantyUpdateListeners;
+    }
 
     public void setWarrantyConsumablesManager(WarrantyConsumablesManager warrantyConsumablesManager) {
         this.warrantyConsumablesManager = warrantyConsumablesManager;
@@ -48,8 +58,16 @@ public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements Re
     }
 
     @Override
-    public void saveWarrantyFee(List<WarrantyFee> warrantyFees) throws RemoteException {
+    public void saveWarrantyFee(final List<WarrantyFee> warrantyFees) throws RemoteException {
         warrantyFeeManager.save(warrantyFees);
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                for (WarrantyUpdateListener warrantyUpdateListener : warrantyUpdateListeners) {
+                    warrantyUpdateListener.updateWarrantyFeeEvent(CollectionUtil.toArray(warrantyFees, WarrantyFee.class));
+                }
+            }
+        });
     }
 
     @Override

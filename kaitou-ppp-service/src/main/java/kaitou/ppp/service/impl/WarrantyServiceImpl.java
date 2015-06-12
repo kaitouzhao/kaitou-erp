@@ -5,6 +5,7 @@ import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
 import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.manager.listener.WarrantyUpdateListener;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
@@ -22,6 +23,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static kaitou.ppp.service.ServiceInvokeManager.*;
+
 /**
  * 保修管理服务层实现.
  * User: 赵立伟
@@ -37,6 +40,11 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
     private SystemSettingsManager systemSettingsManager;
     private RemoteRegistryManager remoteRegistryManager;
     private WarrantyConsumablesManager warrantyConsumablesManager;
+    private List<WarrantyUpdateListener> warrantyUpdateListeners;
+
+    public void setWarrantyUpdateListeners(List<WarrantyUpdateListener> warrantyUpdateListeners) {
+        this.warrantyUpdateListeners = warrantyUpdateListeners;
+    }
 
     public void setWarrantyConsumablesManager(WarrantyConsumablesManager warrantyConsumablesManager) {
         this.warrantyConsumablesManager = warrantyConsumablesManager;
@@ -82,7 +90,7 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
     }
 
     @Override
-    public void saveOrUpdateWarrantyFee(WarrantyFee... warrantyFee) {
+    public void saveOrUpdateWarrantyFee(final WarrantyFee... warrantyFee) {
         if (CollectionUtil.isEmpty(warrantyFee)) {
             return;
         }
@@ -92,23 +100,25 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
             warrantyFees.add(fee);
         }
         logOperation("成功导入/更新保修费记录数：" + warrantyFeeManager.save(warrantyFees));
-        new Thread(new Runnable() {
+        asynchronousRun(new InvokeRunnable() {
             @Override
-            public void run() {
-                List<RemoteWarrantyService> remoteWarrantyServices = ServiceClient.queryServicesOfListener(RemoteWarrantyService.class, remoteRegistryManager.queryRegistryIps(), systemSettingsManager.getLocalIp());
-                if (CollectionUtil.isEmpty(remoteWarrantyServices)) {
-                    return;
-                }
-                logOperation("通知已注册的远程服务更新保修费记录");
-                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
-                    try {
-                        remoteWarrantyService.saveWarrantyFee(warrantyFees);
-                    } catch (RemoteException e) {
-                        logSystemEx(e);
-                    }
+            public void run() throws RemoteException {
+                logOperation("联动更新与保修费相关的数据");
+                for (WarrantyUpdateListener warrantyUpdateListener : warrantyUpdateListeners) {
+                    warrantyUpdateListener.updateWarrantyFeeEvent(warrantyFee);
                 }
             }
-        }).start();
+        });
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteWarrantyService> remoteWarrantyServices = queryRemoteService(RemoteWarrantyService.class);
+                logOperation("通知已注册的远程服务更新保修费记录");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    remoteWarrantyService.saveWarrantyFee(warrantyFees);
+                }
+            }
+        });
     }
 
     @Override

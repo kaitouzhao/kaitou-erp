@@ -2,6 +2,7 @@ package kaitou.ppp.domain.card;
 
 import kaitou.ppp.domain.BaseDomain4InDoubt;
 import kaitou.ppp.domain.annotation.PKField;
+import kaitou.ppp.domain.system.SysCode;
 import org.apache.commons.lang.StringUtils;
 
 import java.awt.*;
@@ -16,6 +17,12 @@ import static kaitou.ppp.domain.system.SysCode.WarrantyStatus;
  * Time: 21:22
  */
 public class CardApplicationRecord extends BaseDomain4InDoubt {
+    /**
+     * 区域
+     *
+     * @see kaitou.ppp.domain.system.SysCode.SaleRegion
+     */
+    private String saleRegion;
     /**
      * 保修卡号
      */
@@ -181,7 +188,8 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
     @Override
     public String toString() {
         return "CardApplicationRecord{" +
-                "warrantyCard='" + warrantyCard + '\'' +
+                "saleRegion='" + saleRegion + '\'' +
+                ", warrantyCard='" + warrantyCard + '\'' +
                 ", applyDate='" + applyDate + '\'' +
                 ", status='" + status + '\'' +
                 ", isBack='" + isBack + '\'' +
@@ -200,6 +208,14 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
                 ", installedAddress='" + installedAddress + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getSaleRegion() {
+        return SysCode.SaleRegion.convert2Value(saleRegion);
+    }
+
+    public void setSaleRegion(String saleRegion) {
+        this.saleRegion = saleRegion;
     }
 
     public String getModelType() {

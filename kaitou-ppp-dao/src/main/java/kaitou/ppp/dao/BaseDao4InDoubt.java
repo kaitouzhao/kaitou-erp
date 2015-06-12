@@ -21,6 +21,8 @@ import static com.womai.bsp.tool.utils.ReflectionUtil.getFieldValue;
  */
 public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends BaseDao {
 
+    private static final String SERIAL_NO_FIELD_NAME = "serialNo";
+
     @SuppressWarnings("unchecked")
     @Override
     public Object[] preSave(Object... domains) {
@@ -40,6 +42,12 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
 //        return check2(domains);
     }
 
+    /**
+     * 校验主键（优化后）
+     *
+     * @param domains 实体集合
+     * @return 待保存的实体集合
+     */
     private Object[] check2(Object[] domains) {
         String pkFieldName = getPkFieldName();
         if (StringUtils.isEmpty(pkFieldName)) {
@@ -69,9 +77,8 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
             for (String oneDb : dbList) {
                 for (T domain : toSave) {
                     Object newPKValue = getFieldValue(getDomainClass(), pkFieldName, domain);
-                    String serialNoFieldName = "serialNo";
-                    Object serialValue = getFieldValue(getDomainClass(), serialNoFieldName, domain);
-                    if (!hasFieldValue(pkFieldName, newPKValue, oneDb) || hasFieldValue(serialNoFieldName, serialValue, oneDb)) {
+                    Object serialValue = getFieldValue(getDomainClass(), SERIAL_NO_FIELD_NAME, domain);
+                    if (!hasFieldValue(pkFieldName, newPKValue, oneDb) || hasFieldValue(SERIAL_NO_FIELD_NAME, serialValue, oneDb)) {
                         continue;
                     }
                     domain.doInDoubt();
@@ -85,6 +92,12 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
         return CollectionUtil.toArray(newToSave, getDomainClass());
     }
 
+    /**
+     * 校验主键
+     *
+     * @param domains 实体集合
+     * @return 待保存的实体集合
+     */
     private Object[] check1(Object[] domains) {
         String pkFieldName = getPkFieldName();
         if (StringUtils.isEmpty(pkFieldName)) {
@@ -154,4 +167,48 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
         return pkField.getName();
     }
 
+    /**
+     * 特殊处理与被删除实体主键冲突的实体
+     *
+     * @param domains 待删除实体集合
+     * @return 特殊处理实体
+     */
+    @Override
+    protected List<T> afterDelete(Object... domains) {
+        if (CollectionUtil.isEmpty(domains)) {
+            return super.afterDelete(domains);
+        }
+        List<String> dbList = readDBFile(((T) domains[0]).dbFileSuffix());
+        Map<Object, List<String>> checkThisBatchHasDuplicate = new HashMap<Object, List<String>>();
+        String pkFieldName = getPkFieldName();
+        Class domainClass = getDomainClass();
+        for (Object obj : domains) {
+            T domain = (T) obj;
+            Object pkValue = getFieldValue(domainClass, pkFieldName, domain);
+            Object serialValue = domain.getSerialNo();
+            for (String oneDb : dbList) {
+                if (!hasFieldValue(pkFieldName, pkValue, oneDb) || hasFieldValue(SERIAL_NO_FIELD_NAME, serialValue, oneDb)) {
+                    continue;
+                }
+                List<String> hasList = checkThisBatchHasDuplicate.get(pkValue);
+                if (CollectionUtil.isEmpty(hasList)) {
+                    checkThisBatchHasDuplicate.put(pkValue, CollectionUtil.newList(oneDb));
+                } else {
+                    hasList.add(oneDb);
+                }
+            }
+        }
+        List<T> specialHandlingDomains = CollectionUtil.newList();
+        for (Map.Entry<Object, List<String>> item : checkThisBatchHasDuplicate.entrySet()) {
+            List<String> dbs = item.getValue();
+            if (CollectionUtil.isNotEmpty(dbs) && dbs.size() == 1) {
+                for (String db : dbs) {
+                    T duplicateDomain = (T) json2Object(db, getDomainClass());
+                    duplicateDomain.noDoubt();
+                    specialHandlingDomains.add(duplicateDomain);
+                }
+            }
+        }
+        return specialHandlingDomains;
+    }
 }

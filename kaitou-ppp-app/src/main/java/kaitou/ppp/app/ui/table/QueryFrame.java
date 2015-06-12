@@ -5,9 +5,9 @@
 package kaitou.ppp.app.ui.table;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
 import kaitou.ppp.app.ui.dialog.ConfirmHint;
 import kaitou.ppp.app.ui.dialog.OperationHint;
-import kaitou.ppp.app.ui.dialog.SaveDialog;
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.BaseDomain4InDoubt;
 import org.apache.commons.lang.StringUtils;
@@ -134,7 +134,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         if (OP_COLUMN_TITLE.equals(tableTitles[tableTitles.length - 1])) {
             opColumnIndex = tableTitles.length - 1;
         }
-        this.datas = OPManager.query(this.queryObject.domainType());
+        this.datas = query(this.queryObject.domainType());
         shownDatas.addAll(datas);
         initComponents();
         initTableData();
@@ -312,7 +312,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
                             break;
                         }
                         String fieldValueStr = fieldValue.toString();
-                        if (!fieldValueStr.contains(textFieldValue.trim())) {
+                        if (!fieldValueStr.toLowerCase().contains(textFieldValue.toLowerCase().trim())) {
                             excludes.add(i);
                             break;
                         }
@@ -389,7 +389,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             if (!hint.isOk()) {
                 return;
             }
-            Object[] deleted = new Object[selectedRows.size()];
+            final Object[] deleted = new Object[selectedRows.size()];
             List<Integer> deletedIndexes = new ArrayList<Integer>();
             for (int i = 0; i < selectedRows.size(); i++) {
                 int index = getShownDataIndex(selectedRows.get(i));
@@ -399,8 +399,12 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             for (Integer deletedIndex : deletedIndexes) {
                 datas.remove(shownDatas.get(deletedIndex));
             }
-            delete(queryObject.domainType(), deleted);
-            new OperationHint(this, "删除成功！");
+            doRunWithWaiting(self, new OpRunnable() {
+                @Override
+                public void run() {
+                    delete(queryObject.domainType(), deleted);
+                }
+            }, "删除成功！");
             queryByCondition();
         } catch (Exception ex) {
             handleEx(ex, this);
@@ -409,7 +413,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
 
     private void saveBtnActionPerformed(ActionEvent e) {
         try {
-            SaveDialog<T> saveDialog = new SaveDialog<T>(this, queryObject);
+            BaseSaveDialog<T> saveDialog = wannaSave(queryObject, self);
             if (!saveDialog.isOk() || saveDialog.getDomain() == null) {
                 return;
             }
@@ -450,13 +454,17 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
                 return;
             }
             Object edited = shownDatas.get(getShownDataIndex(row));
-            Object dataObj = datas.get(datas.indexOf(edited));
+            final Object dataObj = datas.get(datas.indexOf(edited));
             String fieldName = String.valueOf(Array.get(queryObject.fieldNames(), column - 1));
             String fieldValue = String.valueOf(dataTable.getValueAt(row, column));
             setFieldValue(fieldName, edited, fieldValue);
             setFieldValue(fieldName, dataObj, fieldValue);
-            saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(dataObj), queryObject.domainClass()));
-            new OperationHint(self, "更新成功");
+            doRunWithWaiting(self, new OpRunnable() {
+                @Override
+                public void run() {
+                    saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(dataObj), queryObject.domainClass()));
+                }
+            }, "更新成功");
             select();
         }
 
@@ -513,7 +521,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
                 return;
             }
             Object shownObj = shownDatas.get(getShownDataIndex(opIndexes[0]));
-            Object dataObj = datas.get(datas.indexOf(shownObj));
+            final Object dataObj = datas.get(datas.indexOf(shownObj));
             String btnText = btn.getText();
             String changeValue;
             String[] opNames = queryObject.opNames();
@@ -525,8 +533,12 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             String opFieldName = queryObject.opFieldName();
             setFieldValue(opFieldName, shownObj, changeValue);
             setFieldValue(opFieldName, dataObj, changeValue);
-            saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(dataObj), queryObject.domainClass()));
-            new OperationHint(self, "操作成功");
+            doRunWithWaiting(self, new OpRunnable() {
+                @Override
+                public void run() {
+                    saveOrUpdate(queryObject.domainType(), CollectionUtil.toArray(CollectionUtil.newList(dataObj), queryObject.domainClass()));
+                }
+            }, "操作成功");
             select();
         }
 
@@ -667,6 +679,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         sendBtn = new JButton();
         allSelectedBtn = new JButton();
         noSelectedBtn = new JButton();
+        editableHint = new JLabel();
 
         //======== this ========
         addWindowListener(new WindowAdapter() {
@@ -862,6 +875,12 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         contentPane.add(noSelectedBtn);
         noSelectedBtn.setBounds(new Rectangle(new Point(70, 145), noSelectedBtn.getPreferredSize()));
 
+        //---- editableHint ----
+        editableHint.setText("*\u662f\u53ef\u4ee5\u4fee\u6539\u7684\u5217");
+        editableHint.setForeground(Color.red);
+        contentPane.add(editableHint);
+        editableHint.setBounds(new Rectangle(new Point(195, 150), editableHint.getPreferredSize()));
+
         contentPane.setPreferredSize(new Dimension(920, 695));
         setSize(920, 695);
         setLocationRelativeTo(getOwner());
@@ -944,5 +963,6 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     private JButton sendBtn;
     private JButton allSelectedBtn;
     private JButton noSelectedBtn;
+    private JLabel editableHint;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }
