@@ -17,4 +17,11 @@ public interface ExportService {
      * @param numberOfYear 认定年份。默认全部，可以是一个或多个
      */
     public void exportShopDetails(File targetFile, String... numberOfYear);
+
+    /**
+     * 导出SOID识别码
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportSOIDCode(File targetFile);
 }

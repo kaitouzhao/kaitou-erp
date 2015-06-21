@@ -1,8 +1,10 @@
 package kaitou.ppp.domain.engineer;
 
 import kaitou.ppp.domain.BaseDomain;
-import kaitou.ppp.domain.system.SysCode;
 import org.apache.commons.lang.StringUtils;
+
+import static kaitou.ppp.domain.system.SysCode.DB_FILE_NAME_SPLIT;
+import static kaitou.ppp.domain.system.SysCode.SaleRegion;
 
 /**
  * 工程师培训信息.
@@ -22,7 +24,7 @@ public class EngineerTraining extends BaseDomain {
     /**
      * 销售区域
      *
-     * @see kaitou.ppp.domain.system.SysCode.SaleRegion
+     * @see SaleRegion
      */
     protected String saleRegion;
     /**
@@ -85,15 +87,19 @@ public class EngineerTraining extends BaseDomain {
      * 备注
      */
     private String note;
+    /**
+     * 年份
+     */
+    private String year;
 
     @Override
     public String dbFileSuffix() {
-        return '_' + shopId + '_' + getClass().getSimpleName() + DB_SUFFIX;
+        return DB_FILE_NAME_SPLIT + shopId + DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
     public String dbFileName() {
-        return SysCode.SaleRegion.convert2Code(saleRegion) + dbFileSuffix();
+        return SaleRegion.convert2Code(saleRegion) + dbFileSuffix();
     }
 
     @Override
@@ -151,37 +157,16 @@ public class EngineerTraining extends BaseDomain {
                 ", trainingModel='" + trainingModel + '\'' +
                 ", qualified='" + qualified + '\'' +
                 ", note='" + note + '\'' +
+                ", year='" + year + '\'' +
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        EngineerTraining training = (EngineerTraining) o;
-
-        if (dateOfTraining != null ? !dateOfTraining.equals(training.dateOfTraining) : training.dateOfTraining != null)
-            return false;
-        if (id != null ? !id.equals(training.id) : training.id != null) return false;
-        if (productLine != null ? !productLine.equals(training.productLine) : training.productLine != null)
-            return false;
-        if (trainer != null ? !trainer.equals(training.trainer) : training.trainer != null) return false;
-        if (trainingModel != null ? !trainingModel.equals(training.trainingModel) : training.trainingModel != null)
-            return false;
-        return !(trainingType != null ? !trainingType.equals(training.trainingType) : training.trainingType != null);
-
+    public String getYear() {
+        return year;
     }
 
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (trainer != null ? trainer.hashCode() : 0);
-        result = 31 * result + (trainingType != null ? trainingType.hashCode() : 0);
-        result = 31 * result + (dateOfTraining != null ? dateOfTraining.hashCode() : 0);
-        result = 31 * result + (trainingModel != null ? trainingModel.hashCode() : 0);
-        return result;
+    public void setYear(String year) {
+        this.year = year;
     }
 
     public String getQualified() {
@@ -217,7 +202,7 @@ public class EngineerTraining extends BaseDomain {
     }
 
     public String getSaleRegion() {
-        return SysCode.SaleRegion.convert2Value(saleRegion);
+        return SaleRegion.convert2Value(saleRegion);
     }
 
     public void setSaleRegion(String saleRegion) {

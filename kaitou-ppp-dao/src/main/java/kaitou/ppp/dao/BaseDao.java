@@ -19,6 +19,7 @@ import static com.womai.bsp.tool.utils.JsonUtil.json2Object;
 import static com.womai.bsp.tool.utils.JsonUtil.object2Json;
 import static kaitou.ppp.common.utils.FileUtil.readLines;
 import static kaitou.ppp.common.utils.FileUtil.writeLines;
+import static kaitou.ppp.domain.BaseDomain.BACK_SUFFIX;
 import static kaitou.ppp.domain.BaseDomain.DB_SUFFIX;
 import static kaitou.ppp.domain.system.SysCode.DB_FILE_NAME_SPLIT;
 
@@ -57,9 +58,20 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
      * @param domains 实体集合。支持一个或多个
      * @return 成功保存记录数
      */
-    @SuppressWarnings("unchecked")
     public int save(Object... domains) {
-        Object[] toSave = preSave(domains);
+        return save(true, domains);
+    }
+
+    /**
+     * 保存/更新
+     *
+     * @param isNewTransaction 是否开启新事务
+     * @param domains          实体集合。支持一个或多个
+     * @return 成功保存记录数
+     */
+    @SuppressWarnings("unchecked")
+    public int save(boolean isNewTransaction, Object... domains) {
+        Object[] toSave = preSave(isNewTransaction, domains);
         if (CollectionUtil.isEmpty(toSave)) {
             return 0;
         }
@@ -81,7 +93,7 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
             String backDbFileName = domain.backDbFileName();
             List<T> domainList = domainMap.get(backDbFileName);
             if (domainList == null) {
-                domainList = query(domain.dbFileName());
+                domainList = query(isNewTransaction ? domain.dbFileName() : domain.backDbFileName());
                 if (CollectionUtil.isEmpty(domainList)) {
                     domainList = new ArrayList<T>();
                 }
@@ -129,11 +141,18 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
      * 保存/更新前如有特殊操作，请覆盖此方法
      * </p>
      *
-     * @param domains 实体集合。支持一个或多个
+     * @param isNewTransaction 是否开启新事务
+     * @param domains          实体集合。支持一个或多个
      * @return 待保存的实体集合
      */
     @SuppressWarnings("unchecked")
-    protected Object[] preSave(Object... domains) {
+    protected Object[] preSave(boolean isNewTransaction, Object... domains) {
+        for (Object obj : domains) {
+            T domain = (T) obj;
+            if (domain.getSerialNo() < 0) {
+                domain.generateSerialNo();
+            }
+        }
         return CollectionUtil.toArray(CollectionUtil.newList(domains), Object.class);
     }
 
@@ -208,28 +227,7 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
         if (pager.inValid()) {
             throw new RuntimeException("分页无效");
         }
-        List<String> dbList = readDBFile();
-        if (CollectionUtil.isEmpty(dbList)) {
-            return pager.setTotalSize(0);
-        }
-        List<String> selectedList = new ArrayList<String>();
-        if (CollectionUtil.isEmpty(conditions)) {
-            selectedList.addAll(dbList);
-        } else {
-            for (String db : dbList) {
-                boolean isSelected = true;
-                for (Condition condition : conditions) {
-                    String fieldValue = JsonUtil.getFieldValue(db, condition.getFieldName());
-                    if (!fieldValue.toLowerCase().contains(String.valueOf(condition.getFieldValue()).toLowerCase().trim())) {
-                        isSelected = false;
-                        break;
-                    }
-                }
-                if (isSelected) {
-                    selectedList.add(db);
-                }
-            }
-        }
+        List<String> selectedList = query(conditions);
         pager.setTotalSize(selectedList.size());
         List<String> pagerList = selectedList.subList(pager.beginIndex(), pager.endIndex());
         List<T> domainList = new ArrayList<T>();
@@ -240,17 +238,66 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
     }
 
     /**
+     * 根据查询条件筛选数据
+     *
+     * @param conditions 查询条件列表
+     * @return 数据列表
+     */
+    private List<String> query(List<Condition> conditions) {
+        List<String> dbList = readDBFile();
+        List<String> selectedList = new ArrayList<String>();
+        if (CollectionUtil.isEmpty(dbList)) {
+            return selectedList;
+        }
+        if (CollectionUtil.isEmpty(conditions)) {
+            selectedList.addAll(dbList);
+            return selectedList;
+        }
+        for (String db : dbList) {
+            boolean isSelected = true;
+            for (Condition condition : conditions) {
+                String fieldValue = JsonUtil.getFieldValue(db, condition.getFieldName());
+                if (!fieldValue.toLowerCase().contains(String.valueOf(condition.getFieldValue()).toLowerCase().trim())) {
+                    isSelected = false;
+                    break;
+                }
+            }
+            if (isSelected) {
+                selectedList.add(db);
+            }
+        }
+        return selectedList;
+    }
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件
+     * @return 结果集
+     */
+    public List<T> queryAll(List<Condition> conditions) {
+        List<T> domainList = new ArrayList<T>();
+        List<String> selectedList = query(conditions);
+        for (String db : selectedList) {
+            domainList.add(json2Object(db, getDomainClass()));
+        }
+        return domainList;
+    }
+
+    /**
      * 查询
      *
-     * @param dbType DB文件类型。如果为空，则默认获取全部
+     * @param isNewTransaction 是否开启新事务
+     * @param dbType           DB文件类型。如果为空，则默认获取全部
      * @return 实体列表
      */
-    public List<T> query(String... dbType) {
+    protected List<T> query(boolean isNewTransaction, String... dbType) {
         List<T> domainList = new ArrayList<T>();
         final String domainName = getDomainClass().getSimpleName();
+        final String dbSuffix = isNewTransaction ? domainName + DB_SUFFIX : domainName + DB_SUFFIX + BACK_SUFFIX;
         if (!CollectionUtil.isEmpty(dbType)) {
             for (String sId : dbType) {
-                String dbFileSuffix = sId + DB_FILE_NAME_SPLIT + domainName + DB_SUFFIX;
+                String dbFileSuffix = sId + DB_FILE_NAME_SPLIT + dbSuffix;
                 domainList.addAll(query(dbFileSuffix));
             }
             return domainList;
@@ -259,7 +306,7 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
         File[] dbFiles = dbDirFile.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return name.endsWith(domainName + DB_SUFFIX);
+                return name.endsWith(dbSuffix);
             }
         });
         for (File dbFile : dbFiles) {
@@ -270,12 +317,32 @@ public abstract class BaseDao<T extends BaseDomain> extends BaseLogManager {
     }
 
     /**
+     * 查询
+     *
+     * @param dbType DB文件类型。如果为空，则默认获取全部
+     * @return 实体列表
+     */
+    public List<T> query(String... dbType) {
+        return query(true, dbType);
+    }
+
+    /**
+     * 查询全部
+     *
+     * @param isNewTransaction 是否开启新事务
+     * @return 实体列表
+     */
+    protected List<T> queryAll(boolean isNewTransaction) {
+        return query(isNewTransaction);
+    }
+
+    /**
      * 查询全部
      *
      * @return 实体列表
      */
     public List<T> queryAll() {
-        return query();
+        return queryAll(true);
     }
 
     /**

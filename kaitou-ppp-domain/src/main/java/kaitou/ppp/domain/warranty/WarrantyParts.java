@@ -251,7 +251,7 @@ public class WarrantyParts extends BaseDomain {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + getClass().getSimpleName() + DB_SUFFIX;
+        return SysCode.DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
@@ -282,126 +282,6 @@ public class WarrantyParts extends BaseDomain {
                 ", faultPhenomenon='" + faultPhenomenon + '\'' +
                 ", note='" + note + '\'' +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        WarrantyParts that = (WarrantyParts) o;
-
-        if (a != null ? !a.equals(that.a) : that.a != null) return false;
-        if (camg != null ? !camg.equals(that.camg) : that.camg != null) return false;
-        if (camg1 != null ? !camg1.equals(that.camg1) : that.camg1 != null) return false;
-        if (category != null ? !category.equals(that.category) : that.category != null) return false;
-        if (classNo != null ? !classNo.equals(that.classNo) : that.classNo != null) return false;
-        if (costPerUnit != null ? !costPerUnit.equals(that.costPerUnit) : that.costPerUnit != null) return false;
-        if (crs != null ? !crs.equals(that.crs) : that.crs != null) return false;
-        if (deliveryNumber != null ? !deliveryNumber.equals(that.deliveryNumber) : that.deliveryNumber != null)
-            return false;
-        if (div != null ? !div.equals(that.div) : that.div != null) return false;
-        if (div1 != null ? !div1.equals(that.div1) : that.div1 != null) return false;
-        if (eoOrMeOrderNo != null ? !eoOrMeOrderNo.equals(that.eoOrMeOrderNo) : that.eoOrMeOrderNo != null)
-            return false;
-        if (expClass != null ? !expClass.equals(that.expClass) : that.expClass != null) return false;
-        if (expPDiv != null ? !expPDiv.equals(that.expPDiv) : that.expPDiv != null) return false;
-        if (expenseDepartment != null ? !expenseDepartment.equals(that.expenseDepartment) : that.expenseDepartment != null)
-            return false;
-        if (expenseRegion != null ? !expenseRegion.equals(that.expenseRegion) : that.expenseRegion != null)
-            return false;
-        if (faultPhenomenon != null ? !faultPhenomenon.equals(that.faultPhenomenon) : that.faultPhenomenon != null)
-            return false;
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (icpSpecial != null ? !icpSpecial.equals(that.icpSpecial) : that.icpSpecial != null) return false;
-        if (icpSpecialTax != null ? !icpSpecialTax.equals(that.icpSpecialTax) : that.icpSpecialTax != null)
-            return false;
-        if (icpSpecialTotal != null ? !icpSpecialTotal.equals(that.icpSpecialTotal) : that.icpSpecialTotal != null)
-            return false;
-        if (invoiceDate != null ? !invoiceDate.equals(that.invoiceDate) : that.invoiceDate != null) return false;
-        if (model != null ? !model.equals(that.model) : that.model != null) return false;
-        if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
-            return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (orderSubmitDate != null ? !orderSubmitDate.equals(that.orderSubmitDate) : that.orderSubmitDate != null)
-            return false;
-        if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
-        if (productName != null ? !productName.equals(that.productName) : that.productName != null) return false;
-        if (purchaseDate != null ? !purchaseDate.equals(that.purchaseDate) : that.purchaseDate != null) return false;
-        if (ramboInvoiceNo != null ? !ramboInvoiceNo.equals(that.ramboInvoiceNo) : that.ramboInvoiceNo != null)
-            return false;
-        if (ramboOrderNo != null ? !ramboOrderNo.equals(that.ramboOrderNo) : that.ramboOrderNo != null) return false;
-        if (repairOrder != null ? !repairOrder.equals(that.repairOrder) : that.repairOrder != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopCompanyCode != null ? !shopCompanyCode.equals(that.shopCompanyCode) : that.shopCompanyCode != null)
-            return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (size != null ? !size.equals(that.size) : that.size != null) return false;
-        if (sysModel != null ? !sysModel.equals(that.sysModel) : that.sysModel != null) return false;
-        if (tax != null ? !tax.equals(that.tax) : that.tax != null) return false;
-        if (totalAfterTax != null ? !totalAfterTax.equals(that.totalAfterTax) : that.totalAfterTax != null)
-            return false;
-        if (totalPreTax != null ? !totalPreTax.equals(that.totalPreTax) : that.totalPreTax != null) return false;
-        if (userCompanyName != null ? !userCompanyName.equals(that.userCompanyName) : that.userCompanyName != null)
-            return false;
-        if (userContact != null ? !userContact.equals(that.userContact) : that.userContact != null) return false;
-        if (userLinkMan != null ? !userLinkMan.equals(that.userLinkMan) : that.userLinkMan != null) return false;
-        if (warrantyOrderType != null ? !warrantyOrderType.equals(that.warrantyOrderType) : that.warrantyOrderType != null)
-            return false;
-        if (warrantyType != null ? !warrantyType.equals(that.warrantyType) : that.warrantyType != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
-        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
-        result = 31 * result + (expenseDepartment != null ? expenseDepartment.hashCode() : 0);
-        result = 31 * result + (expenseRegion != null ? expenseRegion.hashCode() : 0);
-        result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
-        result = 31 * result + (warrantyType != null ? warrantyType.hashCode() : 0);
-        result = 31 * result + (warrantyOrderType != null ? warrantyOrderType.hashCode() : 0);
-        result = 31 * result + (expClass != null ? expClass.hashCode() : 0);
-        result = 31 * result + (expPDiv != null ? expPDiv.hashCode() : 0);
-        result = 31 * result + (eoOrMeOrderNo != null ? eoOrMeOrderNo.hashCode() : 0);
-        result = 31 * result + (invoiceDate != null ? invoiceDate.hashCode() : 0);
-        result = 31 * result + (ramboOrderNo != null ? ramboOrderNo.hashCode() : 0);
-        result = 31 * result + (ramboInvoiceNo != null ? ramboInvoiceNo.hashCode() : 0);
-        result = 31 * result + (shopCompanyCode != null ? shopCompanyCode.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (partNo != null ? partNo.hashCode() : 0);
-        result = 31 * result + (size != null ? size.hashCode() : 0);
-        result = 31 * result + (div != null ? div.hashCode() : 0);
-        result = 31 * result + (camg != null ? camg.hashCode() : 0);
-        result = 31 * result + (productName != null ? productName.hashCode() : 0);
-        result = 31 * result + (sysModel != null ? sysModel.hashCode() : 0);
-        result = 31 * result + (costPerUnit != null ? costPerUnit.hashCode() : 0);
-        result = 31 * result + (deliveryNumber != null ? deliveryNumber.hashCode() : 0);
-        result = 31 * result + (totalPreTax != null ? totalPreTax.hashCode() : 0);
-        result = 31 * result + (tax != null ? tax.hashCode() : 0);
-        result = 31 * result + (totalAfterTax != null ? totalAfterTax.hashCode() : 0);
-        result = 31 * result + (orderSubmitDate != null ? orderSubmitDate.hashCode() : 0);
-        result = 31 * result + (userCompanyName != null ? userCompanyName.hashCode() : 0);
-        result = 31 * result + (userLinkMan != null ? userLinkMan.hashCode() : 0);
-        result = 31 * result + (userContact != null ? userContact.hashCode() : 0);
-        result = 31 * result + (purchaseDate != null ? purchaseDate.hashCode() : 0);
-        result = 31 * result + (model != null ? model.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (repairOrder != null ? repairOrder.hashCode() : 0);
-        result = 31 * result + (faultPhenomenon != null ? faultPhenomenon.hashCode() : 0);
-        result = 31 * result + (classNo != null ? classNo.hashCode() : 0);
-        result = 31 * result + (div1 != null ? div1.hashCode() : 0);
-        result = 31 * result + (camg1 != null ? camg1.hashCode() : 0);
-        result = 31 * result + (icpSpecial != null ? icpSpecial.hashCode() : 0);
-        result = 31 * result + (icpSpecialTax != null ? icpSpecialTax.hashCode() : 0);
-        result = 31 * result + (icpSpecialTotal != null ? icpSpecialTotal.hashCode() : 0);
-        result = 31 * result + (a != null ? a.hashCode() : 0);
-        result = 31 * result + (crs != null ? crs.hashCode() : 0);
-        result = 31 * result + (category != null ? category.hashCode() : 0);
-        return result;
     }
 
     public String getProductLine() {

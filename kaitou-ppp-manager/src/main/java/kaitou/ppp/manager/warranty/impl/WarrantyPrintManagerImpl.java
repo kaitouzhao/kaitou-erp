@@ -43,4 +43,18 @@ public class WarrantyPrintManagerImpl extends BaseFileDaoManager<WarrantyPrint> 
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
     }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<WarrantyPrint> warrantyPrintList = queryAll();
+        for (WarrantyPrint warrantyPrint : warrantyPrintList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(warrantyPrint.getShopName())) {
+                    continue;
+                }
+                warrantyPrint.setShopId(shop.getId());
+            }
+        }
+        save(warrantyPrintList);
+    }
 }

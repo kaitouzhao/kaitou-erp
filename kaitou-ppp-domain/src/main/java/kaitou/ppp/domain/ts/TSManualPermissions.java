@@ -64,36 +64,6 @@ public class TSManualPermissions extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TSManualPermissions that = (TSManualPermissions) o;
-
-        if (addModel != null ? !addModel.equals(that.addModel) : that.addModel != null) return false;
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (email != null ? !email.equals(that.email) : that.email != null) return false;
-        if (engineerName != null ? !engineerName.equals(that.engineerName) : that.engineerName != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (robinAccount != null ? !robinAccount.equals(that.robinAccount) : that.robinAccount != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (engineerName != null ? engineerName.hashCode() : 0);
-        result = 31 * result + (robinAccount != null ? robinAccount.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (addModel != null ? addModel.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getApplyDate() {
         return applyDate;
     }

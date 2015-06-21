@@ -1,6 +1,7 @@
 package kaitou.ppp.manager.tech.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.domain.tech.TechSDSPermission;
@@ -8,6 +9,7 @@ import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
 import kaitou.ppp.manager.tech.SDSPermissionManager;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -47,5 +49,20 @@ public class SDSPermissionManagerImpl extends BaseFileDaoManager<TechSDSPermissi
     @Override
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<TechSDSPermission> permissionList = queryAll();
+        FileUtil.delete(dbDir + File.separatorChar + "TechSDSPermission.kdb");
+        for (TechSDSPermission permission : permissionList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(permission.getShopName())) {
+                    continue;
+                }
+                permission.setShopId(shop.getId());
+            }
+        }
+        save(permissionList);
     }
 }

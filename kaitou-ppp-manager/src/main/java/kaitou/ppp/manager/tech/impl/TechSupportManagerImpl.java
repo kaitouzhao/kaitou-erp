@@ -43,4 +43,18 @@ public class TechSupportManagerImpl extends BaseFileDaoManager<TechSupport> impl
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
     }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<TechSupport> techSupportList = queryAll();
+        for (TechSupport techSupport : techSupportList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(techSupport.getShopName())) {
+                    continue;
+                }
+                techSupport.setShopId(shop.getId());
+            }
+        }
+        save(techSupportList);
+    }
 }

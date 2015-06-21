@@ -5,8 +5,11 @@ import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.card.CardApplication;
 import kaitou.ppp.domain.card.CardApplicationRecord;
+import kaitou.ppp.domain.system.SysCode;
+import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.shop.ShopManager;
+import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 import kaitou.ppp.rmi.service.RemoteCardService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.CardService;
@@ -27,10 +30,7 @@ import org.joda.time.DateTime;
 import java.io.*;
 import java.rmi.RemoteException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
 import static kaitou.ppp.domain.system.SysCode.*;
@@ -54,10 +54,15 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     private String template;
 
     private ShopManager shopManager;
+    private WarrantyFeeManager warrantyFeeManager;
     private CardApplicationRecordManager cardApplicationRecordManager;
 
     public void setShopManager(ShopManager shopManager) {
         this.shopManager = shopManager;
+    }
+
+    public void setWarrantyFeeManager(WarrantyFeeManager warrantyFeeManager) {
+        this.warrantyFeeManager = warrantyFeeManager;
     }
 
     public void setCardApplicationRecordManager(CardApplicationRecordManager cardApplicationRecordManager) {
@@ -342,11 +347,28 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     @SuppressWarnings("unchecked")
     public void saveOrUpdateCardApplicationRecord(final CardApplicationRecord... cardApplicationRecords) {
         final List<CardApplicationRecord> cardApplicationRecordList = new ArrayList<CardApplicationRecord>();
+        List<WarrantyFee> warrantyFeeList = warrantyFeeManager.query();
+        Collections.sort(warrantyFeeList, new Comparator<WarrantyFee>() {
+            @Override
+            public int compare(WarrantyFee o1, WarrantyFee o2) {
+                return o1.comparator(o2);
+            }
+        });
         for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
             String shopId = shopManager.getCachedIdByName(cardApplicationRecord.getShopName());
             if (StringUtils.isNotEmpty(shopId)) {
                 cardApplicationRecord.setShopId(shopId);
                 cardApplicationRecord.setSaleRegion(shopManager.getCachedShop(shopId).getSaleRegion());
+            }
+            for (WarrantyFee warrantyFee : warrantyFeeList) {
+                if (cardApplicationRecord.getFuselage().equals(warrantyFee.getFuselage())) {
+                    if (StringUtils.isEmpty(cardApplicationRecord.getIsBack())) {
+                        cardApplicationRecord.setIsBack(warrantyFee.checkCardApplicationRecordIsBack());
+                    }
+                    if (warrantyFee.checkCardApplicationRecordIsOutOfWarranty() && !SysCode.WarrantyStatus.OUT_WARRANTY.getValue().equals(cardApplicationRecord.getStatus())) {
+                        cardApplicationRecord.setStatus(SysCode.WarrantyStatus.OUT_WARRANTY.getValue());
+                    }
+                }
             }
             cardApplicationRecordList.add(cardApplicationRecord);
         }
@@ -381,7 +403,7 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     }
 
     @Override
-    public Pager<CardApplicationRecord> queryPager(int currentPage, List<Condition> conditions) {
+    public Pager<CardApplicationRecord> queryCardApplicationRecordPager(int currentPage, List<Condition> conditions) {
         Pager<CardApplicationRecord> pager = cardApplicationRecordManager.queryPager(currentPage, conditions);
         List<CardApplicationRecord> cardApplicationRecords = pager.getResult();
         for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
@@ -391,5 +413,10 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
             cardApplicationRecord.setStatus(WarrantyStatus.getStatus(cardApplicationRecord.getInstalledDate()));
         }
         return pager;
+    }
+
+    @Override
+    public List<CardApplicationRecord> queryCardApplicationRecord(List<Condition> conditions) {
+        return cardApplicationRecordManager.queryAll(conditions);
     }
 }

@@ -162,6 +162,34 @@ public abstract class FileUtil {
     }
 
     /**
+     * 删除目录文件
+     *
+     * @param dir    目录路径
+     * @param suffix 删除文件后缀集合。为空则不删除
+     */
+    public static void deleteFilesOfDir(String dir, final String... suffix) {
+        if (StringUtils.isEmpty(dir) || CollectionUtil.isEmpty(suffix) || !isExists(dir)) {
+            return;
+        }
+        File[] files = new File(dir).listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                for (String s : suffix) {
+                    if (name.endsWith(s)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        if (CollectionUtil.isNotEmpty(files)) {
+            for (File file : files) {
+                delete(file.getPath());
+            }
+        }
+    }
+
+    /**
      * 拷贝文件
      *
      * @param srcPath    源文件路径

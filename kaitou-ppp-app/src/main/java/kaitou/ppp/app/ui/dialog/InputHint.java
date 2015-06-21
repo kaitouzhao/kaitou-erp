@@ -4,8 +4,6 @@
 
 package kaitou.ppp.app.ui.dialog;
 
-import com.jgoodies.forms.layout.CellConstraints;
-import com.jgoodies.forms.layout.FormLayout;
 import com.womai.bsp.tool.utils.CollectionUtil;
 
 import javax.swing.*;
@@ -95,7 +93,6 @@ public class InputHint extends JDialog {
         inputArea = new JPanel();
         buttonBar = new JPanel();
         okButton = new JButton();
-        CellConstraints cc = new CellConstraints();
 
         //======== this ========
         setTitle("\u8bf7\u8f93\u5165");
@@ -110,17 +107,13 @@ public class InputHint extends JDialog {
 
             //======== contentPanel ========
             {
-                contentPanel.setLayout(new FormLayout(
-                    "default",
-                    "fill:default"));
+                contentPanel.setLayout(new FlowLayout());
 
                 //======== inputArea ========
                 {
-                    inputArea.setLayout(new FormLayout(
-                        "default",
-                        "fill:default"));
+                    inputArea.setLayout(new FlowLayout());
                 }
-                contentPanel.add(inputArea, cc.xy(1, 1));
+                contentPanel.add(inputArea);
             }
             dialogPane.add(contentPanel, BorderLayout.CENTER);
 
@@ -128,8 +121,8 @@ public class InputHint extends JDialog {
             {
                 buttonBar.setBorder(new EmptyBorder(12, 0, 0, 0));
                 buttonBar.setLayout(new GridBagLayout());
-                ((GridBagLayout)buttonBar.getLayout()).columnWidths = new int[] {0, 80};
-                ((GridBagLayout)buttonBar.getLayout()).columnWeights = new double[] {1.0, 0.0};
+                ((GridBagLayout) buttonBar.getLayout()).columnWidths = new int[]{0, 80};
+                ((GridBagLayout) buttonBar.getLayout()).columnWeights = new double[]{1.0, 0.0};
 
                 //---- okButton ----
                 okButton.setText("OK");
@@ -140,8 +133,8 @@ public class InputHint extends JDialog {
                     }
                 });
                 buttonBar.add(okButton, new GridBagConstraints(1, 0, 1, 1, 0.0, 0.0,
-                    GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(0, 0, 0, 0), 0, 0));
+                        GridBagConstraints.CENTER, GridBagConstraints.BOTH,
+                        new Insets(0, 0, 0, 0), 0, 0));
             }
             dialogPane.add(buttonBar, BorderLayout.SOUTH);
         }

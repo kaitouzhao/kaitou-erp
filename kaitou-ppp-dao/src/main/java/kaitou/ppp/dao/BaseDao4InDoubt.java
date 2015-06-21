@@ -25,9 +25,9 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object[] preSave(Object... domains) {
+    public Object[] preSave(boolean isNewTransaction, Object... domains) {
         if (CollectionUtil.isEmpty(domains)) {
-            return super.preSave(domains);
+            return super.preSave(isNewTransaction, domains);
         }
         debugTime("生成序列号开始");
         for (Object obj : domains) {
@@ -38,20 +38,21 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
         }
         debugTime("生成序列号结束");
         // TODO 待优化
-        return check1(domains);
-//        return check2(domains);
+        return check1(isNewTransaction, domains);
+//        return check2(isNewTransaction, domains);
     }
 
     /**
      * 校验主键（优化后）
      *
-     * @param domains 实体集合
+     * @param isNewTransaction 是否新开事务
+     * @param domains          实体集合
      * @return 待保存的实体集合
      */
-    private Object[] check2(Object[] domains) {
+    private Object[] check2(boolean isNewTransaction, Object[] domains) {
         String pkFieldName = getPkFieldName();
         if (StringUtils.isEmpty(pkFieldName)) {
-            return super.preSave(domains);
+            return super.preSave(isNewTransaction, domains);
         }
         List<T> toSave = CollectionUtil.newList(domains);
         if (CollectionUtil.isNotEmpty(toSave)) {
@@ -95,16 +96,17 @@ public abstract class BaseDao4InDoubt<T extends BaseDomain4InDoubt> extends Base
     /**
      * 校验主键
      *
-     * @param domains 实体集合
+     * @param isNewTransaction 是否新开事务
+     * @param domains          实体集合
      * @return 待保存的实体集合
      */
-    private Object[] check1(Object[] domains) {
+    private Object[] check1(boolean isNewTransaction, Object[] domains) {
         String pkFieldName = getPkFieldName();
         if (StringUtils.isEmpty(pkFieldName)) {
-            return super.preSave(domains);
+            return super.preSave(isNewTransaction, domains);
         }
         Set<T> toSave = new HashSet<T>(CollectionUtil.newList(domains));
-        List<T> existsList = queryAll();
+        List<T> existsList = queryAll(isNewTransaction);
         debugTime("查询已存在的记录");
         for (T existsDomain : existsList) {
             if (existsDomain.isInDoubt()) {

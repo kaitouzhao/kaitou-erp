@@ -8,14 +8,16 @@
     <import resource="applicationContext-tx.xml"/>
 
     <bean id="cardService" class="kaitou.ppp.service.impl.CardServiceImpl">
-        <property name="complete" value="d://temp//ppp//complete//"/>
+        <property name="complete" value="d://ppp//complete//"/>
         <property name="logFileName" value="记录.xlsx"/>
-        <property name="output" value="d://temp//ppp//output//"/>
-        <property name="template" value="d://temp//ppp//template//"/>
+        <property name="output" value="d://ppp//output//"/>
+        <property name="template" value="d://ppp//template//"/>
         <property name="templateName" value="保修卡.xls"/>
-        <property name="workspace" value="d://temp//ppp//workspace//"/>
-        <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
+        <property name="workspace" value="d://ppp//workspace//"/>
+
         <property name="shopManager" ref="shopManager"/>
+        <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
+        <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
     </bean>
 
     <bean id="engineerService" class="kaitou.ppp.service.impl.EngineerServiceImpl">
@@ -30,6 +32,7 @@
     </bean>
 
     <bean id="shopService" class="kaitou.ppp.service.impl.ShopServiceImpl">
+        <property name="dbDir" value="d://ppp//db"/>
         <property name="shopManager" ref="shopManager"/>
         <property name="shopDetailManager" ref="shopDetailManager"/>
         <property name="shopRTSManager" ref="shopRTSManager"/>
@@ -53,6 +56,7 @@
                 <ref bean="sdsPermissionManager"/>
                 <ref bean="techSupportManager"/>
                 <ref bean="installPermissionManager"/>
+                <ref bean="cardApplicationRecordManager"/>
             </list>
         </property>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
@@ -64,19 +68,19 @@
 
     <bean id="systemSettingsService" class="kaitou.ppp.service.impl.SystemSettingsServiceImpl">
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
-        <property name="pppDir" value="d://temp//ppp"/>
+        <property name="pppDir" value="d://ppp"/>
     </bean>
 
     <bean id="dbService" class="kaitou.ppp.service.impl.DbServiceImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
-        <property name="backDbFile" value="d://temp//ppp//db_back.zip"/>
-        <property name="pppDir" value="d://temp//ppp"/>
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="backDbFile" value="d://ppp//db_back.zip"/>
+        <property name="pppDir" value="d://ppp"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
     </bean>
 
     <bean id="upgradeService" class="kaitou.ppp.service.impl.UpgradeServiceImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
-        <property name="confDir" value="d://temp//ppp//conf"/>
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="confDir" value="d://ppp//conf"/>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
         <property name="shopManager" ref="shopManager"/>
@@ -89,11 +93,12 @@
     </bean>
 
     <bean id="localDBVersionService" class="kaitou.ppp.service.impl.LocalDBVersionServiceImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
         <property name="localDBVersionManager" ref="localDBVersionManager"/>
     </bean>
 
     <bean id="exportService" class="kaitou.ppp.service.impl.ExportServiceImpl">
+        <property name="soidCodeManager" ref="soidCodeManager"/>
         <property name="shopDetailManager" ref="shopDetailManager"/>
     </bean>
 
@@ -115,6 +120,7 @@
     <bean id="techService" class="kaitou.ppp.service.impl.TechServiceImpl">
         <property name="shopManager" ref="shopManager"/>
         <property name="soidCodeManager" ref="soidCodeManager"/>
+        <property name="techDongleManager" ref="techDongleManager"/>
         <property name="techSupportManager" ref="techSupportManager"/>
         <property name="sdsPermissionManager" ref="sdsPermissionManager"/>
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
@@ -124,6 +130,7 @@
     </bean>
 
     <bean id="tsService" class="kaitou.ppp.service.impl.TSServiceImpl">
+        <property name="tsDongleManager" ref="tsDongleManager"/>
         <property name="tsTrainingManager" ref="tsTrainingManager"/>
         <property name="toolRecipientsManager" ref="toolRecipientsManager"/>
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>

@@ -1,6 +1,8 @@
 package kaitou.ppp.service.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.ts.*;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
@@ -8,11 +10,18 @@ import kaitou.ppp.manager.ts.*;
 import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteTSService;
 import kaitou.ppp.service.BaseExcelService;
+import kaitou.ppp.service.ServiceInvokeManager;
 import kaitou.ppp.service.TSService;
 
 import java.io.File;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
+import static kaitou.ppp.service.ServiceInvokeManager.queryRemoteService;
 
 /**
  * TS管理服务层实现.
@@ -22,6 +31,7 @@ import java.util.List;
  */
 public class TSServiceImpl extends BaseExcelService implements TSService {
 
+    private TsDongleManager tsDongleManager;
     private TSTrainingManager tsTrainingManager;
     private ToolRecipientsManager toolRecipientsManager;
     private TSSDSPermissionManager tssdsPermissionManager;
@@ -33,6 +43,10 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
 
     private SystemSettingsManager systemSettingsManager;
     private RemoteRegistryManager remoteRegistryManager;
+
+    public void setTsDongleManager(TsDongleManager tsDongleManager) {
+        this.tsDongleManager = tsDongleManager;
+    }
 
     public void setToolRecipientsManager(ToolRecipientsManager toolRecipientsManager) {
         this.toolRecipientsManager = toolRecipientsManager;
@@ -273,6 +287,31 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public List<TSSDSPermission> getTSSDSEndDateReminder() {
+        List<TSSDSPermission> permissionList = tssdsPermissionManager.queryAll();
+        List<TSSDSPermission> reminderList = new ArrayList<TSSDSPermission>();
+        if (CollectionUtil.isEmpty(permissionList)) {
+            return reminderList;
+        }
+        for (TSSDSPermission permission : permissionList) {
+            if (permission.shouldReminder()) {
+                reminderList.add(permission);
+            }
+        }
+        return reminderList;
+    }
+
+    @Override
+    public Pager<TSSDSPermission> queryTSSDSPermissionPager(int currentPage, List<Condition> conditions) {
+        return tssdsPermissionManager.queryPager(currentPage, conditions);
+    }
+
+    @Override
+    public List<TSSDSPermission> queryTSSDSPermission(List<Condition> conditions) {
+        return tssdsPermissionManager.queryAll(conditions);
     }
 
     @Override
@@ -555,7 +594,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
 
     @Override
     public List<ComponentBorrowing> queryComponentBorrowing() {
-        return componentBorrowingManager.query();
+        List<ComponentBorrowing> componentBorrowingList = componentBorrowingManager.query();
+        Collections.sort(componentBorrowingList, new Comparator<ComponentBorrowing>() {
+            @Override
+            public int compare(ComponentBorrowing o1, ComponentBorrowing o2) {
+                return o1.comparatorBySerialNumber(o2);
+            }
+        });
+        return componentBorrowingList;
     }
 
     @SuppressWarnings("unchecked")
@@ -608,5 +654,61 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void importTSDongles(File srcFile) {
+        saveOrUpdateTSDongles(CollectionUtil.toArray(readFromExcel(srcFile, TSDongle.class), TSDongle.class));
+    }
+
+    @Override
+    public void exportTSDongles(File targetFile) {
+        export2Excel(tsDongleManager.queryAll(), targetFile, TSDongle.class);
+    }
+
+    @Override
+    public List<TSDongle> queryTSDongles() {
+        return tsDongleManager.queryAll();
+    }
+
+    @Override
+    public void saveOrUpdateTSDongles(TSDongle... tsDongles) {
+        final List<TSDongle> tsDongleList = CollectionUtil.newList(tsDongles);
+        logOperation("成功导入/更新TS dongle记录数：" + tsDongleManager.save(tsDongleList));
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteTSService> remoteTSServices = queryRemoteService(RemoteTSService.class);
+                logOperation("通知已注册的远程服务更新TS dongle记录");
+                for (RemoteTSService remoteTsService : remoteTSServices) {
+                    remoteTsService.saveTSDongle(tsDongleList);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void deleteTSDongles(final Object... tsDongles) {
+        logOperation("成功删除TS dongle记录数：" + tsDongleManager.delete(tsDongles));
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteTSService> remoteTSServices = queryRemoteService(RemoteTSService.class);
+                logOperation("通知已注册的远程服务更新删除TS dongle记录");
+                for (RemoteTSService remoteTsService : remoteTSServices) {
+                    remoteTsService.deleteTSDongle(tsDongles);
+                }
+            }
+        });
+    }
+
+    @Override
+    public Pager<TSDongle> queryTSDonglePager(int currentPage, List<Condition> conditions) {
+        return tsDongleManager.queryPager(currentPage, conditions);
+    }
+
+    @Override
+    public List<TSDongle> queryTSDongle(List<Condition> conditions) {
+        return tsDongleManager.queryAll(conditions);
     }
 }

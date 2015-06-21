@@ -1,11 +1,15 @@
 package kaitou.ppp.manager.card.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
+import kaitou.ppp.domain.shop.Shop;
+import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.domain.system.SysCode;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
+import kaitou.ppp.manager.listener.ShopUpdateListener;
 import kaitou.ppp.manager.listener.WarrantyUpdateListener;
 import org.apache.commons.lang.StringUtils;
 
@@ -19,7 +23,7 @@ import java.util.List;
  * Date: 2015/3/7
  * Time: 21:41
  */
-public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApplicationRecord> implements CardApplicationRecordManager, WarrantyUpdateListener {
+public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApplicationRecord> implements CardApplicationRecordManager, WarrantyUpdateListener, ShopUpdateListener {
 
     @Override
     public Class<CardApplicationRecord> domainClass() {
@@ -50,19 +54,46 @@ public class CardApplicationRecordManagerImpl extends BaseFileDaoManager<CardApp
         for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
             for (WarrantyFee warrantyFee : warrantyFees) {
                 if (cardApplicationRecord.getFuselage().equals(warrantyFee.getFuselage())) {
-                    try {
-                        if (Double.valueOf(warrantyFee.getInstalledFee()) > 0) {
-                            cardApplicationRecord.setIsBack("是");
-                        }
-                    } catch (NumberFormatException e) {
+                    if (StringUtils.isEmpty(cardApplicationRecord.getIsBack())) {
+                        cardApplicationRecord.setIsBack(warrantyFee.checkCardApplicationRecordIsBack());
                     }
-                    try {
-                        if (Double.valueOf(warrantyFee.getMaintenanceFee()) > 0) {
-                            cardApplicationRecord.setStatus(SysCode.WarrantyStatus.OUT_WARRANTY.getValue());
-                        }
-                    } catch (NumberFormatException e) {
+                    if (warrantyFee.checkCardApplicationRecordIsOutOfWarranty() && !SysCode.WarrantyStatus.OUT_WARRANTY.getValue().equals(cardApplicationRecord.getStatus())) {
+                        cardApplicationRecord.setStatus(SysCode.WarrantyStatus.OUT_WARRANTY.getValue());
                     }
                 }
+            }
+        }
+        save(cardApplicationRecords);
+    }
+
+    @Override
+    public void updateShopEvent(Shop... shops) {
+        List<CardApplicationRecord> cardApplicationRecords = queryAll();
+        for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
+            for (Shop shop : shops) {
+                if (shop.getId().equals(cardApplicationRecord.getShopId())) {
+                    cardApplicationRecord.setShopName(shop.getName());
+                }
+            }
+        }
+        save(cardApplicationRecords);
+    }
+
+    @Override
+    public void updateShopDetailEvent(ShopDetail... shopDetails) {
+
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<CardApplicationRecord> cardApplicationRecords = queryAll();
+        FileUtil.deleteFilesOfDir(dbDir, "CardApplicationRecord.kdb");
+        for (CardApplicationRecord cardApplicationRecord : cardApplicationRecords) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(cardApplicationRecord.getShopName())) {
+                    continue;
+                }
+                cardApplicationRecord.setShopId(shop.getId());
             }
         }
         save(cardApplicationRecords);

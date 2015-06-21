@@ -1,5 +1,7 @@
 package kaitou.ppp.service;
 
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.tech.*;
 
 import java.io.File;
@@ -189,4 +191,55 @@ public interface TechService {
      */
     public void deleteInstallPermission(Object... installPermission);
 
+    /**
+     * 导入dongle记录
+     *
+     * @param srcFile 源文件
+     */
+    public void importTechDongles(File srcFile);
+
+    /**
+     * 导出dongle记录
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportTechDongles(File targetFile);
+
+    /**
+     * 查询dongle记录
+     *
+     * @return dongle记录列表
+     */
+    public List<TechDongle> queryTechDongles();
+
+    /**
+     * 保存/更新dongle记录
+     *
+     * @param techDongles dongle记录
+     */
+    public void saveOrUpdateTechDongles(TechDongle... techDongles);
+
+    /**
+     * 删除dongle记录
+     *
+     * @param techDongles dongle记录
+     */
+    public void deleteTechDongles(Object... techDongles);
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<TechDongle> queryTechDonglePager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<TechDongle> queryTechDongle(List<Condition> conditions);
 }

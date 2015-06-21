@@ -2,6 +2,8 @@ package kaitou.ppp.manager.mock.domain;
 
 import kaitou.ppp.domain.engineer.Engineer;
 
+import static kaitou.ppp.domain.system.SysCode.DB_FILE_NAME_SPLIT;
+
 /**
  * 工程师桩.
  * User: 赵立伟
@@ -52,6 +54,6 @@ public class MockEngineer extends Engineer {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + shopId + '_' + "Engineer.kdb";
+        return DB_FILE_NAME_SPLIT + shopId + DB_FILE_NAME_SPLIT + "Engineer.kdb";
     }
 }

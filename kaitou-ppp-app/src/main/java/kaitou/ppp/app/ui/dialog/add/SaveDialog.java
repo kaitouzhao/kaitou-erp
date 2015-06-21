@@ -6,7 +6,7 @@ package kaitou.ppp.app.ui.dialog.add;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
-import kaitou.ppp.app.ui.table.IQueryObject;
+import kaitou.ppp.app.ui.table.queryobject.IQueryObject;
 import kaitou.ppp.domain.BaseDomain;
 
 import javax.swing.*;

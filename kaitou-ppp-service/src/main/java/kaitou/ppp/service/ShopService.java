@@ -233,4 +233,11 @@ public interface ShopService {
      * @param partsLibraries 零件备库信息
      */
     public void deletePartsLibrary(Object... partsLibraries);
+
+    /**
+     * 更新认定店编号
+     *
+     * @param srcFile 源文件
+     */
+    public void updateShopId(File srcFile);
 }

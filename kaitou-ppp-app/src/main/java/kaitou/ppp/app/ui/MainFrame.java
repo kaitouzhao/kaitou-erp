@@ -9,9 +9,13 @@ import kaitou.ppp.app.ui.dialog.InputHint;
 import kaitou.ppp.app.ui.dialog.OnlineConfig;
 import kaitou.ppp.app.ui.dialog.OperationHint;
 import kaitou.ppp.app.ui.dialog.ReportErrorHint;
+import kaitou.ppp.app.ui.table.PageQueryFrame;
 import kaitou.ppp.app.ui.table.QueryFrame;
-import kaitou.ppp.app.ui.table.QueryFrameNew;
-import kaitou.ppp.app.ui.table.queryobject.*;
+import kaitou.ppp.app.ui.table.WarrantyPartsQueryFrame;
+import kaitou.ppp.app.ui.table.queryobject.basic.*;
+import kaitou.ppp.app.ui.table.queryobject.tech.*;
+import kaitou.ppp.app.ui.table.queryobject.ts.*;
+import kaitou.ppp.app.ui.table.queryobject.warranty.*;
 import kaitou.ppp.common.utils.NetworkUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
@@ -25,7 +29,6 @@ import kaitou.ppp.domain.tech.*;
 import kaitou.ppp.domain.ts.*;
 import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
-import kaitou.ppp.domain.warranty.WarrantyParts;
 import kaitou.ppp.domain.warranty.WarrantyPrint;
 import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteDBVersionService;
@@ -34,6 +37,8 @@ import kaitou.ppp.service.LocalDBVersionService;
 import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,10 +48,23 @@ import java.util.List;
 import java.util.Map;
 
 import static com.womai.bsp.tool.utils.PropertyUtil.getValue;
-import static kaitou.ppp.app.SpringContextManager.*;
+import static kaitou.ppp.app.SpringContextManager.getCardService;
+import static kaitou.ppp.app.SpringContextManager.getDbService;
+import static kaitou.ppp.app.SpringContextManager.getEngineerService;
+import static kaitou.ppp.app.SpringContextManager.getExportService;
+import static kaitou.ppp.app.SpringContextManager.getLocalDBVersionService;
+import static kaitou.ppp.app.SpringContextManager.getLocalRegistryService;
+import static kaitou.ppp.app.SpringContextManager.getServiceProvider;
+import static kaitou.ppp.app.SpringContextManager.getShopService;
+import static kaitou.ppp.app.SpringContextManager.getSystemSettingsService;
+import static kaitou.ppp.app.SpringContextManager.getTechService;
+import static kaitou.ppp.app.SpringContextManager.getTsService;
+import static kaitou.ppp.app.SpringContextManager.getWarrantyService;
 import static kaitou.ppp.app.ui.UIUtil.*;
-import static kaitou.ppp.app.ui.table.OPManager.OpRunnable;
-import static kaitou.ppp.app.ui.table.OPManager.doRunWithExHandler;
+import static kaitou.ppp.app.ui.table.OPManager.*;
+import static kaitou.ppp.app.ui.table.OPManager.getUpgradeService;
+import static kaitou.ppp.service.ServiceInvokeManager.InvokeRunnable;
+import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
 
 /**
  * 主界面
@@ -79,7 +97,7 @@ public class MainFrame extends JFrame {
      * @param args 参数
      */
     public static void main(String[] args) {
-        getUpgradeService().upgradeTo3Dot3();
+        getUpgradeService().upgradeTo3Dot4();
 
         asynchronousInit();
 
@@ -157,6 +175,30 @@ public class MainFrame extends JFrame {
     }
 
     /**
+     * 异步获取TS SDS到期提醒
+     */
+    private void asynchronousGetTSSDSReminder() {
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<TSSDSPermission> reminderList = getTsService().getTSSDSEndDateReminder();
+                Object[] column = {"工程师姓名", "到期时间"};
+                Object[][] data = new Object[(reminderList.size())][2];
+                if (CollectionUtil.isNotEmpty(reminderList)) {
+                    for (int i = 0; i < reminderList.size(); i++) {
+                        TSSDSPermission permission = reminderList.get(i);
+                        data[i][0] = permission.getEngineerName();
+                        data[i][1] = permission.getEndDate();
+                    }
+                }
+                tsSDSReminderTable.setModel(new DefaultTableModel(data, column));
+                ((TitledBorder) tsSDSReminderPanel.getBorder()).setTitle("SDS需要更新提醒");
+                tsSDSReminderPanel.setVisible(true);
+            }
+        });
+    }
+
+    /**
      * 根据联机状态变更窗体标题
      *
      * @param onlineStatus 联机状态
@@ -179,6 +221,8 @@ public class MainFrame extends JFrame {
         setTitleByOnlineStatus(OnlineStatus.ONLINE_PREPARING_FLAG);
 
         asynchronousUpgradeDBVersions();
+
+        asynchronousGetTSSDSReminder();
     }
 
     /**
@@ -263,10 +307,14 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                File targetFile = chooseExportFile("压缩文件", "zip");
+                final File targetFile = chooseExportFile("压缩文件", "zip");
                 if (targetFile == null) return;
-                getDbService().backupDB(targetFile.getPath());
-                new OperationHint(self, "备份成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getDbService().backupDB(targetFile.getPath());
+                    }
+                }, "备份成功");
             }
         });
     }
@@ -275,10 +323,14 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                File srcFile = chooseImportFile("压缩文件", "zip");
+                final File srcFile = chooseImportFile("压缩文件", "zip");
                 if (srcFile == null) return;
-                getDbService().recovery(srcFile.getPath());
-                new OperationHint(self, "恢复成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getDbService().recovery(srcFile.getPath());
+                    }
+                }, "恢复成功");
             }
         });
     }
@@ -381,7 +433,7 @@ public class MainFrame extends JFrame {
     }
 
     private void exportShopDetailActionPerformed(ActionEvent e) {
-        doRunWithExHandler(this, new OpRunnable() {
+        doRunWithExHandler(self, new OpRunnable() {
             @Override
             public void run() {
                 InputHint inputHint = new InputHint(self, new String[]{"导出认定年份"});
@@ -405,10 +457,14 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                File targetFile = chooseExportFile("excel文件", "xlsx");
+                final File targetFile = chooseExportFile("excel文件", "xlsx");
                 if (targetFile == null) return;
-                getShopService().exportAll(targetFile);
-                new OperationHint(self, "导出成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getShopService().exportAll(targetFile);
+                    }
+                }, "导出成功");
             }
         });
     }
@@ -417,8 +473,12 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                getCardService().generateCards();
-                new OperationHint(self, "生成成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getCardService().generateCards();
+                    }
+                }, "生成成功");
             }
         });
     }
@@ -427,39 +487,52 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
                 if (srcFile == null) return;
-                getCardService().importCardApplicationRecords(srcFile);
-                new OperationHint(self, "导入成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getCardService().importCardApplicationRecords(srcFile);
+                    }
+                }, "导入成功");
             }
         });
     }
 
     private void queryCardApplicationRecordActionPerformed(ActionEvent e) {
-        new QueryFrameNew<CardApplicationRecord>(new CardApplicationRecordQueryObject());
+        new PageQueryFrame<CardApplicationRecord>(new CardApplicationRecordQueryObject());
     }
 
     private void exportCardApplicationRecordActionPerformed(ActionEvent e) {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                File targetFile = chooseExportFile("excel文件", "xlsx");
+                final File targetFile = chooseExportFile("excel文件", "xlsx");
                 if (targetFile == null) return;
-                getCardService().exportCardApplicationRecords(targetFile);
-                new OperationHint(self, "导出成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getCardService().exportCardApplicationRecords(targetFile);
+                    }
+                }, "导出成功");
             }
         });
     }
 
     private void countShopEquipmentActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getShopService().countShopEquipment(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getShopService().countShopEquipment(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
     }
 
     private void onlineSettingActionPerformed(ActionEvent e) {
@@ -497,34 +570,44 @@ public class MainFrame extends JFrame {
     }
 
     private void importWarrantyFeeActionPerformed(ActionEvent e) {
-        try {
-            File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
-            if (srcFile == null) return;
-            getWarrantyService().importWarrantyFee(srcFile);
-            new OperationHint(this, "导入成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getWarrantyService().importWarrantyFee(srcFile);
+                    }
+                }, "导入成功");
+            }
+        });
     }
 
     private void exportWarrantyFeeActionPerformed(ActionEvent e) {
-        try {
-            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
-            if (!inputHint.isOk()) {
-                return;
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                InputHint inputHint = new InputHint(self, new String[]{"导出年份"});
+                if (!inputHint.isOk()) {
+                    return;
+                }
+                final String numberOfYear = inputHint.getInputResult()[0];
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        if (StringUtils.isEmpty(numberOfYear)) {
+                            getWarrantyService().exportWarrantyFee(targetFile);
+                        } else {
+                            getWarrantyService().exportWarrantyFee(targetFile, numberOfYear);
+                        }
+                    }
+                }, "导出成功");
             }
-            String numberOfYear = inputHint.getInputResult()[0];
-            File targetFile = chooseExportFile("excel文件", "xls");
-            if (targetFile == null) return;
-            if (StringUtils.isEmpty(numberOfYear)) {
-                getWarrantyService().exportWarrantyFee(targetFile);
-            } else {
-                getWarrantyService().exportWarrantyFee(targetFile, numberOfYear);
-            }
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        });
     }
 
     private void queryWarrantyFeeActionPerformed(ActionEvent e) {
@@ -543,27 +626,32 @@ public class MainFrame extends JFrame {
     }
 
     private void queryWarrantyPartsActionPerformed(ActionEvent e) {
-        new QueryFrame<WarrantyParts>(getWarrantyService().queryWarrantyParts(), new WarrantyPartsQueryObject());
+        new WarrantyPartsQueryFrame(new WarrantyPartsQueryObject());
     }
 
     private void exportWarrantyPartsActionPerformed(ActionEvent e) {
-        try {
-            InputHint inputHint = new InputHint(this, new String[]{"导出年份"});
-            if (!inputHint.isOk()) {
-                return;
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                InputHint inputHint = new InputHint(self, new String[]{"导出年份"});
+                if (!inputHint.isOk()) {
+                    return;
+                }
+                final String numberOfYear = inputHint.getInputResult()[0];
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        if (StringUtils.isEmpty(numberOfYear)) {
+                            getWarrantyService().exportWarrantyParts(targetFile);
+                        } else {
+                            getWarrantyService().exportWarrantyParts(targetFile, numberOfYear);
+                        }
+                    }
+                }, "导出成功");
             }
-            String numberOfYear = inputHint.getInputResult()[0];
-            File targetFile = chooseExportFile("excel文件", "xls");
-            if (targetFile == null) return;
-            if (StringUtils.isEmpty(numberOfYear)) {
-                getWarrantyService().exportWarrantyParts(targetFile);
-            } else {
-                getWarrantyService().exportWarrantyParts(targetFile, numberOfYear);
-            }
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        });
     }
 
     private void reportErrorActionPerformed(ActionEvent e) {
@@ -734,14 +822,19 @@ public class MainFrame extends JFrame {
     }
 
     private void exportSOIDCodeActionPerformed(ActionEvent e) {
-        try {
-            File targetFile = chooseExportFile("excel文件", "xlsx");
-            if (targetFile == null) return;
-            getTechService().exportSOIDCode(targetFile);
-            new OperationHint(this, "导出成功");
-        } catch (Exception ex) {
-            handleEx(ex, this);
-        }
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getExportService().exportSOIDCode(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
     }
 
     private void querySDSPermissionActionPerformed(ActionEvent e) {
@@ -893,7 +986,7 @@ public class MainFrame extends JFrame {
     }
 
     private void queryTSSDSPermissionActionPerformed(ActionEvent e) {
-        new QueryFrame<TSSDSPermission>(getTsService().queryTSSDSPermission(), new TSSDSPermissionQueryObject());
+        new PageQueryFrame<TSSDSPermission>(new TSSDSPermissionQueryObject());
     }
 
     private void importTSSDSPermissionActionPerformed(ActionEvent e) {
@@ -1084,6 +1177,94 @@ public class MainFrame extends JFrame {
         }
     }
 
+    private void queryTechDongleActionPerformed(ActionEvent e) {
+        new PageQueryFrame<TechDongle>(new TechDongleQueryObject());
+    }
+
+    private void importTechDongleActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getTechService().importTechDongles(srcFile);
+                    }
+                }, "导入成功");
+            }
+        });
+    }
+
+    private void exportTechDongleActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getTechService().exportTechDongles(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
+    }
+
+    private void queryTSDongleActionPerformed(ActionEvent e) {
+        new PageQueryFrame<TSDongle>(new TSDongleQueryObject());
+    }
+
+    private void importTSDongleActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getTsService().importTSDongles(srcFile);
+                    }
+                }, "导入成功");
+            }
+        });
+    }
+
+    private void exportTSDongleActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getTsService().exportTSDongles(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
+    }
+
+    private void updateShopIdActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getShopService().updateShopId(srcFile);
+                    }
+                }, "更新成功");
+            }
+        });
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         managerMenuBar = new JMenuBar();
@@ -1160,6 +1341,10 @@ public class MainFrame extends JFrame {
         queryInstallPermission = new JMenuItem();
         importInstallPermission = new JMenuItem();
         exportInstallPermission = new JMenuItem();
+        techDongle = new JMenu();
+        queryTechDongle = new JMenuItem();
+        importTechDongle = new JMenuItem();
+        exportTechDongle = new JMenuItem();
         tsManagement = new JMenu();
         tsTraining = new JMenu();
         queryTSTraining = new JMenuItem();
@@ -1193,6 +1378,10 @@ public class MainFrame extends JFrame {
         queryComponentBorrowing = new JMenuItem();
         importComponentBorrowing = new JMenuItem();
         exportComponentBorrowing = new JMenuItem();
+        tsDongle = new JMenu();
+        queryTSDongle = new JMenuItem();
+        importTSDongle = new JMenuItem();
+        exportTSDongle = new JMenuItem();
         onlineMenu = new JMenu();
         onlineSetting = new JMenuItem();
         startOnline = new JMenuItem();
@@ -1202,6 +1391,10 @@ public class MainFrame extends JFrame {
         backupDB = new JMenuItem();
         recoveryDB = new JMenuItem();
         reportError = new JMenuItem();
+        updateShopId = new JMenuItem();
+        tsSDSReminderPanel = new JPanel();
+        tsSDSReminderScrollPane = new JScrollPane();
+        tsSDSReminderTable = new JTable();
 
         //======== this ========
         setTitle("PPP-ERP\u4e3b\u754c\u9762");
@@ -1858,6 +2051,42 @@ public class MainFrame extends JFrame {
                     techInstallPermission.add(exportInstallPermission);
                 }
                 technicalManagement.add(techInstallPermission);
+
+                //======== techDongle ========
+                {
+                    techDongle.setText("dongle\u8bb0\u5f55");
+
+                    //---- queryTechDongle ----
+                    queryTechDongle.setText("\u67e5\u8be2");
+                    queryTechDongle.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTechDongleActionPerformed(e);
+                        }
+                    });
+                    techDongle.add(queryTechDongle);
+
+                    //---- importTechDongle ----
+                    importTechDongle.setText("\u5bfc\u5165");
+                    importTechDongle.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTechDongleActionPerformed(e);
+                        }
+                    });
+                    techDongle.add(importTechDongle);
+
+                    //---- exportTechDongle ----
+                    exportTechDongle.setText("\u5bfc\u51fa");
+                    exportTechDongle.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTechDongleActionPerformed(e);
+                        }
+                    });
+                    techDongle.add(exportTechDongle);
+                }
+                technicalManagement.add(techDongle);
             }
             managerMenuBar.add(technicalManagement);
 
@@ -2152,6 +2381,42 @@ public class MainFrame extends JFrame {
                     componentBorrowing.add(exportComponentBorrowing);
                 }
                 tsManagement.add(componentBorrowing);
+
+                //======== tsDongle ========
+                {
+                    tsDongle.setText("dongle\u8bb0\u5f55");
+
+                    //---- queryTSDongle ----
+                    queryTSDongle.setText("\u67e5\u8be2");
+                    queryTSDongle.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTSDongleActionPerformed(e);
+                        }
+                    });
+                    tsDongle.add(queryTSDongle);
+
+                    //---- importTSDongle ----
+                    importTSDongle.setText("\u5bfc\u5165");
+                    importTSDongle.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTSDongleActionPerformed(e);
+                        }
+                    });
+                    tsDongle.add(importTSDongle);
+
+                    //---- exportTSDongle ----
+                    exportTSDongle.setText("\u5bfc\u51fa");
+                    exportTSDongle.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTSDongleActionPerformed(e);
+                        }
+                    });
+                    tsDongle.add(exportTSDongle);
+                }
+                tsManagement.add(tsDongle);
             }
             managerMenuBar.add(tsManagement);
 
@@ -2234,12 +2499,37 @@ public class MainFrame extends JFrame {
                     }
                 });
                 helpMenu.add(reportError);
+
+                //---- updateShopId ----
+                updateShopId.setText("\u66f4\u65b0\u8ba4\u5b9a\u5e97\u7f16\u53f7");
+                updateShopId.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        updateShopIdActionPerformed(e);
+                    }
+                });
+                helpMenu.add(updateShopId);
             }
             managerMenuBar.add(helpMenu);
         }
         setJMenuBar(managerMenuBar);
 
-        contentPane.setPreferredSize(new Dimension(400, 300));
+        //======== tsSDSReminderPanel ========
+        {
+            tsSDSReminderPanel.setBorder(new TitledBorder("\u6b63\u5728\u83b7\u53d6SDS\u9700\u8981\u66f4\u65b0\u63d0\u9192......"));
+            tsSDSReminderPanel.setLayout(null);
+
+            //======== tsSDSReminderScrollPane ========
+            {
+                tsSDSReminderScrollPane.setViewportView(tsSDSReminderTable);
+            }
+            tsSDSReminderPanel.add(tsSDSReminderScrollPane);
+            tsSDSReminderScrollPane.setBounds(10, 25, 325, 215);
+        }
+        contentPane.add(tsSDSReminderPanel);
+        tsSDSReminderPanel.setBounds(15, 10, 345, 255);
+
+        contentPane.setPreferredSize(new Dimension(960, 530));
         pack();
         setLocationRelativeTo(getOwner());
         // JFormDesigner - End of component initialization  //GEN-END:initComponents
@@ -2320,6 +2610,10 @@ public class MainFrame extends JFrame {
     private JMenuItem queryInstallPermission;
     private JMenuItem importInstallPermission;
     private JMenuItem exportInstallPermission;
+    private JMenu techDongle;
+    private JMenuItem queryTechDongle;
+    private JMenuItem importTechDongle;
+    private JMenuItem exportTechDongle;
     private JMenu tsManagement;
     private JMenu tsTraining;
     private JMenuItem queryTSTraining;
@@ -2353,6 +2647,10 @@ public class MainFrame extends JFrame {
     private JMenuItem queryComponentBorrowing;
     private JMenuItem importComponentBorrowing;
     private JMenuItem exportComponentBorrowing;
+    private JMenu tsDongle;
+    private JMenuItem queryTSDongle;
+    private JMenuItem importTSDongle;
+    private JMenuItem exportTSDongle;
     private JMenu onlineMenu;
     private JMenuItem onlineSetting;
     private JMenuItem startOnline;
@@ -2362,5 +2660,9 @@ public class MainFrame extends JFrame {
     private JMenuItem backupDB;
     private JMenuItem recoveryDB;
     private JMenuItem reportError;
+    private JMenuItem updateShopId;
+    private JPanel tsSDSReminderPanel;
+    private JScrollPane tsSDSReminderScrollPane;
+    private JTable tsSDSReminderTable;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

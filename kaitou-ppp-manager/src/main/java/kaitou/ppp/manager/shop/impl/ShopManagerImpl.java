@@ -90,4 +90,9 @@ public class ShopManagerImpl extends BaseFileDaoManager<Shop> implements ShopMan
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
         // DO NOTHING
     }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        
+    }
 }

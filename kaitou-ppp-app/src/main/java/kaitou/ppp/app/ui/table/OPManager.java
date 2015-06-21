@@ -5,7 +5,8 @@ import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
 import kaitou.ppp.app.ui.dialog.OperationHint;
 import kaitou.ppp.app.ui.dialog.add.SaveDialog;
 import kaitou.ppp.app.ui.dialog.add.TechInstallPermissionSaveDialog;
-import kaitou.ppp.app.ui.table.queryobject.InstallPermissionQueryObject;
+import kaitou.ppp.app.ui.table.queryobject.IQueryObject;
+import kaitou.ppp.app.ui.table.queryobject.tech.InstallPermissionQueryObject;
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.BaseDomain;
@@ -63,6 +64,10 @@ public abstract class OPManager extends SpringContextManager {
      * @param toDoObj    待操作对象
      */
     public static void saveOrUpdate(String domainType, Object... toDoObj) {
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            getTsService().saveOrUpdateTSDongles((TSDongle[]) toDoObj);
+            return;
+        }
         if (ComponentBorrowing.class.getSimpleName().equals(domainType)) {
             getTsService().saveOrUpdateComponentBorrowing((ComponentBorrowing[]) toDoObj);
             return;
@@ -93,6 +98,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TSTraining.class.getSimpleName().equals(domainType)) {
             getTsService().saveOrUpdateTSTraining((TSTraining[]) toDoObj);
+            return;
+        }
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            getTechService().saveOrUpdateTechDongles((TechDongle[]) toDoObj);
             return;
         }
         if (TechInstallPermission.class.getSimpleName().equals(domainType)) {
@@ -171,6 +180,128 @@ public abstract class OPManager extends SpringContextManager {
     }
 
     /**
+     * 公共导出导入模板接口
+     *
+     * @param domainType 领域类型
+     * @param targetFile 目标文件
+     */
+    public static void exportImportModel(String domainType, File targetFile) {
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, TSDongle.class);
+            return;
+        }
+        if (ComponentBorrowing.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, ComponentBorrowing.class);
+            return;
+        }
+        if (ToolRecipients.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, ToolRecipients.class);
+            return;
+        }
+        if (NewMachineClaim.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, NewMachineClaim.class);
+            return;
+        }
+        if (OldMachineRenew.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, OldMachineRenew.class);
+            return;
+        }
+        if (TSInstallPermission.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, TSInstallPermission.class);
+            return;
+        }
+        if (TSSDSPermission.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, TSSDSPermission.class);
+            return;
+        }
+        if (TSManualPermissions.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, TSManualPermissions.class);
+            return;
+        }
+        if (TSTraining.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, TSTraining.class);
+            return;
+        }
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).exportImportModel(targetFile, TechDongle.class);
+            return;
+        }
+        if (TechInstallPermission.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).exportImportModel(targetFile, TechInstallPermission.class);
+            return;
+        }
+        if (TechSupport.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).exportImportModel(targetFile, TechSupport.class);
+            return;
+        }
+        if (TechSDSPermission.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).exportImportModel(targetFile, TechSDSPermission.class);
+            return;
+        }
+        if (SOIDCode.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).exportImportModel(targetFile, SOIDCode.class);
+            return;
+        }
+        if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).exportImportModel(targetFile, TechManualPermissions.class);
+            return;
+        }
+        if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getWarrantyService()).exportImportModel(targetFile, WarrantyConsumables.class);
+            return;
+        }
+        if (WarrantyPrint.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getWarrantyService()).exportImportModel(targetFile, WarrantyPrint.class);
+            return;
+        }
+        if (WarrantyParts.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getWarrantyService()).exportImportModel(targetFile, WarrantyParts.class);
+            return;
+        }
+        if (WarrantyFee.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getWarrantyService()).exportImportModel(targetFile, WarrantyFee.class);
+            return;
+        }
+        if (Shop.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getShopService()).exportImportModel(targetFile, Shop.class);
+            return;
+        }
+        if (ShopDetail.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getShopService()).exportImportModel(targetFile, ShopDetail.class);
+            return;
+        }
+        if (ShopRTS.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getShopService()).exportImportModel(targetFile, ShopRTS.class);
+            return;
+        }
+        if (ShopContract.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getShopService()).exportImportModel(targetFile, ShopContract.class);
+            return;
+        }
+        if (ShopPay.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getShopService()).exportImportModel(targetFile, ShopPay.class);
+            return;
+        }
+        if (PartsLibrary.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getShopService()).exportImportModel(targetFile, PartsLibrary.class);
+            return;
+        }
+        if (Engineer.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getEngineerService()).exportImportModel(targetFile, Engineer.class);
+            return;
+        }
+        if (EngineerTraining.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getEngineerService()).exportImportModel(targetFile, EngineerTraining.class);
+            return;
+        }
+        if (CardApplicationRecord.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getEngineerService()).exportImportModel(targetFile, CardApplicationRecord.class);
+            return;
+        }
+        throw new RuntimeException("尚未支持此类型导出：" + domainType);
+    }
+
+    /**
      * 公共导出接口
      *
      * @param domainType 领域类型
@@ -179,6 +310,10 @@ public abstract class OPManager extends SpringContextManager {
      */
     @SuppressWarnings("unchecked")
     public static void export(String domainType, List dataList, File targetFile) {
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).export2Excel(dataList, targetFile, TSDongle.class);
+            return;
+        }
         if (ComponentBorrowing.class.getSimpleName().equals(domainType)) {
             ((BaseExcelService) getTsService()).export2Excel(dataList, targetFile, ComponentBorrowing.class);
             return;
@@ -209,6 +344,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TSTraining.class.getSimpleName().equals(domainType)) {
             ((BaseExcelService) getTsService()).export2Excel(dataList, targetFile, TSTraining.class);
+            return;
+        }
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTechService()).export2Excel(dataList, targetFile, TechDongle.class);
             return;
         }
         if (TechInstallPermission.class.getSimpleName().equals(domainType)) {
@@ -293,6 +432,10 @@ public abstract class OPManager extends SpringContextManager {
      * @param deleted    待删除对象
      */
     public static void delete(String domainType, Object... deleted) {
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            getTsService().deleteTSDongles(deleted);
+            return;
+        }
         if (ComponentBorrowing.class.getSimpleName().equals(domainType)) {
             getTsService().deleteComponentBorrowing(deleted);
             return;
@@ -323,6 +466,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TSTraining.class.getSimpleName().equals(domainType)) {
             getTsService().deleteTSTraining(deleted);
+            return;
+        }
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            getTechService().deleteTechDongles(deleted);
             return;
         }
         if (TechInstallPermission.class.getSimpleName().equals(domainType)) {
@@ -408,6 +555,9 @@ public abstract class OPManager extends SpringContextManager {
      * @return 对象列表
      */
     public static <T extends BaseDomain> List<T> query(String domainType) {
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSDongles();
+        }
         if (ComponentBorrowing.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTsService().queryComponentBorrowing();
         }
@@ -431,6 +581,9 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TSTraining.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTsService().queryTSTraining();
+        }
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().queryTechDongles();
         }
         if (TechInstallPermission.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTechService().queryInstallPermission();
@@ -499,8 +652,47 @@ public abstract class OPManager extends SpringContextManager {
      * @return 封装后的分页对象
      */
     public static <T extends BaseDomain> Pager<T> queryPager(String domainType, int currentPage, List<Condition> conditions) {
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getTechService().queryTechDonglePager(currentPage, conditions);
+        }
+        if (TSSDSPermission.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getTsService().queryTSSDSPermissionPager(currentPage, conditions);
+        }
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getTsService().queryTSDonglePager(currentPage, conditions);
+        }
+        if (WarrantyParts.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getWarrantyService().queryWarrantyPartsPager(currentPage, conditions);
+        }
         if (CardApplicationRecord.class.getSimpleName().equals(domainType)) {
-            return (Pager<T>) getCardService().queryPager(currentPage, conditions);
+            return (Pager<T>) getCardService().queryCardApplicationRecordPager(currentPage, conditions);
+        }
+        throw new RuntimeException("尚未支持此类型导出：" + domainType);
+    }
+
+    /**
+     * 公共不分页查询接口
+     *
+     * @param domainType 领域类型
+     * @param conditions 查询条件列表
+     * @param <T>        对象类型
+     * @return 结果集
+     */
+    public static <T extends BaseDomain> List<T> queryAll(String domainType, List<Condition> conditions) {
+        if (TechDongle.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTechService().queryTechDongle(conditions);
+        }
+        if (TSSDSPermission.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSSDSPermission(conditions);
+        }
+        if (TSDongle.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSDongle(conditions);
+        }
+        if (WarrantyParts.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryWarrantyParts(conditions);
+        }
+        if (CardApplicationRecord.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getCardService().queryCardApplicationRecord(conditions);
         }
         throw new RuntimeException("尚未支持此类型导出：" + domainType);
     }

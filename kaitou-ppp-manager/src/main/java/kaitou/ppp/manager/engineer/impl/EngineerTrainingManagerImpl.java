@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.womai.bsp.tool.utils.BeanCopyUtil.copyBean;
+import static kaitou.ppp.common.utils.FileUtil.deleteFilesOfDir;
 
 /**
  * 工程师培训信息DAO事务管理层实现.
@@ -103,6 +104,21 @@ public class EngineerTrainingManagerImpl extends BaseFileDaoManager<EngineerTrai
                 training.setNumberOfYear(cachedShopDetail.getNumberOfYear());
             }
             trainings.addAll(list);
+        }
+        save(trainings);
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<EngineerTraining> trainings = queryAll();
+        deleteFilesOfDir(dbDir, "EngineerTraining.kdb");
+        for (EngineerTraining training : trainings) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(training.getShopName())) {
+                    continue;
+                }
+                training.setShopId(shop.getId());
+            }
         }
         save(trainings);
     }

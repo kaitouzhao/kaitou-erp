@@ -1,8 +1,9 @@
 package kaitou.ppp.domain.engineer;
 
 import kaitou.ppp.domain.BaseDomain;
-import kaitou.ppp.domain.system.SysCode;
 import org.apache.commons.lang.StringUtils;
+
+import static kaitou.ppp.domain.system.SysCode.*;
 
 /**
  * 工程师.
@@ -14,7 +15,7 @@ public class Engineer extends BaseDomain {
     /**
      * 销售区域
      *
-     * @see kaitou.ppp.domain.system.SysCode.SaleRegion
+     * @see SaleRegion
      */
     protected String saleRegion;
     /**
@@ -60,7 +61,7 @@ public class Engineer extends BaseDomain {
     /**
      * 状态
      *
-     * @see kaitou.ppp.domain.system.SysCode.EngineerStatus
+     * @see EngineerStatus
      */
     protected String status;
     /**
@@ -78,26 +79,7 @@ public class Engineer extends BaseDomain {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + shopId + '_' + getClass().getSimpleName() + DB_SUFFIX;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Engineer engineer = (Engineer) o;
-
-        if (id != null ? !id.equals(engineer.id) : engineer.id != null) return false;
-        return !(productLine != null ? !productLine.equals(engineer.productLine) : engineer.productLine != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        return result;
+        return DB_FILE_NAME_SPLIT + shopId + DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     /**
@@ -107,14 +89,11 @@ public class Engineer extends BaseDomain {
      */
     @Override
     public String dbFileName() {
-        return SysCode.SaleRegion.convert2Code(saleRegion) + dbFileSuffix();
+        return SaleRegion.convert2Code(saleRegion) + dbFileSuffix();
     }
 
     @Override
     public void check() {
-        if (StringUtils.isEmpty(id)) {
-            throw new RuntimeException("编号为空");
-        }
         if (StringUtils.isEmpty(name)) {
             throw new RuntimeException("姓名为空");
         }
@@ -154,7 +133,7 @@ public class Engineer extends BaseDomain {
     }
 
     public String getSaleRegion() {
-        return SysCode.SaleRegion.convert2Value(saleRegion);
+        return SaleRegion.convert2Value(saleRegion);
     }
 
     public void setSaleRegion(String saleRegion) {

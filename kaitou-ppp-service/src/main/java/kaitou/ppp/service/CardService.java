@@ -61,5 +61,14 @@ public interface CardService {
      * @param conditions  查询条件列表
      * @return 封装结果集的分页对象
      */
-    public Pager<CardApplicationRecord> queryPager(int currentPage, List<Condition> conditions);
+    public Pager<CardApplicationRecord> queryCardApplicationRecordPager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<CardApplicationRecord> queryCardApplicationRecord(List<Condition> conditions);
+
 }

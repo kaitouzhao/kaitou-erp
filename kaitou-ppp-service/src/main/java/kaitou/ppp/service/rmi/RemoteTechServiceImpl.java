@@ -17,10 +17,15 @@ import java.util.List;
 public class RemoteTechServiceImpl extends UnicastRemoteObject implements RemoteTechService {
 
     private SOIDCodeManager soidCodeManager;
+    private TechDongleManager techDongleManager;
     private TechSupportManager techSupportManager;
     private SDSPermissionManager sdsPermissionManager;
     private InstallPermissionManager installPermissionManager;
     private ManualPermissionsManager manualPermissionsManager;
+
+    public void setTechDongleManager(TechDongleManager techDongleManager) {
+        this.techDongleManager = techDongleManager;
+    }
 
     public void setInstallPermissionManager(InstallPermissionManager installPermissionManager) {
         this.installPermissionManager = installPermissionManager;
@@ -94,5 +99,15 @@ public class RemoteTechServiceImpl extends UnicastRemoteObject implements Remote
     @Override
     public void deleteInstallPermission(Object... installPermission) throws RemoteException {
         installPermissionManager.delete(installPermission);
+    }
+
+    @Override
+    public void saveTechDongle(List<TechDongle> techDongles) throws RemoteException {
+        techDongleManager.save(techDongles);
+    }
+
+    @Override
+    public void deleteTechDongle(Object... techDongles) throws RemoteException {
+        techDongleManager.delete(techDongles);
     }
 }

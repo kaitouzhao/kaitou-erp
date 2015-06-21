@@ -75,42 +75,6 @@ public class ShopContract extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ShopContract that = (ShopContract) o;
-
-        if (contractNo != null ? !contractNo.equals(that.contractNo) : that.contractNo != null) return false;
-        if (deliveryAddress != null ? !deliveryAddress.equals(that.deliveryAddress) : that.deliveryAddress != null)
-            return false;
-        if (deliveryTime != null ? !deliveryTime.equals(that.deliveryTime) : that.deliveryTime != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
-        if (recipient != null ? !recipient.equals(that.recipient) : that.recipient != null) return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (trackingNumber != null ? !trackingNumber.equals(that.trackingNumber) : that.trackingNumber != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = contractNo != null ? contractNo.hashCode() : 0;
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (deliveryAddress != null ? deliveryAddress.hashCode() : 0);
-        result = 31 * result + (recipient != null ? recipient.hashCode() : 0);
-        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-        result = 31 * result + (trackingNumber != null ? trackingNumber.hashCode() : 0);
-        result = 31 * result + (deliveryTime != null ? deliveryTime.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getContractNo() {
         return contractNo;
     }

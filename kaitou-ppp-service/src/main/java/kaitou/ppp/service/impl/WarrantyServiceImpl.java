@@ -1,6 +1,8 @@
 package kaitou.ppp.service.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
@@ -159,6 +161,16 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
     @Override
     public List<WarrantyParts> queryWarrantyParts() {
         return warrantyPartsManager.query();
+    }
+
+    @Override
+    public Pager<WarrantyParts> queryWarrantyPartsPager(int currentPage, List<Condition> conditions) {
+        return warrantyPartsManager.queryPager(currentPage, conditions);
+    }
+
+    @Override
+    public List<WarrantyParts> queryWarrantyParts(List<Condition> conditions) {
+        return warrantyPartsManager.queryAll(conditions);
     }
 
     @Override

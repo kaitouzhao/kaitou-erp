@@ -8,6 +8,7 @@ import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
 import kaitou.ppp.app.ui.dialog.ConfirmHint;
 import kaitou.ppp.app.ui.dialog.OperationHint;
+import kaitou.ppp.app.ui.table.queryobject.IQueryObject;
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.BaseDomain4InDoubt;
 import org.apache.commons.lang.StringUtils;
@@ -41,63 +42,63 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     /**
      * 操作列标题
      */
-    private static final String OP_COLUMN_TITLE = "操作";
+    protected static final String OP_COLUMN_TITLE = "操作";
     /**
      * 选择列号
      */
-    private static final int SELECT_COLUMN_INDEX = 0;
+    protected static final int SELECT_COLUMN_INDEX = 0;
     /**
      * 数据开始列号
      */
-    private static final int DATA_COLUMN_START_INDEX = 1;
+    protected static final int DATA_COLUMN_START_INDEX = 1;
     /**
      * 存疑筛选名
      */
-    private static final String CHOOSE_IN_DOUBT_LABEL = "存疑";
+    protected static final String CHOOSE_IN_DOUBT_LABEL = "存疑";
     /**
      * 当前frame
      */
-    private QueryFrame self = this;
+    protected QueryFrame self = this;
     /**
      * 查询区域输入框动态集合
      */
-    private List<JTextField> queryTextFields = new ArrayList<JTextField>();
+    protected List<JTextField> queryTextFields = new ArrayList<JTextField>();
     /**
      * 数据源
      */
-    private List<T> datas;
+    protected List<T> datas;
     /**
      * 显示的数据
      */
-    private List<T> shownDatas = new ArrayList<T>();
+    protected List<T> shownDatas = new ArrayList<T>();
     /**
      * 当前页码
      */
-    private int currentPageIndex = 1;
+    protected int currentPageIndex = 1;
     /**
      * 每页显示条数
      */
-    private int countPerPage = 25;
+    protected int countPerPage = 25;
     /**
      * 总页数
      */
-    private int pageCount;
+    protected int pageCount;
     /**
      * 总记录数
      */
-    private int recordCount;
+    protected int recordCount;
     /**
      * 查询对象
      */
-    private IQueryObject<T> queryObject;
+    protected IQueryObject<T> queryObject;
     /**
      * 操作列号
      */
-    private int opColumnIndex = -1;
+    protected int opColumnIndex = -1;
     /**
      * 筛选存疑
      */
-    private JCheckBox selectInDoubt;
+    protected JCheckBox selectInDoubt;
 
     /**
      * 构造器
@@ -149,7 +150,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      * 初始化表格参数
      */
     @SuppressWarnings(value = "unchecked")
-    private void initTableData() {
+    protected void initTableData() {
         recordCount = shownDatas.size();
         if (recordCount % countPerPage == 0) {
             pageCount = recordCount / countPerPage;
@@ -167,7 +168,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      * 下一页
      */
     @SuppressWarnings(value = "unchecked")
-    private void nextPage() {
+    protected void nextPage() {
         if (currentPageIndex < pageCount) {
             currentPageIndex++;
         }
@@ -177,7 +178,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     /**
      * 上一页
      */
-    private void previousPage() {
+    protected void previousPage() {
         if (currentPageIndex > 1) {
             currentPageIndex--;
         }
@@ -188,7 +189,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      * 选择
      */
     @SuppressWarnings(value = "unchecked")
-    private void select() {
+    protected void select() {
         List<T> currentList = new ArrayList<T>();
         for (int i = (currentPageIndex - 1) * countPerPage; i < currentPageIndex * countPerPage && i < recordCount; i++) {
             currentList.add(shownDatas.get(i));
@@ -201,7 +202,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      *
      * @param list 当前显示列表
      */
-    private void view(List<? extends BaseDomain> list) {
+    protected void view(List<? extends BaseDomain> list) {
         String[] fieldNames = queryObject.fieldNames();
         int fieldNamesSize = fieldNames.length + 1;
         Object[][] objects = new Object[(list.size())][fieldNamesSize];
@@ -231,7 +232,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      *
      * @return 行号列表
      */
-    private List<Integer> getSelectedRows() {
+    protected List<Integer> getSelectedRows() {
         List<Integer> selectedRows = new ArrayList<Integer>();
         for (int row = 0; row < dataTable.getRowCount(); row++) {
             if (dataTable.getValueAt(row, SELECT_COLUMN_INDEX) == Boolean.TRUE) {
@@ -241,7 +242,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         return selectedRows;
     }
 
-    private void firstPageBtnActionPerformed(ActionEvent e) {
+    protected void firstPageBtnActionPerformed(ActionEvent e) {
         try {
             currentPageIndex = 1;
             select();
@@ -250,7 +251,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void previousPageBtnActionPerformed(ActionEvent e) {
+    protected void previousPageBtnActionPerformed(ActionEvent e) {
         try {
             previousPage();
         } catch (Exception ex) {
@@ -258,7 +259,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void nextPageBtnActionPerformed(ActionEvent e) {
+    protected void nextPageBtnActionPerformed(ActionEvent e) {
         try {
             nextPage();
         } catch (Exception ex) {
@@ -266,7 +267,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void thisWindowClosed(WindowEvent e) {
+    protected void thisWindowClosed(WindowEvent e) {
         setVisible(false);
         // TODO 待优化
 //        datas = null;
@@ -276,14 +277,14 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     }
 
     @SuppressWarnings(value = "unchecked")
-    private void queryBtnActionPerformed(ActionEvent e) {
+    protected void queryBtnActionPerformed(ActionEvent e) {
         queryByCondition();
     }
 
     /**
      * 根据查询条件筛选
      */
-    private void queryByCondition() {
+    protected void queryByCondition() {
         try {
             boolean pickInDoubt = selectInDoubt != null ? selectInDoubt.isSelected() : false;
             shownDatas.clear();
@@ -335,11 +336,11 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void selectPageActionPerformed(ActionEvent e) {
+    protected void selectPageActionPerformed(ActionEvent e) {
         // DO NOTHING
     }
 
-    private void selectPageItemStateChanged(ItemEvent e) {
+    protected void selectPageItemStateChanged(ItemEvent e) {
         try {
             currentPageIndex = Integer.valueOf(e.getItem().toString());
             select();
@@ -349,7 +350,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     }
 
     @SuppressWarnings(value = "unchecked")
-    private void resetBtnActionPerformed(ActionEvent e) {
+    protected void resetBtnActionPerformed(ActionEvent e) {
         try {
             for (JTextField queryTextField : queryTextFields) {
                 queryTextField.setText("");
@@ -364,7 +365,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void dataTableMouseClicked(MouseEvent e) {
+    protected void dataTableMouseClicked(MouseEvent e) {
         if (e.getButton() != 3) {
             return;
         }
@@ -378,7 +379,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         new OperationHint(this, "已复制到剪切板上");
     }
 
-    private void deleteBtnActionPerformed(ActionEvent e) {
+    protected void deleteBtnActionPerformed(ActionEvent e) {
         try {
             List<Integer> selectedRows = getSelectedRows();
             if (selectedRows.size() <= 0) {
@@ -411,7 +412,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void saveBtnActionPerformed(ActionEvent e) {
+    protected void saveBtnActionPerformed(ActionEvent e) {
         try {
             BaseSaveDialog<T> saveDialog = wannaSave(queryObject, self);
             if (!saveDialog.isOk() || saveDialog.getDomain() == null) {
@@ -430,7 +431,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      *
      * @see javax.swing.table.DefaultTableModel
      */
-    private class QueryTable extends DefaultTableModel {
+    protected class QueryTable extends DefaultTableModel {
         private QueryTable(Object[][] data, Object[] columnNames) {
             super(data, columnNames);
         }
@@ -480,7 +481,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     /**
      * 自定义table行色渲染
      */
-    private class QueryTableColorRenderer extends DefaultTableCellRenderer {
+    protected class QueryTableColorRenderer extends DefaultTableCellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -500,7 +501,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     /**
      * 自定义table按钮列编辑器
      */
-    private class QueryTableBtnCellEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer, ActionListener {
+    protected class QueryTableBtnCellEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer, ActionListener {
 
         private JButton btn = null;
 
@@ -581,15 +582,11 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      * @param tableRow 行号
      * @return 显示数据位置
      */
-    private int getShownDataIndex(int tableRow) {
+    protected int getShownDataIndex(int tableRow) {
         return tableRow + (currentPageIndex - 1) * countPerPage;
     }
 
-    private void queryAreaKeyPressed(KeyEvent e) {
-        // TODO add your code here
-    }
-
-    private void exportBtnActionPerformed(ActionEvent e) {
+    protected void exportBtnActionPerformed(ActionEvent e) {
         try {
             File targetFile = chooseExportFile("excel文件", "xlsx");
             if (targetFile == null) return;
@@ -610,7 +607,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void sendBtnActionPerformed(ActionEvent e) {
+    protected void sendBtnActionPerformed(ActionEvent e) {
         try {
             List<Integer> selectedRows = getSelectedRows();
             if (selectedRows.size() <= 0) {
@@ -629,7 +626,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void resultAreaMouseWheelMoved(MouseWheelEvent e) {
+    protected void resultAreaMouseWheelMoved(MouseWheelEvent e) {
         if (e.getWheelRotation() < 0) {
             previousPage();
         } else {
@@ -637,7 +634,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         }
     }
 
-    private void allSelectedBtnActionPerformed(ActionEvent e) {
+    protected void allSelectedBtnActionPerformed(ActionEvent e) {
         changeCheckboxStatus(Boolean.TRUE);
     }
 
@@ -646,15 +643,27 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      *
      * @param isSelected 是否选中
      */
-    private void changeCheckboxStatus(Boolean isSelected) {
+    protected void changeCheckboxStatus(Boolean isSelected) {
         for (int row = 0; row < dataTable.getRowCount(); row++) {
             dataTable.setValueAt(isSelected, row, SELECT_COLUMN_INDEX);
         }
         dataTable.repaint();
     }
 
-    private void noSelectedBtnActionPerformed(ActionEvent e) {
+    protected void noSelectedBtnActionPerformed(ActionEvent e) {
         changeCheckboxStatus(Boolean.FALSE);
+    }
+
+    protected void downloadImportModelBtnActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                File targetFile = chooseExportFile("excel文件", "xlsx");
+                if (targetFile == null) return;
+                exportImportModel(queryObject.domainType(), targetFile);
+                new OperationHint(self, "导出成功");
+            }
+        });
     }
 
     /**
@@ -680,6 +689,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         allSelectedBtn = new JButton();
         noSelectedBtn = new JButton();
         editableHint = new JLabel();
+        downloadImportModelBtn = new JButton();
 
         //======== this ========
         addWindowListener(new WindowAdapter() {
@@ -748,7 +758,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         nextPageBtn.setBounds(new Rectangle(new Point(455, 635), nextPageBtn.getPreferredSize()));
 
         //---- recordCountShow ----
-        recordCountShow.setText("\u603b\u8ba1\uff1a");
+        recordCountShow.setText("\u6761\u6570\uff1a");
         contentPane.add(recordCountShow);
         recordCountShow.setBounds(5, 640, 120, recordCountShow.getPreferredSize().height);
 
@@ -776,12 +786,6 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         //======== queryArea ========
         {
             queryArea.setAutoscrolls(true);
-            queryArea.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    queryAreaKeyPressed(e);
-                }
-            });
             queryArea.setLayout(new FlowLayout(FlowLayout.LEFT));
         }
         contentPane.add(queryArea);
@@ -881,6 +885,17 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
         contentPane.add(editableHint);
         editableHint.setBounds(new Rectangle(new Point(195, 150), editableHint.getPreferredSize()));
 
+        //---- downloadImportModelBtn ----
+        downloadImportModelBtn.setText("\u5bfc\u5165\u6a21\u677f\u5411\u5bfc");
+        downloadImportModelBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                downloadImportModelBtnActionPerformed(e);
+            }
+        });
+        contentPane.add(downloadImportModelBtn);
+        downloadImportModelBtn.setBounds(new Rectangle(new Point(335, 110), downloadImportModelBtn.getPreferredSize()));
+
         contentPane.setPreferredSize(new Dimension(920, 695));
         setSize(920, 695);
         setLocationRelativeTo(getOwner());
@@ -891,7 +906,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     /**
      * 初始化查询区域
      */
-    private void initQueryArea() {
+    protected void initQueryArea() {
         String[] queryFieldNames = queryObject.queryFieldNames();
         if (CollectionUtil.isEmpty(queryFieldNames)) {
             return;
@@ -910,7 +925,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             if (StringUtils.isEmpty(queryLabelTitle)) {
                 continue;
             }
-            queryLabel = new JLabel(queryLabelTitle);
+            queryLabel = new JLabel(queryLabelTitle.replace("*", ""));
             queryArea.add(queryLabel);
             queryTextField = new JTextField(10);
             queryTextField.addKeyListener(new KeyListener() {
@@ -964,5 +979,6 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     private JButton allSelectedBtn;
     private JButton noSelectedBtn;
     private JLabel editableHint;
+    private JButton downloadImportModelBtn;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

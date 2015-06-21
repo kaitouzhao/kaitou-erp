@@ -1,5 +1,7 @@
 package kaitou.ppp.manager.ts;
 
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.ts.TSSDSPermission;
 
 import java.util.List;
@@ -34,4 +36,21 @@ public interface TSSDSPermissionManager {
      * @return 成功执行条数
      */
     public int delete(Object... tsSDSPermissions);
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<TSSDSPermission> queryPager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<TSSDSPermission> queryAll(List<Condition> conditions);
 }

@@ -21,7 +21,7 @@ public class ShopDaoImpl extends BaseDao<Shop> implements ShopDao {
     }
 
     @Override
-    public Object[] preSave(Object... domains) {
+    public Object[] preSave(boolean isNewTransaction, Object... domains) {
         List<String> shopIds = new ArrayList<String>();
         List<Integer> indexList = new ArrayList<Integer>();
         Shop shop;
@@ -43,6 +43,6 @@ public class ShopDaoImpl extends BaseDao<Shop> implements ShopDao {
             logOperation(info.toString());
             throw new RuntimeException(info.toString());
         }
-        return super.preSave(domains);
+        return super.preSave(isNewTransaction, domains);
     }
 }

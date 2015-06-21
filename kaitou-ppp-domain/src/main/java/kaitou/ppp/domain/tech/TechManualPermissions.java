@@ -74,39 +74,6 @@ public class TechManualPermissions extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TechManualPermissions that = (TechManualPermissions) o;
-
-        if (email != null ? !email.equals(that.email) : that.email != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (permissionModels != null ? !permissionModels.equals(that.permissionModels) : that.permissionModels != null)
-            return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (userName != null ? !userName.equals(that.userName) : that.userName != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (userName != null ? userName.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (permissionModels != null ? permissionModels.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getSaleRegion() {
         return SysCode.SaleRegion.convert2Value(saleRegion);
     }

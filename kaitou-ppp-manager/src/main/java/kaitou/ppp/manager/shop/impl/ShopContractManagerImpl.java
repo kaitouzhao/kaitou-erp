@@ -7,6 +7,7 @@ import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
 import kaitou.ppp.manager.shop.ShopContractManager;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,10 +31,16 @@ public class ShopContractManagerImpl extends BaseFileDaoManager<ShopContract> im
         Collections.sort(shopContracts, new Comparator<ShopContract>() {
             @Override
             public int compare(ShopContract o1, ShopContract o2) {
+                if (StringUtils.isEmpty(o1.getShopId())) {
+                    return -1;
+                }
+                if (StringUtils.isEmpty(o2.getShopId())) {
+                    return 1;
+                }
                 try {
                     return Long.valueOf(o1.getShopId().substring(3)).compareTo(Long.valueOf(o2.getShopId().substring(3)));
                 } catch (Exception e) {
-                    return 0;
+                    return -1;
                 }
             }
         });
@@ -60,5 +67,19 @@ public class ShopContractManagerImpl extends BaseFileDaoManager<ShopContract> im
     @Override
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<ShopContract> contractList = queryAll();
+        for (ShopContract contract : contractList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(contract.getShopName())) {
+                    continue;
+                }
+                contract.setShopId(shop.getId());
+            }
+        }
+        save(contractList);
     }
 }

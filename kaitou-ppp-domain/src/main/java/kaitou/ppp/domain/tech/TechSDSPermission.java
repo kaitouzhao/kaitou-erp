@@ -94,47 +94,6 @@ public class TechSDSPermission extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TechSDSPermission that = (TechSDSPermission) o;
-
-        if (applicant != null ? !applicant.equals(that.applicant) : that.applicant != null) return false;
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (email != null ? !email.equals(that.email) : that.email != null) return false;
-        if (endDate != null ? !endDate.equals(that.endDate) : that.endDate != null) return false;
-        if (firstApplyOrDelay != null ? !firstApplyOrDelay.equals(that.firstApplyOrDelay) : that.firstApplyOrDelay != null)
-            return false;
-        if (mac != null ? !mac.equals(that.mac) : that.mac != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (applicant != null ? applicant.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
-        result = 31 * result + (mac != null ? mac.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-        result = 31 * result + (firstApplyOrDelay != null ? firstApplyOrDelay.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getSaleRegion() {
         return SysCode.SaleRegion.convert2Value(saleRegion);
     }

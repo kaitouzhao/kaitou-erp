@@ -32,7 +32,7 @@ public class OutboxDBVersionDaoImpl extends BaseDao<OutboxDBVersion> implements 
     @Override
     public List<OutboxDBVersion> queryOutbox(String destIp) {
         List<OutboxDBVersion> result = CollectionUtil.newList();
-        List<OutboxDBVersion> outboxDBVersions = query();
+        List<OutboxDBVersion> outboxDBVersions = query(true);
         if (StringUtils.isEmpty(destIp) || CollectionUtil.isEmpty(outboxDBVersions)) {
             return result;
         }
@@ -46,7 +46,7 @@ public class OutboxDBVersionDaoImpl extends BaseDao<OutboxDBVersion> implements 
 
     @Override
     public void add2Outbox(List<OutboxDBVersion> outboxDBVersions) {
-        List<OutboxDBVersion> allList = query();
+        List<OutboxDBVersion> allList = query(true);
         String latestModifyTime = new DateTime().toString("yyyy-MM-dd HH:mm:ss");
         OutboxDBVersion outboxDBVersion;
         for (OutboxDBVersion version : outboxDBVersions) {
@@ -84,7 +84,7 @@ public class OutboxDBVersionDaoImpl extends BaseDao<OutboxDBVersion> implements 
 
     @Override
     public void remove(List<OutboxDBVersion> outboxDBVersions) {
-        List<OutboxDBVersion> allList = query();
+        List<OutboxDBVersion> allList = query(true);
         if (CollectionUtil.isEmpty(outboxDBVersions) || CollectionUtil.isEmpty(allList)) {
             return;
         }

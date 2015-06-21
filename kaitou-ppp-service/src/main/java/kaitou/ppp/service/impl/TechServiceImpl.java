@@ -1,6 +1,8 @@
 package kaitou.ppp.service.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.tech.*;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
@@ -16,6 +18,8 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static kaitou.ppp.service.ServiceInvokeManager.*;
+
 /**
  * 技术管理服务实现.
  * User: 赵立伟
@@ -29,6 +33,7 @@ public class TechServiceImpl extends BaseExcelService implements TechService {
     private RemoteRegistryManager remoteRegistryManager;
 
     private SOIDCodeManager soidCodeManager;
+    private TechDongleManager techDongleManager;
     private TechSupportManager techSupportManager;
     private SDSPermissionManager sdsPermissionManager;
     private InstallPermissionManager installPermissionManager;
@@ -44,6 +49,10 @@ public class TechServiceImpl extends BaseExcelService implements TechService {
 
     public void setRemoteRegistryManager(RemoteRegistryManager remoteRegistryManager) {
         this.remoteRegistryManager = remoteRegistryManager;
+    }
+
+    public void setTechDongleManager(TechDongleManager techDongleManager) {
+        this.techDongleManager = techDongleManager;
     }
 
     public void setSoidCodeManager(SOIDCodeManager soidCodeManager) {
@@ -384,5 +393,61 @@ public class TechServiceImpl extends BaseExcelService implements TechService {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void importTechDongles(File srcFile) {
+        saveOrUpdateTechDongles(CollectionUtil.toArray(readFromExcel(srcFile, TechDongle.class), TechDongle.class));
+    }
+
+    @Override
+    public void exportTechDongles(File targetFile) {
+        export2Excel(techDongleManager.queryAll(), targetFile, TechDongle.class);
+    }
+
+    @Override
+    public List<TechDongle> queryTechDongles() {
+        return techDongleManager.queryAll();
+    }
+
+    @Override
+    public void saveOrUpdateTechDongles(TechDongle... techDongles) {
+        final List<TechDongle> techDongleList = CollectionUtil.newList(techDongles);
+        logOperation("成功导入/更新技术管理dongle记录数：" + techDongleManager.save(techDongleList));
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteTechService> remoteTechServices = queryRemoteService(RemoteTechService.class);
+                logOperation("通知已注册的远程服务更新技术管理dongle记录");
+                for (RemoteTechService remoteTechService : remoteTechServices) {
+                    remoteTechService.saveTechDongle(techDongleList);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void deleteTechDongles(final Object... techDongles) {
+        logOperation("成功删除技术管理dongle记录数：" + techDongleManager.delete(techDongles));
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteTechService> remoteTechServices = queryRemoteService(RemoteTechService.class);
+                logOperation("通知已注册的远程服务更新删除技术管理dongle记录");
+                for (RemoteTechService remoteTechService : remoteTechServices) {
+                    remoteTechService.deleteTechDongle(techDongles);
+                }
+            }
+        });
+    }
+
+    @Override
+    public Pager<TechDongle> queryTechDonglePager(int currentPage, List<Condition> conditions) {
+        return techDongleManager.queryPager(currentPage, conditions);
+    }
+
+    @Override
+    public List<TechDongle> queryTechDongle(List<Condition> conditions) {
+        return techDongleManager.queryAll(conditions);
     }
 }

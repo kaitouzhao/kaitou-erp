@@ -1,6 +1,7 @@
 package kaitou.ppp.domain.ts;
 
 import kaitou.ppp.domain.BaseDomain;
+import kaitou.ppp.domain.system.SysCode;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -18,6 +19,12 @@ public class ToolRecipients extends BaseDomain {
      * 月份
      */
     private String numberOfMonth;
+    /**
+     * 区域
+     *
+     * @see kaitou.ppp.domain.system.SysCode.SaleRegion
+     */
+    private String saleRegion;
     /**
      * 申请时间
      */
@@ -69,7 +76,7 @@ public class ToolRecipients extends BaseDomain {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + getClass().getSimpleName() + DB_SUFFIX;
+        return SysCode.DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
@@ -89,44 +96,12 @@ public class ToolRecipients extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ToolRecipients that = (ToolRecipients) o;
-
-        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
-            return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (price != null ? !price.equals(that.price) : that.price != null) return false;
-        if (recipients != null ? !recipients.equals(that.recipients) : that.recipients != null) return false;
-        if (toolName != null ? !toolName.equals(that.toolName) : that.toolName != null) return false;
-        if (toolNo != null ? !toolNo.equals(that.toolNo) : that.toolNo != null) return false;
-        if (totalPrice != null ? !totalPrice.equals(that.totalPrice) : that.totalPrice != null) return false;
-        if (useEngineerName != null ? !useEngineerName.equals(that.useEngineerName) : that.useEngineerName != null)
-            return false;
-
-        return true;
+    public String getSaleRegion() {
+        return SysCode.SaleRegion.convert2Value(saleRegion);
     }
 
-    @Override
-    public int hashCode() {
-        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
-        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (recipients != null ? recipients.hashCode() : 0);
-        result = 31 * result + (useEngineerName != null ? useEngineerName.hashCode() : 0);
-        result = 31 * result + (toolNo != null ? toolNo.hashCode() : 0);
-        result = 31 * result + (toolName != null ? toolName.hashCode() : 0);
-        result = 31 * result + (amount != null ? amount.hashCode() : 0);
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        result = 31 * result + (totalPrice != null ? totalPrice.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
+    public void setSaleRegion(String saleRegion) {
+        this.saleRegion = saleRegion;
     }
 
     public String getNumberOfYear() {

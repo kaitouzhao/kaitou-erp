@@ -82,4 +82,18 @@ public interface RemoteTechService extends Remote {
      * @param installPermission 装机权限
      */
     public void deleteInstallPermission(Object... installPermission) throws RemoteException;
+
+    /**
+     * 保存dongle记录
+     *
+     * @param techDongles dongle记录列表
+     */
+    public void saveTechDongle(List<TechDongle> techDongles) throws RemoteException;
+
+    /**
+     * 删除dongle记录
+     *
+     * @param techDongles dongle记录
+     */
+    public void deleteTechDongle(Object... techDongles) throws RemoteException;
 }

@@ -14,6 +14,8 @@ import kaitou.ppp.manager.listener.ShopUpdateListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import static kaitou.ppp.common.utils.FileUtil.deleteFilesOfDir;
+
 /**
  * 工程师事务管理实现.
  * User: 赵立伟
@@ -77,6 +79,21 @@ public class EngineerManagerImpl extends BaseFileDaoManager<Engineer> implements
                 engineer.setNumberOfYear(cachedShopDetail.getNumberOfYear());
             }
             engineers.addAll(list);
+        }
+        save(engineers);
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<Engineer> engineers = queryAll();
+        deleteFilesOfDir(dbDir, "Engineer.kdb");
+        for (Engineer engineer : engineers) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(engineer.getShopName())) {
+                    continue;
+                }
+                engineer.setShopId(shop.getId());
+            }
         }
         save(engineers);
     }

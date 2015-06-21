@@ -4,125 +4,133 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="engineerDao" class="kaitou.ppp.dao.engineer.impl.EngineerDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="engineerTrainingDao" class="kaitou.ppp.dao.engineer.impl.EngineerTrainingDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="shopDao" class="kaitou.ppp.dao.shop.impl.ShopDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="shopDetailDao" class="kaitou.ppp.dao.shop.impl.ShopDetailDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="shopRTSDao" class="kaitou.ppp.dao.shop.impl.ShopRTSDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="shopPayDao" class="kaitou.ppp.dao.shop.impl.ShopPayDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="shopContractDao" class="kaitou.ppp.dao.shop.impl.ShopContractDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="partsLibraryDao" class="kaitou.ppp.dao.shop.impl.PartsLibraryDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="cardApplicationRecordDao" class="kaitou.ppp.dao.card.impl.CardApplicationRecordDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="cachedShopDao" class="kaitou.ppp.dao.shop.impl.CachedShopDaoImpl"/>
 
     <bean id="systemSettingsDao" class="kaitou.ppp.dao.system.impl.SystemSettingsDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//conf"/>
+        <property name="dbDir" value="d://ppp//conf"/>
     </bean>
 
     <bean id="remoteRegistryDao" class="kaitou.ppp.dao.system.impl.RemoteRegistryDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//conf"/>
+        <property name="dbDir" value="d://ppp//conf"/>
     </bean>
 
     <bean id="localDBVersionDao" class="kaitou.ppp.dao.system.impl.LocalDBVersionDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//conf"/>
+        <property name="dbDir" value="d://ppp//conf"/>
     </bean>
 
     <bean id="outboxDBVersionDao" class="kaitou.ppp.dao.system.impl.OutboxDBVersionDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="warrantyFeeDao" class="kaitou.ppp.dao.warranty.impl.WarrantyFeeDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="warrantyPartsDao" class="kaitou.ppp.dao.warranty.impl.WarrantyPartsDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="warrantyPrintDao" class="kaitou.ppp.dao.warranty.impl.WarrantyPrintDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="warrantyConsumablesDao" class="kaitou.ppp.dao.warranty.impl.WarrantyConsumablesDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="manualPermissionsDao" class="kaitou.ppp.dao.tech.impl.ManualPermissionsDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="soidCodeDao" class="kaitou.ppp.dao.tech.impl.SOIDCodeDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="sdsPermissionDao" class="kaitou.ppp.dao.tech.impl.SDSPermissionDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="techSupportDao" class="kaitou.ppp.dao.tech.impl.TechSupportDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
+    </bean>
+
+    <bean id="techDongleDao" class="kaitou.ppp.dao.tech.impl.TechDongleDaoImpl">
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="installPermissionDao" class="kaitou.ppp.dao.tech.impl.InstallPermissionDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="tsTrainingDao" class="kaitou.ppp.dao.ts.impl.TSTrainingDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="tsManualPermissionsDao" class="kaitou.ppp.dao.ts.impl.TSManualPermissionsDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="tsSDSPermissionDao" class="kaitou.ppp.dao.ts.impl.TSSDSPermissionDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="tsInstallPermissionDao" class="kaitou.ppp.dao.ts.impl.TSInstallPermissionDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
+    </bean>
+
+    <bean id="tsDongleDao" class="kaitou.ppp.dao.ts.impl.TsDongleDaoImpl">
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="oldMachineRenewDao" class="kaitou.ppp.dao.ts.impl.OldMachineRenewDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="newMachineClaimDao" class="kaitou.ppp.dao.ts.impl.NewMachineClaimDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="toolRecipientsDao" class="kaitou.ppp.dao.ts.impl.ToolRecipientsDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
     <bean id="componentBorrowingDao" class="kaitou.ppp.dao.ts.impl.ComponentBorrowingDaoImpl">
-        <property name="dbDir" value="d://temp//ppp//db"/>
+        <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
 </beans>

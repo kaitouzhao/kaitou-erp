@@ -34,11 +34,22 @@ public abstract class BaseFileDaoManager<T extends BaseDomain> extends FileDaoMa
     /**
      * 保存
      *
+     * @param isNewTransaction 是否开启新事务
+     * @param domainList       实体列表
+     * @return 成功保存个数
+     */
+    public int save(boolean isNewTransaction, List<T> domainList) {
+        return dao.save(isNewTransaction, CollectionUtil.toArray(domainList, domainClass()));
+    }
+
+    /**
+     * 保存
+     *
      * @param domainList 实体列表
      * @return 成功保存个数
      */
     public int save(List<T> domainList) {
-        return dao.save(CollectionUtil.toArray(domainList, domainClass()));
+        return save(true, domainList);
     }
 
     /**
@@ -80,5 +91,15 @@ public abstract class BaseFileDaoManager<T extends BaseDomain> extends FileDaoMa
      */
     public Pager<T> queryPager(int currentPage, List<Condition> conditions) {
         return dao.queryPager(currentPage, conditions);
+    }
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<T> queryAll(List<Condition> conditions) {
+        return dao.queryAll(conditions);
     }
 }

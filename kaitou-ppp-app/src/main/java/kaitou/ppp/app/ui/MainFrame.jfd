@@ -9,6 +9,28 @@ new FormModel {
 			name: "this"
 			"$sizePolicy": 0
 			"title": "PPP-ERP主界面"
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
+				"autoSize": false
+			} ) {
+				name: "tsSDSReminderPanel"
+				"border": new javax.swing.border.TitledBorder( "正在获取SDS需要更新提醒......" )
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "tsSDSReminderScrollPane"
+					add( new FormComponent( "javax.swing.JTable" ) {
+						name: "tsSDSReminderTable"
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 10
+					"y": 25
+					"width": 325
+					"height": 215
+				} )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"x": 15
+				"y": 10
+				"height": 255
+				"width": 345
+			} )
 			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
 				name: "managerMenuBar"
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
@@ -355,6 +377,25 @@ new FormModel {
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportInstallPermissionActionPerformed", true ) )
 						} )
 					} )
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "techDongle"
+						"text": "dongle记录"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "queryTechDongle"
+							"text": "查询"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "queryTechDongleActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "importTechDongle"
+							"text": "导入"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "importTechDongleActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "exportTechDongle"
+							"text": "导出"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportTechDongleActionPerformed", true ) )
+						} )
+					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "tsManagement"
@@ -511,6 +552,25 @@ new FormModel {
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportComponentBorrowingActionPerformed", true ) )
 						} )
 					} )
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "tsDongle"
+						"text": "dongle记录"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "queryTSDongle"
+							"text": "查询"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "queryTSDongleActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "importTSDongle"
+							"text": "导入"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "importTSDongleActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "exportTSDongle"
+							"text": "导出"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportTSDongleActionPerformed", true ) )
+						} )
+					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "onlineMenu"
@@ -554,11 +614,16 @@ new FormModel {
 						"text": "报告错误"
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "reportErrorActionPerformed", true ) )
 					} )
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "updateShopId"
+						"text": "更新认定店编号"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "updateShopIdActionPerformed", true ) )
+					} )
 				} )
 			}
 		}, new FormLayoutConstraints( null ) {
 			"location": new java.awt.Point( 0, 0 )
-			"size": new java.awt.Dimension( 400, 300 )
+			"size": new java.awt.Dimension( 960, 530 )
 		} )
 	}
 }

@@ -79,43 +79,6 @@ public class TechInstallPermission extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TechInstallPermission that = (TechInstallPermission) o;
-
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (mac != null ? !mac.equals(that.mac) : that.mac != null) return false;
-        if (model != null ? !model.equals(that.model) : that.model != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (openingTime != null ? !openingTime.equals(that.openingTime) : that.openingTime != null) return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (userCompanyName != null ? !userCompanyName.equals(that.userCompanyName) : that.userCompanyName != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (model != null ? model.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (mac != null ? mac.hashCode() : 0);
-        result = 31 * result + (openingTime != null ? openingTime.hashCode() : 0);
-        result = 31 * result + (userCompanyName != null ? userCompanyName.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getSaleRegion() {
         return SysCode.SaleRegion.convert2Value(saleRegion);
     }

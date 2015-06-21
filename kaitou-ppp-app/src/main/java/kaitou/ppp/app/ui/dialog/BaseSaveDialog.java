@@ -1,7 +1,7 @@
 package kaitou.ppp.app.ui.dialog;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
-import kaitou.ppp.app.ui.table.IQueryObject;
+import kaitou.ppp.app.ui.table.queryobject.IQueryObject;
 import kaitou.ppp.app.ui.table.OPManager;
 import kaitou.ppp.domain.BaseDomain;
 

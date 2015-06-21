@@ -5,7 +5,7 @@
 package kaitou.ppp.app.ui.dialog.add;
 
 import kaitou.ppp.app.ui.dialog.BaseSaveDialog;
-import kaitou.ppp.app.ui.table.IQueryObject;
+import kaitou.ppp.app.ui.table.queryobject.IQueryObject;
 import kaitou.ppp.domain.tech.TechInstallPermission;
 
 import javax.swing.*;

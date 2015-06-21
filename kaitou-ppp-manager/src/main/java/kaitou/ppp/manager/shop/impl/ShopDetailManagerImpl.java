@@ -1,6 +1,7 @@
 package kaitou.ppp.manager.shop.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.dao.shop.CachedShopDao;
 import kaitou.ppp.dao.shop.ShopDetailDao;
 import kaitou.ppp.domain.shop.Shop;
@@ -62,5 +63,20 @@ public class ShopDetailManagerImpl extends BaseFileDaoManager<ShopDetail> implem
     @Override
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
         cachedShopDao.updateShopDetails(shopDetails);
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<ShopDetail> shopDetailList = queryAll();
+        FileUtil.deleteFilesOfDir(dbDir, "ShopDetail.kdb");
+        for (ShopDetail shopDetail : shopDetailList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(shopDetail.getName())) {
+                    continue;
+                }
+                shopDetail.setId(shop.getId());
+            }
+        }
+        save(shopDetailList);
     }
 }

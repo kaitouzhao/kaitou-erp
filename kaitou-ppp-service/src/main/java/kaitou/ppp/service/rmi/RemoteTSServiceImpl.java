@@ -16,6 +16,7 @@ import java.util.List;
  */
 public class RemoteTSServiceImpl extends UnicastRemoteObject implements RemoteTSService {
 
+    private TsDongleManager tsDongleManager;
     private TSTrainingManager tsTrainingManager;
     private ToolRecipientsManager toolRecipientsManager;
     private TSSDSPermissionManager tssdsPermissionManager;
@@ -24,6 +25,10 @@ public class RemoteTSServiceImpl extends UnicastRemoteObject implements RemoteTS
     private ComponentBorrowingManager componentBorrowingManager;
     private TSInstallPermissionManager tsInstallPermissionManager;
     private TSManualPermissionsManager tsManualPermissionsManager;
+
+    public void setTsDongleManager(TsDongleManager tsDongleManager) {
+        this.tsDongleManager = tsDongleManager;
+    }
 
     public void setToolRecipientsManager(ToolRecipientsManager toolRecipientsManager) {
         this.toolRecipientsManager = toolRecipientsManager;
@@ -139,5 +144,15 @@ public class RemoteTSServiceImpl extends UnicastRemoteObject implements RemoteTS
     @Override
     public void deleteComponentBorrowing(Object... componentBorrowing) throws RemoteException {
         componentBorrowingManager.delete(componentBorrowing);
+    }
+
+    @Override
+    public void saveTSDongle(List<TSDongle> tsDongles) throws RemoteException {
+        tsDongleManager.save(tsDongles);
+    }
+
+    @Override
+    public void deleteTSDongle(Object... tsDongles) throws RemoteException {
+        tsDongleManager.delete(tsDongles);
     }
 }

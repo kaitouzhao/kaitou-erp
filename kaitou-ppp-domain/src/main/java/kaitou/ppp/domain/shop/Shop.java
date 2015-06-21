@@ -18,6 +18,10 @@ public class Shop extends BaseDomain {
      */
     protected String saleRegion;
     /**
+     * 省份
+     */
+    protected String province;
+    /**
      * 认定店编号（合同编号）
      */
     protected String id;
@@ -92,6 +96,7 @@ public class Shop extends BaseDomain {
     public String toString() {
         return "Shop{" +
                 "saleRegion='" + saleRegion + '\'' +
+                ", province='" + province + '\'' +
                 ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", linkMan='" + linkMan + '\'' +
@@ -126,6 +131,14 @@ public class Shop extends BaseDomain {
     @Override
     public String dbFileSuffix() {
         return '_' + getClass().getSimpleName() + DB_SUFFIX;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
     }
 
     public String getPppBusinessInterfacePeople() {

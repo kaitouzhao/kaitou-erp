@@ -23,4 +23,11 @@ public interface ShopUpdateListener {
      * @param shopDetails 认定级别集合
      */
     public void updateShopDetailEvent(ShopDetail... shopDetails);
+
+    /**
+     * 更新认定店编号事件
+     *
+     * @param shops 认定店集合
+     */
+    public void updateShopIdEvent(Shop... shops);
 }

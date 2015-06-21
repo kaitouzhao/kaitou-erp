@@ -1,6 +1,8 @@
 package kaitou.ppp.service.impl;
 
+import com.womai.bsp.tool.utils.BeanCopyUtil;
 import com.womai.bsp.tool.utils.CollectionUtil;
+import com.womai.bsp.tool.utils.ExcelUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.shop.*;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
@@ -30,6 +32,10 @@ import static kaitou.ppp.service.ServiceInvokeManager.*;
  * Time: 13:24
  */
 public class ShopServiceImpl extends BaseExcelService implements ShopService {
+    /**
+     * DB文件目录
+     */
+    private String dbDir;
 
     private ShopManager shopManager;
     private ShopRTSManager shopRTSManager;
@@ -41,6 +47,10 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
     private RemoteRegistryManager remoteRegistryManager;
     private List<ShopUpdateListener> shopUpdateListeners;
     private CardApplicationRecordManager cardApplicationRecordManager;
+
+    public void setDbDir(String dbDir) {
+        this.dbDir = dbDir;
+    }
 
     public void setPartsLibraryManager(PartsLibraryManager partsLibraryManager) {
         this.partsLibraryManager = partsLibraryManager;
@@ -546,5 +556,29 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
                 }
             }
         }).start();
+    }
+
+    @Override
+    public void updateShopId(File srcFile) {
+        List<String[]> dataList = ExcelUtil.readExcel(srcFile, "基础", 3, 2);
+        List<Shop> shops = shopManager.query();
+        List<Shop> newShops = new ArrayList<Shop>();
+        for (Shop shop : shops) {
+            Shop newShop = new Shop();
+            BeanCopyUtil.copyBean(shop, newShop);
+            for (String[] data : dataList) {
+                if (!shop.getName().equals(data[1])) {
+                    continue;
+                }
+                newShop.setId(data[0]);
+                newShop.setProvince(data[2]);
+            }
+            newShops.add(newShop);
+        }
+        deleteShops(CollectionUtil.toArray(shops, Shop.class));
+        saveOrUpdateShop(CollectionUtil.toArray(newShops, Shop.class));
+        for (ShopUpdateListener listener : shopUpdateListeners) {
+            listener.updateShopIdEvent(CollectionUtil.toArray(newShops, Shop.class));
+        }
     }
 }

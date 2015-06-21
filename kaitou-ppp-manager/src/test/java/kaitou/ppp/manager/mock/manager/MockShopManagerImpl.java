@@ -15,7 +15,7 @@ import java.util.List;
 public class MockShopManagerImpl extends ShopManagerImpl {
 
     @Override
-    public int save(List<Shop> shops) {
+    public int save(boolean isNewTransaction, List<Shop> shops) {
         Shop[] shopArray = CollectionUtil.toArray(shops, Shop.class);
         return shopDao.save(shopArray);
     }

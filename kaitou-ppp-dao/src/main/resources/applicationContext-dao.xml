@@ -89,6 +89,10 @@
         <property name="dbDir" value="${db.file.dir}"/>
     </bean>
 
+    <bean id="techDongleDao" class="kaitou.ppp.dao.tech.impl.TechDongleDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
     <bean id="installPermissionDao" class="kaitou.ppp.dao.tech.impl.InstallPermissionDaoImpl">
         <property name="dbDir" value="${db.file.dir}"/>
     </bean>
@@ -106,6 +110,10 @@
     </bean>
 
     <bean id="tsInstallPermissionDao" class="kaitou.ppp.dao.ts.impl.TSInstallPermissionDaoImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+    </bean>
+
+    <bean id="tsDongleDao" class="kaitou.ppp.dao.ts.impl.TsDongleDaoImpl">
         <property name="dbDir" value="${db.file.dir}"/>
     </bean>
 

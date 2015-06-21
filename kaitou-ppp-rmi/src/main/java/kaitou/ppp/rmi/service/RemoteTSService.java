@@ -125,4 +125,17 @@ public interface RemoteTSService extends Remote {
      */
     public void deleteComponentBorrowing(Object... componentBorrowing) throws RemoteException;
 
+    /**
+     * 保存dongle记录
+     *
+     * @param tsDongles dongle记录列表
+     */
+    public void saveTSDongle(List<TSDongle> tsDongles) throws RemoteException;
+
+    /**
+     * 删除dongle记录
+     *
+     * @param tsDongles dongle记录
+     */
+    public void deleteTSDongle(Object... tsDongles) throws RemoteException;
 }

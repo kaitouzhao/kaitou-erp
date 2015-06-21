@@ -134,6 +134,12 @@
         <property name="localDBVersionDao" ref="localDBVersionDao"/>
     </bean>
 
+    <bean id="techDongleManager" class="kaitou.ppp.manager.tech.impl.TechDongleManagerImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+        <property name="dao" ref="techDongleDao"/>
+        <property name="localDBVersionDao" ref="localDBVersionDao"/>
+    </bean>
+
     <bean id="installPermissionManager" class="kaitou.ppp.manager.tech.impl.InstallPermissionManagerImpl">
         <property name="dbDir" value="${db.file.dir}"/>
         <property name="dao" ref="installPermissionDao"/>
@@ -161,6 +167,12 @@
     <bean id="tsInstallPermissionManager" class="kaitou.ppp.manager.ts.impl.TSInstallPermissionManagerImpl">
         <property name="dbDir" value="${db.file.dir}"/>
         <property name="dao" ref="tsInstallPermissionDao"/>
+        <property name="localDBVersionDao" ref="localDBVersionDao"/>
+    </bean>
+
+    <bean id="tsDongleManager" class="kaitou.ppp.manager.ts.impl.TsDongleManagerImpl">
+        <property name="dbDir" value="${db.file.dir}"/>
+        <property name="dao" ref="tsDongleDao"/>
         <property name="localDBVersionDao" ref="localDBVersionDao"/>
     </bean>
 

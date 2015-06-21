@@ -1,7 +1,5 @@
 package kaitou.ppp.domain;
 
-import org.joda.time.DateTime;
-
 /**
  * 允许数据存疑的domain父类.
  * User: 赵立伟
@@ -13,50 +11,9 @@ public abstract class BaseDomain4InDoubt extends BaseDomain {
     private static final String NO_DOUBT = "false";
     private static final String IN_DOUBT = "true";
     /**
-     * 自增序列号
-     */
-    private static int autoIncrement = 1;
-    /**
-     * 流水号
-     */
-    public long serialNo = -1;
-    /**
      * 存疑。默认为false，即不存疑
      */
     protected String inDoubt = NO_DOUBT;
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        BaseDomain4InDoubt that = (BaseDomain4InDoubt) o;
-
-        if (serialNo != that.serialNo) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return (int) (serialNo ^ (serialNo >>> 32));
-    }
-
-    /**
-     * 生成流水号
-     * <p>时间戳+自增序列号</p>
-     */
-    public void generateSerialNo() {
-        String serialNoStr = String.valueOf(new DateTime().getMillis()) + String.valueOf(autoIncrement++);
-        serialNo = Long.valueOf(serialNoStr);
-    }
-
-    public long getSerialNo() {
-        return serialNo;
-    }
-
-    public void setSerialNo(long serialNo) {
-        this.serialNo = serialNo;
-    }
 
     public String getInDoubt() {
         return inDoubt;

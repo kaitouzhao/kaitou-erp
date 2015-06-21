@@ -1,6 +1,7 @@
 package kaitou.ppp.manager.shop.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.domain.shop.ShopPay;
@@ -48,5 +49,20 @@ public class ShopPayManagerImpl extends BaseFileDaoManager<ShopPay> implements S
     @Override
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
         // DO NOTHING
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<ShopPay> shopPayList = queryAll();
+        FileUtil.deleteFilesOfDir(dbDir, "ShopPay.kdb");
+        for (ShopPay shopPay : shopPayList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(shopPay.getName())) {
+                    continue;
+                }
+                shopPay.setId(shop.getId());
+            }
+        }
+        save(shopPayList);
     }
 }

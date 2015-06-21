@@ -1,5 +1,7 @@
 package kaitou.ppp.service;
 
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.ts.*;
 
 import java.io.File;
@@ -119,6 +121,30 @@ public interface TSService {
      * @param tsSDSPermission TS SDS权限
      */
     public void deleteTSSDSPermission(Object... tsSDSPermission);
+
+    /**
+     * 获取TS SDS权限到期时间提醒
+     *
+     * @return 提醒语
+     */
+    public List<TSSDSPermission> getTSSDSEndDateReminder();
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<TSSDSPermission> queryTSSDSPermissionPager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<TSSDSPermission> queryTSSDSPermission(List<Condition> conditions);
 
     /**
      * 导入TS装机权限
@@ -299,4 +325,55 @@ public interface TSService {
      */
     public void deleteComponentBorrowing(Object... componentBorrowing);
 
+    /**
+     * 导入dongle记录
+     *
+     * @param srcFile 源文件
+     */
+    public void importTSDongles(File srcFile);
+
+    /**
+     * 导出dongle记录
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportTSDongles(File targetFile);
+
+    /**
+     * 查询dongle记录
+     *
+     * @return dongle记录列表
+     */
+    public List<TSDongle> queryTSDongles();
+
+    /**
+     * 保存/更新dongle记录
+     *
+     * @param tsDongles dongle记录
+     */
+    public void saveOrUpdateTSDongles(TSDongle... tsDongles);
+
+    /**
+     * 删除dongle记录
+     *
+     * @param tsDongles dongle记录
+     */
+    public void deleteTSDongles(Object... tsDongles);
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<TSDongle> queryTSDonglePager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<TSDongle> queryTSDongle(List<Condition> conditions);
 }

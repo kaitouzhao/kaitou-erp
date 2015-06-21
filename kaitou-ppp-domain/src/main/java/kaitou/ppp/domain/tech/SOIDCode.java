@@ -69,38 +69,6 @@ public class SOIDCode extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        SOIDCode soidCode = (SOIDCode) o;
-
-        if (newSoid != null ? !newSoid.equals(soidCode.newSoid) : soidCode.newSoid != null) return false;
-        if (newVerificationCode != null ? !newVerificationCode.equals(soidCode.newVerificationCode) : soidCode.newVerificationCode != null)
-            return false;
-        if (note != null ? !note.equals(soidCode.note) : soidCode.note != null) return false;
-        if (permissionProductLine != null ? !permissionProductLine.equals(soidCode.permissionProductLine) : soidCode.permissionProductLine != null)
-            return false;
-        if (saleRegion != null ? !saleRegion.equals(soidCode.saleRegion) : soidCode.saleRegion != null) return false;
-        if (shopId != null ? !shopId.equals(soidCode.shopId) : soidCode.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(soidCode.shopName) : soidCode.shopName != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (permissionProductLine != null ? permissionProductLine.hashCode() : 0);
-        result = 31 * result + (newSoid != null ? newSoid.hashCode() : 0);
-        result = 31 * result + (newVerificationCode != null ? newVerificationCode.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getSaleRegion() {
         return SysCode.SaleRegion.convert2Value(saleRegion);
     }

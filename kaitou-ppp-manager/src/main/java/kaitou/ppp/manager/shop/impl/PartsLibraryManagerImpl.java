@@ -1,6 +1,7 @@
 package kaitou.ppp.manager.shop.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.domain.shop.PartsLibrary;
 import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopDetail;
@@ -47,5 +48,20 @@ public class PartsLibraryManagerImpl extends BaseFileDaoManager<PartsLibrary> im
     @Override
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+//        List<PartsLibrary> partsLibraryList = queryAll();
+//        FileUtil.deleteFilesOfDir(dbDir, "PartsLibrary.kdb");
+//        for (PartsLibrary partsLibrary : partsLibraryList) {
+//            for (Shop shop : shops) {
+//                if (!shop.getName().equals(partsLibrary.getShopName())) {
+//                    continue;
+//                }
+//                partsLibrary.setShopId(shop.getId());
+//            }
+//        }
+//        save(partsLibraryList);
     }
 }

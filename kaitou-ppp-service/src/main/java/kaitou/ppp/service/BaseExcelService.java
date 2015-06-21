@@ -165,4 +165,19 @@ public abstract class BaseExcelService extends BaseLogManager {
         String[] columns = getValue(SCHEME_PROPERTIES, exportPrefix + simpleName + "_COLUMN").split(",");
         export2Excel(domainList, sheetName, headers, columns, targetFile);
     }
+
+    /**
+     * 导出导入模板
+     *
+     * @param targetFile  目标文件
+     * @param domainClass 实体类型
+     */
+    public <T extends BaseDomain> void exportImportModel(File targetFile, Class<T> domainClass) {
+        String simpleName = domainClass.getSimpleName();
+        String sheetName = getValue(SCHEME_PROPERTIES, simpleName + SHEET_NAME_SUFFIX);
+        String exportPrefix = "IMPORT_";
+        String[] headers = getValue(SCHEME_PROPERTIES, exportPrefix + simpleName + "_HEADER").split(",");
+        String[] columns = getValue(SCHEME_PROPERTIES, exportPrefix + simpleName + "_COLUMN").split(",");
+        export2Excel(CollectionUtil.newList(), sheetName, headers, columns, targetFile);
+    }
 }

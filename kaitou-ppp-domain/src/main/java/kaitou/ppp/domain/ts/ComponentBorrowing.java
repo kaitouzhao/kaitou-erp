@@ -3,6 +3,8 @@ package kaitou.ppp.domain.ts;
 import kaitou.ppp.domain.BaseDomain;
 import org.apache.commons.lang.StringUtils;
 
+import static kaitou.ppp.common.utils.NumberUtil.toInt;
+
 /**
  * 零件借用.
  * User: 赵立伟
@@ -13,7 +15,7 @@ public class ComponentBorrowing extends BaseDomain {
     /**
      * 序号
      */
-    private String serialNo;
+    private String serialNumber;
     /**
      * 年份
      */
@@ -95,6 +97,16 @@ public class ComponentBorrowing extends BaseDomain {
      */
     private String note;
 
+    /**
+     * 序号比较器
+     *
+     * @param o 比较对象
+     * @return 正序
+     */
+    public int comparatorBySerialNumber(ComponentBorrowing o) {
+        return toInt(serialNumber).compareTo(toInt(o.getSerialNumber()));
+    }
+
     @Override
     public void check() {
         if (StringUtils.isEmpty(numberOfYear)) {
@@ -139,79 +151,12 @@ public class ComponentBorrowing extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ComponentBorrowing that = (ComponentBorrowing) o;
-
-        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
-        if (borrowingCompany != null ? !borrowingCompany.equals(that.borrowingCompany) : that.borrowingCompany != null)
-            return false;
-        if (borrowingDate != null ? !borrowingDate.equals(that.borrowingDate) : that.borrowingDate != null)
-            return false;
-        if (borrowingPerson != null ? !borrowingPerson.equals(that.borrowingPerson) : that.borrowingPerson != null)
-            return false;
-        if (borrowingRegion != null ? !borrowingRegion.equals(that.borrowingRegion) : that.borrowingRegion != null)
-            return false;
-        if (deliverySite != null ? !deliverySite.equals(that.deliverySite) : that.deliverySite != null) return false;
-        if (equipmentRecoveryOrNot != null ? !equipmentRecoveryOrNot.equals(that.equipmentRecoveryOrNot) : that.equipmentRecoveryOrNot != null)
-            return false;
-        if (insideOrOutside != null ? !insideOrOutside.equals(that.insideOrOutside) : that.insideOrOutside != null)
-            return false;
-        if (model != null ? !model.equals(that.model) : that.model != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
-            return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (orderInfo != null ? !orderInfo.equals(that.orderInfo) : that.orderInfo != null) return false;
-        if (partCenterLinkman != null ? !partCenterLinkman.equals(that.partCenterLinkman) : that.partCenterLinkman != null)
-            return false;
-        if (partFrom != null ? !partFrom.equals(that.partFrom) : that.partFrom != null) return false;
-        if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
-        if (piecemealEngineerName != null ? !piecemealEngineerName.equals(that.piecemealEngineerName) : that.piecemealEngineerName != null)
-            return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (productName != null ? !productName.equals(that.productName) : that.productName != null) return false;
-        if (returnDate != null ? !returnDate.equals(that.returnDate) : that.returnDate != null) return false;
-        if (serialNo != null ? !serialNo.equals(that.serialNo) : that.serialNo != null) return false;
-
-        return true;
+    public String getSerialNumber() {
+        return serialNumber;
     }
 
-    @Override
-    public int hashCode() {
-        int result = serialNo != null ? serialNo.hashCode() : 0;
-        result = 31 * result + (numberOfYear != null ? numberOfYear.hashCode() : 0);
-        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
-        result = 31 * result + (borrowingDate != null ? borrowingDate.hashCode() : 0);
-        result = 31 * result + (insideOrOutside != null ? insideOrOutside.hashCode() : 0);
-        result = 31 * result + (borrowingRegion != null ? borrowingRegion.hashCode() : 0);
-        result = 31 * result + (borrowingCompany != null ? borrowingCompany.hashCode() : 0);
-        result = 31 * result + (borrowingPerson != null ? borrowingPerson.hashCode() : 0);
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (model != null ? model.hashCode() : 0);
-        result = 31 * result + (partNo != null ? partNo.hashCode() : 0);
-        result = 31 * result + (productName != null ? productName.hashCode() : 0);
-        result = 31 * result + (amount != null ? amount.hashCode() : 0);
-        result = 31 * result + (piecemealEngineerName != null ? piecemealEngineerName.hashCode() : 0);
-        result = 31 * result + (partFrom != null ? partFrom.hashCode() : 0);
-        result = 31 * result + (equipmentRecoveryOrNot != null ? equipmentRecoveryOrNot.hashCode() : 0);
-        result = 31 * result + (orderInfo != null ? orderInfo.hashCode() : 0);
-        result = 31 * result + (returnDate != null ? returnDate.hashCode() : 0);
-        result = 31 * result + (partCenterLinkman != null ? partCenterLinkman.hashCode() : 0);
-        result = 31 * result + (deliverySite != null ? deliverySite.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
-    public String getSerialNo() {
-        return serialNo;
-    }
-
-    public void setSerialNo(String serialNo) {
-        this.serialNo = serialNo;
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
     }
 
     public String getNumberOfYear() {

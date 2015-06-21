@@ -2,6 +2,10 @@ package kaitou.ppp.domain.ts;
 
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.system.SysCode;
+import org.joda.time.DateTime;
+
+import static kaitou.ppp.common.utils.DateTimeUtil.isSameDate;
+import static kaitou.ppp.common.utils.DateTimeUtil.toDate;
 
 /**
  * TS SDS权限.
@@ -11,11 +15,19 @@ import kaitou.ppp.domain.system.SysCode;
  */
 public class TSSDSPermission extends BaseDomain {
     /**
+     * 提前提醒天数
+     */
+    private static final int REMINDER_DAYS = 3;
+    /**
      * 区域
      *
      * @see kaitou.ppp.domain.system.SysCode.SaleRegion
      */
     private String saleRegion;
+    /**
+     * 城市
+     */
+    private String city;
     /**
      * 首次/更新
      */
@@ -44,6 +56,24 @@ public class TSSDSPermission extends BaseDomain {
      * 备注
      */
     private String note;
+    /**
+     * 是否被更新
+     */
+    private String updated = "未更新";
+
+    /**
+     * 是否需要提醒
+     * <p>到期时间三天前需要提醒</p>
+     *
+     * @return 是为真
+     */
+    public boolean shouldReminder() {
+        DateTime endDateTime = toDate(endDate);
+        if (endDateTime == null || "更新".equals(updated)) {
+            return false;
+        }
+        return isSameDate(endDateTime.minusDays(REMINDER_DAYS), new DateTime());
+    }
 
     @Override
     public String dbFileName() {
@@ -59,6 +89,7 @@ public class TSSDSPermission extends BaseDomain {
     public String toString() {
         return "TSSDSPermission{" +
                 "saleRegion='" + saleRegion + '\'' +
+                ", city='" + city + '\'' +
                 ", addOrUpdate='" + addOrUpdate + '\'' +
                 ", engineerName='" + engineerName + '\'' +
                 ", email='" + email + '\'' +
@@ -66,39 +97,24 @@ public class TSSDSPermission extends BaseDomain {
                 ", applyDate='" + applyDate + '\'' +
                 ", endDate='" + endDate + '\'' +
                 ", note='" + note + '\'' +
+                ", updated=" + updated +
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TSSDSPermission that = (TSSDSPermission) o;
-
-        if (addOrUpdate != null ? !addOrUpdate.equals(that.addOrUpdate) : that.addOrUpdate != null) return false;
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (email != null ? !email.equals(that.email) : that.email != null) return false;
-        if (endDate != null ? !endDate.equals(that.endDate) : that.endDate != null) return false;
-        if (engineerName != null ? !engineerName.equals(that.engineerName) : that.engineerName != null) return false;
-        if (mac != null ? !mac.equals(that.mac) : that.mac != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-
-        return true;
+    public String getUpdated() {
+        return updated;
     }
 
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (addOrUpdate != null ? addOrUpdate.hashCode() : 0);
-        result = 31 * result + (engineerName != null ? engineerName.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
-        result = 31 * result + (mac != null ? mac.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
+    public void setUpdated(String updated) {
+        this.updated = updated;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public String getAddOrUpdate() {

@@ -1,5 +1,7 @@
 package kaitou.ppp.service;
 
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyParts;
@@ -73,6 +75,23 @@ public interface WarrantyService {
      * @return 零件列表
      */
     public List<WarrantyParts> queryWarrantyParts();
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<WarrantyParts> queryWarrantyPartsPager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<WarrantyParts> queryWarrantyParts(List<Condition> conditions);
 
     /**
      * 保存/更新保修及索赔零件

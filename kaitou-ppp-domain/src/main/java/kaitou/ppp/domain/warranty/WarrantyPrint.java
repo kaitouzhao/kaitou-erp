@@ -1,8 +1,10 @@
 package kaitou.ppp.domain.warranty;
 
 import kaitou.ppp.domain.BaseDomain;
-import kaitou.ppp.domain.system.SysCode;
 import org.apache.commons.lang.StringUtils;
+
+import static kaitou.ppp.domain.system.SysCode.DB_FILE_NAME_SPLIT;
+import static kaitou.ppp.domain.system.SysCode.SaleRegion;
 
 /**
  * 打印头保修.
@@ -18,7 +20,7 @@ public class WarrantyPrint extends BaseDomain {
     /**
      * 区域
      *
-     * @see kaitou.ppp.domain.system.SysCode.SaleRegion
+     * @see SaleRegion
      */
     private String saleRegion;
     /**
@@ -140,7 +142,7 @@ public class WarrantyPrint extends BaseDomain {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + getClass().getSimpleName() + DB_SUFFIX;
+        return DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
@@ -177,90 +179,6 @@ public class WarrantyPrint extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        WarrantyPrint that = (WarrantyPrint) o;
-
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (checkNo != null ? !checkNo.equals(that.checkNo) : that.checkNo != null) return false;
-        if (confirmResult != null ? !confirmResult.equals(that.confirmResult) : that.confirmResult != null)
-            return false;
-        if (confirmResultAgain != null ? !confirmResultAgain.equals(that.confirmResultAgain) : that.confirmResultAgain != null)
-            return false;
-        if (confirmResultThird != null ? !confirmResultThird.equals(that.confirmResultThird) : that.confirmResultThird != null)
-            return false;
-        if (dountCount != null ? !dountCount.equals(that.dountCount) : that.dountCount != null) return false;
-        if (faultDate != null ? !faultDate.equals(that.faultDate) : that.faultDate != null) return false;
-        if (faultPhenomenon != null ? !faultPhenomenon.equals(that.faultPhenomenon) : that.faultPhenomenon != null)
-            return false;
-        if (faultType != null ? !faultType.equals(that.faultType) : that.faultType != null) return false;
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (hqReceivingDate != null ? !hqReceivingDate.equals(that.hqReceivingDate) : that.hqReceivingDate != null)
-            return false;
-        if (installedDate != null ? !installedDate.equals(that.installedDate) : that.installedDate != null)
-            return false;
-        if (models != null ? !models.equals(that.models) : that.models != null) return false;
-        if (nozzleCheck != null ? !nozzleCheck.equals(that.nozzleCheck) : that.nozzleCheck != null) return false;
-        if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
-            return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (printInf != null ? !printInf.equals(that.printInf) : that.printInf != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (salesReceipts != null ? !salesReceipts.equals(that.salesReceipts) : that.salesReceipts != null)
-            return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (techReceivingDate != null ? !techReceivingDate.equals(that.techReceivingDate) : that.techReceivingDate != null)
-            return false;
-        if (userCity != null ? !userCity.equals(that.userCity) : that.userCity != null) return false;
-        if (userCompanyName != null ? !userCompanyName.equals(that.userCompanyName) : that.userCompanyName != null)
-            return false;
-        if (userContact != null ? !userContact.equals(that.userContact) : that.userContact != null) return false;
-        if (userLinkMan != null ? !userLinkMan.equals(that.userLinkMan) : that.userLinkMan != null) return false;
-        if (warrantyConsumables != null ? !warrantyConsumables.equals(that.warrantyConsumables) : that.warrantyConsumables != null)
-            return false;
-        if (warrantyReceivingDate != null ? !warrantyReceivingDate.equals(that.warrantyReceivingDate) : that.warrantyReceivingDate != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
-        result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (models != null ? models.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (warrantyConsumables != null ? warrantyConsumables.hashCode() : 0);
-        result = 31 * result + (userCompanyName != null ? userCompanyName.hashCode() : 0);
-        result = 31 * result + (userCity != null ? userCity.hashCode() : 0);
-        result = 31 * result + (userContact != null ? userContact.hashCode() : 0);
-        result = 31 * result + (userLinkMan != null ? userLinkMan.hashCode() : 0);
-        result = 31 * result + (faultPhenomenon != null ? faultPhenomenon.hashCode() : 0);
-        result = 31 * result + (printInf != null ? printInf.hashCode() : 0);
-        result = 31 * result + (nozzleCheck != null ? nozzleCheck.hashCode() : 0);
-        result = 31 * result + (salesReceipts != null ? salesReceipts.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (installedDate != null ? installedDate.hashCode() : 0);
-        result = 31 * result + (faultDate != null ? faultDate.hashCode() : 0);
-        result = 31 * result + (warrantyReceivingDate != null ? warrantyReceivingDate.hashCode() : 0);
-        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
-        result = 31 * result + (confirmResult != null ? confirmResult.hashCode() : 0);
-        result = 31 * result + (techReceivingDate != null ? techReceivingDate.hashCode() : 0);
-        result = 31 * result + (confirmResultAgain != null ? confirmResultAgain.hashCode() : 0);
-        result = 31 * result + (faultType != null ? faultType.hashCode() : 0);
-        result = 31 * result + (checkNo != null ? checkNo.hashCode() : 0);
-        result = 31 * result + (dountCount != null ? dountCount.hashCode() : 0);
-        result = 31 * result + (hqReceivingDate != null ? hqReceivingDate.hashCode() : 0);
-        result = 31 * result + (confirmResultThird != null ? confirmResultThird.hashCode() : 0);
-        return result;
-    }
-
     public String getNumberOfYear() {
         return numberOfYear;
     }
@@ -270,7 +188,7 @@ public class WarrantyPrint extends BaseDomain {
     }
 
     public String getSaleRegion() {
-        return SysCode.SaleRegion.convert2Value(saleRegion);
+        return SaleRegion.convert2Value(saleRegion);
     }
 
     public void setSaleRegion(String saleRegion) {

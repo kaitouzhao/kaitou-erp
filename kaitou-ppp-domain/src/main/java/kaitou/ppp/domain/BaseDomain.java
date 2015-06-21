@@ -1,6 +1,7 @@
 package kaitou.ppp.domain;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import org.joda.time.DateTime;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -19,21 +20,38 @@ public abstract class BaseDomain implements Serializable {
     public static final String DB_SUFFIX = ".kdb";
     public static final String CONFIG_SUFFIX = ".conf";
     public static final String BACK_SUFFIX = ".back";
-
     /**
-     * 自定义校验是否相等
-     *
-     * @param o 待校验对象
-     * @return 是为真
+     * 自增序列号
      */
-    public abstract boolean equals(Object o);
-
+    private static int autoIncrement = 1;
     /**
-     * 自定义计算hashCode
-     *
-     * @return hashCode
+     * 流水号
      */
-    public abstract int hashCode();
+    public long serialNo = -1;
+
+    @Override
+    public boolean equals(Object o) {
+        if (serialNo < 0) {
+            return super.equals(o);
+        }
+
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseDomain that = (BaseDomain) o;
+
+        if (serialNo != that.serialNo) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        if (serialNo < 0) {
+            return super.hashCode();
+        }
+
+        return (int) (serialNo ^ (serialNo >>> 32));
+    }
 
     /**
      * 输出对象数据
@@ -123,5 +141,22 @@ public abstract class BaseDomain implements Serializable {
      */
     public Color tableRowColor() {
         return null;
+    }
+
+    /**
+     * 生成流水号
+     * <p>时间戳+自增序列号</p>
+     */
+    public void generateSerialNo() {
+        String serialNoStr = String.valueOf(new DateTime().getMillis()) + String.valueOf(autoIncrement++);
+        serialNo = Long.valueOf(serialNoStr);
+    }
+
+    public long getSerialNo() {
+        return serialNo;
+    }
+
+    public void setSerialNo(long serialNo) {
+        this.serialNo = serialNo;
     }
 }

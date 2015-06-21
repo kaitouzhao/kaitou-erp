@@ -60,41 +60,6 @@ public class TSInstallPermission extends BaseDomain {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TSInstallPermission that = (TSInstallPermission) o;
-
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (engineerName != null ? !engineerName.equals(that.engineerName) : that.engineerName != null) return false;
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (mac != null ? !mac.equals(that.mac) : that.mac != null) return false;
-        if (model != null ? !model.equals(that.model) : that.model != null) return false;
-        if (modelType != null ? !modelType.equals(that.modelType) : that.modelType != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (userCompanyName != null ? !userCompanyName.equals(that.userCompanyName) : that.userCompanyName != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = saleRegion != null ? saleRegion.hashCode() : 0;
-        result = 31 * result + (engineerName != null ? engineerName.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (modelType != null ? modelType.hashCode() : 0);
-        result = 31 * result + (model != null ? model.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (userCompanyName != null ? userCompanyName.hashCode() : 0);
-        result = 31 * result + (mac != null ? mac.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public String toString() {
         return "TSInstallPermission{" +
                 "saleRegion='" + saleRegion + '\'' +

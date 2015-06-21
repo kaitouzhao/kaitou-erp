@@ -12,4 +12,11 @@
     <artifactId>kaitou-ppp-domain</artifactId>
     <description>数据模型</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>kaitou.ppp</groupId>
+            <artifactId>kaitou-ppp-common</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
 </project>

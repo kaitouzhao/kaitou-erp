@@ -176,4 +176,20 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
             }
         });
     }
+
+    @Override
+    public void upgradeTo3Dot4() {
+        if ("3.4".equals(systemSettingsManager.getSystemSetting(SysCode.LATEST_VERSION_KEY))) {
+            return;
+        }
+        List<Shop> shops = shopManager.query();
+        for (Shop shop : shops) {
+            if (!"PPP0191".equals(shop.getId())) {
+                continue;
+            }
+            shop.setName("广西南宁八图数码信息有限公司");
+            shopManager.save(CollectionUtil.newList(shop));
+            break;
+        }
+    }
 }

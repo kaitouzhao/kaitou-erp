@@ -43,4 +43,18 @@ public class WarrantyConsumablesManagerImpl extends BaseFileDaoManager<WarrantyC
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
     }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<WarrantyConsumables> warrantyConsumablesList = queryAll();
+        for (WarrantyConsumables warrantyConsumables : warrantyConsumablesList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(warrantyConsumables.getShopName())) {
+                    continue;
+                }
+                warrantyConsumables.setShopId(shop.getId());
+            }
+        }
+        save(warrantyConsumablesList);
+    }
 }

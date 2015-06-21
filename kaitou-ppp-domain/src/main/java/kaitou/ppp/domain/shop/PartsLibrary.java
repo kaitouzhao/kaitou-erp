@@ -107,52 +107,6 @@ public class PartsLibrary extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        PartsLibrary that = (PartsLibrary) o;
-
-        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
-        if (camgCode != null ? !camgCode.equals(that.camgCode) : that.camgCode != null) return false;
-        if (cost != null ? !cost.equals(that.cost) : that.cost != null) return false;
-        if (eoOrMeOrderNo != null ? !eoOrMeOrderNo.equals(that.eoOrMeOrderNo) : that.eoOrMeOrderNo != null)
-            return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
-            return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
-        if (price != null ? !price.equals(that.price) : that.price != null) return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (productName != null ? !productName.equals(that.productName) : that.productName != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
-        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
-        result = 31 * result + (camgCode != null ? camgCode.hashCode() : 0);
-        result = 31 * result + (eoOrMeOrderNo != null ? eoOrMeOrderNo.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (partNo != null ? partNo.hashCode() : 0);
-        result = 31 * result + (productName != null ? productName.hashCode() : 0);
-        result = 31 * result + (amount != null ? amount.hashCode() : 0);
-        result = 31 * result + (cost != null ? cost.hashCode() : 0);
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getNumberOfYear() {
         return numberOfYear;
     }

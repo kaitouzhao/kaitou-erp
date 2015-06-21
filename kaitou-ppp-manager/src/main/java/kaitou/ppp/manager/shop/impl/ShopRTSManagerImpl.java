@@ -49,4 +49,18 @@ public class ShopRTSManagerImpl extends BaseFileDaoManager<ShopRTS> implements S
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
         // DO NOTHING
     }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<ShopRTS> shopRTSList = queryAll();
+        for (ShopRTS shopRTS : shopRTSList) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(shopRTS.getName())) {
+                    continue;
+                }
+                shopRTS.setId(shop.getId());
+            }
+        }
+        save(shopRTSList);
+    }
 }

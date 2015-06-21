@@ -75,7 +75,7 @@ public class ScreeningShops {
     }
 
     private static void screenShopDetails() {
-        File srcFile = new File(DIR + "认定店原始认定级别数据.xlsx");
+        File srcFile = new File("C:\\Users\\zhao\\Desktop\\PPP\\需求\\认定店原始认定级别数据2015.6.15.xlsx");
         if (!srcFile.exists()) {
             return;
         }
@@ -101,7 +101,7 @@ public class ScreeningShops {
                 shopDetails.add(shopDetail);
             }
         }
-        File targetFile = new File(DIR + "认定店认定级别数据.xlsx");
+        File targetFile = new File("C:\\Users\\zhao\\Desktop\\PPP\\需求\\认定店认定级别数据.xlsx");
         ((BaseExcelService) shopService).export2Excel(shopDetails, targetFile, ShopDetail.class);
     }
 

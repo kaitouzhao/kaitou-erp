@@ -128,7 +128,7 @@ public class WarrantyConsumables extends BaseDomain {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + getClass().getSimpleName() + DB_SUFFIX;
+        return SysCode.DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
@@ -160,75 +160,6 @@ public class WarrantyConsumables extends BaseDomain {
                 ", yesOrNoReason='" + yesOrNoReason + '\'' +
                 ", note='" + note + '\'' +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        WarrantyConsumables that = (WarrantyConsumables) o;
-
-        if (address != null ? !address.equals(that.address) : that.address != null) return false;
-        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (claimNo != null ? !claimNo.equals(that.claimNo) : that.claimNo != null) return false;
-        if (claimReason != null ? !claimReason.equals(that.claimReason) : that.claimReason != null) return false;
-        if (claimType != null ? !claimType.equals(that.claimType) : that.claimType != null) return false;
-        if (eoOrMeOrderNo != null ? !eoOrMeOrderNo.equals(that.eoOrMeOrderNo) : that.eoOrMeOrderNo != null)
-            return false;
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (modelType != null ? !modelType.equals(that.modelType) : that.modelType != null) return false;
-        if (models != null ? !models.equals(that.models) : that.models != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
-        if (phone != null ? !phone.equals(that.phone) : that.phone != null) return false;
-        if (postcode != null ? !postcode.equals(that.postcode) : that.postcode != null) return false;
-        if (productName != null ? !productName.equals(that.productName) : that.productName != null) return false;
-        if (quarter != null ? !quarter.equals(that.quarter) : that.quarter != null) return false;
-        if (recipient != null ? !recipient.equals(that.recipient) : that.recipient != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopCompanyCode != null ? !shopCompanyCode.equals(that.shopCompanyCode) : that.shopCompanyCode != null)
-            return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (submitDate != null ? !submitDate.equals(that.submitDate) : that.submitDate != null) return false;
-        if (yesOrNo != null ? !yesOrNo.equals(that.yesOrNo) : that.yesOrNo != null) return false;
-        if (yesOrNoReason != null ? !yesOrNoReason.equals(that.yesOrNoReason) : that.yesOrNoReason != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
-        result = 31 * result + (quarter != null ? quarter.hashCode() : 0);
-        result = 31 * result + (claimNo != null ? claimNo.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (submitDate != null ? submitDate.hashCode() : 0);
-        result = 31 * result + (eoOrMeOrderNo != null ? eoOrMeOrderNo.hashCode() : 0);
-        result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
-        result = 31 * result + (claimType != null ? claimType.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (shopCompanyCode != null ? shopCompanyCode.hashCode() : 0);
-        result = 31 * result + (modelType != null ? modelType.hashCode() : 0);
-        result = 31 * result + (models != null ? models.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (partNo != null ? partNo.hashCode() : 0);
-        result = 31 * result + (amount != null ? amount.hashCode() : 0);
-        result = 31 * result + (productName != null ? productName.hashCode() : 0);
-        result = 31 * result + (address != null ? address.hashCode() : 0);
-        result = 31 * result + (recipient != null ? recipient.hashCode() : 0);
-        result = 31 * result + (postcode != null ? postcode.hashCode() : 0);
-        result = 31 * result + (phone != null ? phone.hashCode() : 0);
-        result = 31 * result + (claimReason != null ? claimReason.hashCode() : 0);
-        result = 31 * result + (yesOrNo != null ? yesOrNo.hashCode() : 0);
-        result = 31 * result + (yesOrNoReason != null ? yesOrNoReason.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
     }
 
     public String getNumberOfYear() {

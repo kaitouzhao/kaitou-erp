@@ -1,5 +1,7 @@
 package kaitou.ppp.manager.warranty;
 
+import kaitou.ppp.dao.support.Condition;
+import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.warranty.WarrantyParts;
 
 import java.util.List;
@@ -35,4 +37,21 @@ public interface WarrantyPartsManager {
      * @return 成功执行条数
      */
     public int delete(Object... warrantyParts);
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<WarrantyParts> queryPager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<WarrantyParts> queryAll(List<Condition> conditions);
 }

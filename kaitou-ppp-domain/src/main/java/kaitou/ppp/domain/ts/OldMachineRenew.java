@@ -142,68 +142,6 @@ public class OldMachineRenew extends BaseDomain {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        OldMachineRenew that = (OldMachineRenew) o;
-
-        if (amount != null ? !amount.equals(that.amount) : that.amount != null) return false;
-        if (applyDate != null ? !applyDate.equals(that.applyDate) : that.applyDate != null) return false;
-        if (confirmDate != null ? !confirmDate.equals(that.confirmDate) : that.confirmDate != null) return false;
-        if (departmentNo != null ? !departmentNo.equals(that.departmentNo) : that.departmentNo != null) return false;
-        if (feeNo != null ? !feeNo.equals(that.feeNo) : that.feeNo != null) return false;
-        if (fetchReason != null ? !fetchReason.equals(that.fetchReason) : that.fetchReason != null) return false;
-        if (financialNo != null ? !financialNo.equals(that.financialNo) : that.financialNo != null) return false;
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (maintenanceEngineerName != null ? !maintenanceEngineerName.equals(that.maintenanceEngineerName) : that.maintenanceEngineerName != null)
-            return false;
-        if (managerConfirm != null ? !managerConfirm.equals(that.managerConfirm) : that.managerConfirm != null)
-            return false;
-        if (model != null ? !model.equals(that.model) : that.model != null) return false;
-        if (modelType != null ? !modelType.equals(that.modelType) : that.modelType != null) return false;
-        if (note != null ? !note.equals(that.note) : that.note != null) return false;
-        if (numberOfMonth != null ? !numberOfMonth.equals(that.numberOfMonth) : that.numberOfMonth != null)
-            return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
-        if (price != null ? !price.equals(that.price) : that.price != null) return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (totalPrice != null ? !totalPrice.equals(that.totalPrice) : that.totalPrice != null) return false;
-        if (userCompanyName != null ? !userCompanyName.equals(that.userCompanyName) : that.userCompanyName != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = numberOfYear != null ? numberOfYear.hashCode() : 0;
-        result = 31 * result + (numberOfMonth != null ? numberOfMonth.hashCode() : 0);
-        result = 31 * result + (applyDate != null ? applyDate.hashCode() : 0);
-        result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (modelType != null ? modelType.hashCode() : 0);
-        result = 31 * result + (model != null ? model.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (userCompanyName != null ? userCompanyName.hashCode() : 0);
-        result = 31 * result + (maintenanceEngineerName != null ? maintenanceEngineerName.hashCode() : 0);
-        result = 31 * result + (partNo != null ? partNo.hashCode() : 0);
-        result = 31 * result + (price != null ? price.hashCode() : 0);
-        result = 31 * result + (amount != null ? amount.hashCode() : 0);
-        result = 31 * result + (totalPrice != null ? totalPrice.hashCode() : 0);
-        result = 31 * result + (fetchReason != null ? fetchReason.hashCode() : 0);
-        result = 31 * result + (managerConfirm != null ? managerConfirm.hashCode() : 0);
-        result = 31 * result + (confirmDate != null ? confirmDate.hashCode() : 0);
-        result = 31 * result + (financialNo != null ? financialNo.hashCode() : 0);
-        result = 31 * result + (departmentNo != null ? departmentNo.hashCode() : 0);
-        result = 31 * result + (feeNo != null ? feeNo.hashCode() : 0);
-        result = 31 * result + (note != null ? note.hashCode() : 0);
-        return result;
-    }
-
     public String getNumberOfYear() {
         return numberOfYear;
     }

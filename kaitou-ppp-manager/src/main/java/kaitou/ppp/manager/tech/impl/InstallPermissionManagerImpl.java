@@ -1,6 +1,7 @@
 package kaitou.ppp.manager.tech.impl;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
+import kaitou.ppp.common.utils.FileUtil;
 import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.domain.tech.TechInstallPermission;
@@ -8,6 +9,7 @@ import kaitou.ppp.manager.BaseFileDaoManager;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
 import kaitou.ppp.manager.tech.InstallPermissionManager;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -42,5 +44,20 @@ public class InstallPermissionManagerImpl extends BaseFileDaoManager<TechInstall
     @Override
     public void updateShopDetailEvent(ShopDetail... shopDetails) {
 
+    }
+
+    @Override
+    public void updateShopIdEvent(Shop... shops) {
+        List<TechInstallPermission> permissions = queryAll();
+        FileUtil.delete(dbDir + File.separatorChar + "TechInstallPermission.kdb");
+        for (TechInstallPermission permission : permissions) {
+            for (Shop shop : shops) {
+                if (!shop.getName().equals(permission.getShopName())) {
+                    continue;
+                }
+                permission.setShopId(shop.getId());
+            }
+        }
+        save(permissions);
     }
 }

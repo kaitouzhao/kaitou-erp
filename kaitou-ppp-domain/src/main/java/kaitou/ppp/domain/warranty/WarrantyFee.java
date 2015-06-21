@@ -88,6 +88,64 @@ public class WarrantyFee extends BaseDomain4InDoubt {
      */
     private String note;
 
+    /**
+     * 按年份倒序排列
+     *
+     * @param o 比较
+     * @return 年份大的是负数
+     */
+    public int comparator(WarrantyFee o) {
+        Integer thisYear = 0;
+        Integer otherYear = 0;
+        try {
+            thisYear = Integer.valueOf(numberOfYear);
+        } catch (NumberFormatException e) {
+        }
+        try {
+            otherYear = Integer.valueOf(o.getNumberOfYear());
+        } catch (NumberFormatException e) {
+        }
+        return 0 - thisYear.compareTo(otherYear);
+    }
+
+    /**
+     * 校验保修卡生成记录是否寄回
+     * <p>
+     * 安装费大于0则为是
+     * </p>
+     *
+     * @return 是则返回"是"
+     */
+    public String checkCardApplicationRecordIsBack() {
+        try {
+            if (Double.valueOf(installedFee) > 0) {
+                return "是";
+            }
+            return "";
+        } catch (NumberFormatException e) {
+            return "";
+        }
+    }
+
+    /**
+     * 校验保修卡生成记录是否过保
+     * <p>
+     * 保养费大于0则为真
+     * </p>
+     *
+     * @return 过保为真
+     */
+    public boolean checkCardApplicationRecordIsOutOfWarranty() {
+        try {
+            if (Double.valueOf(maintenanceFee) > 0) {
+                return true;
+            }
+            return false;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     @Override
     public void check() {
         if (StringUtils.isEmpty(numberOfYear)) {
@@ -105,7 +163,7 @@ public class WarrantyFee extends BaseDomain4InDoubt {
 
     @Override
     public String dbFileSuffix() {
-        return '_' + getClass().getSimpleName() + DB_SUFFIX;
+        return SysCode.DB_FILE_NAME_SPLIT + getClass().getSimpleName() + DB_SUFFIX;
     }
 
     @Override
@@ -130,64 +188,6 @@ public class WarrantyFee extends BaseDomain4InDoubt {
                 ", ttl='" + ttl + '\'' +
                 ", note='" + note + '\'' +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-
-        WarrantyFee that = (WarrantyFee) o;
-
-        if (serialNo > 0) {
-            return super.equals(o);
-        }
-
-        if (endDate != null ? !endDate.equals(that.endDate) : that.endDate != null) return false;
-        if (fuselage != null ? !fuselage.equals(that.fuselage) : that.fuselage != null) return false;
-        if (installedDate != null ? !installedDate.equals(that.installedDate) : that.installedDate != null)
-            return false;
-        if (installedFee != null ? !installedFee.equals(that.installedFee) : that.installedFee != null) return false;
-        if (maintenanceFee != null ? !maintenanceFee.equals(that.maintenanceFee) : that.maintenanceFee != null)
-            return false;
-        if (model != null ? !model.equals(that.model) : that.model != null) return false;
-        if (numberOfYear != null ? !numberOfYear.equals(that.numberOfYear) : that.numberOfYear != null) return false;
-        if (productLine != null ? !productLine.equals(that.productLine) : that.productLine != null) return false;
-        if (quarter != null ? !quarter.equals(that.quarter) : that.quarter != null) return false;
-        if (saleRegion != null ? !saleRegion.equals(that.saleRegion) : that.saleRegion != null) return false;
-        if (shopId != null ? !shopId.equals(that.shopId) : that.shopId != null) return false;
-        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
-        if (ttl != null ? !ttl.equals(that.ttl) : that.ttl != null) return false;
-        if (userCompanyName != null ? !userCompanyName.equals(that.userCompanyName) : that.userCompanyName != null)
-            return false;
-        if (warrantyCardNo != null ? !warrantyCardNo.equals(that.warrantyCardNo) : that.warrantyCardNo != null)
-            return false;
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        if (serialNo > 0) {
-            return super.hashCode();
-        }
-
-        int result = super.hashCode();
-        result = 31 * result + (numberOfYear != null ? numberOfYear.hashCode() : 0);
-        result = 31 * result + (quarter != null ? quarter.hashCode() : 0);
-        result = 31 * result + (warrantyCardNo != null ? warrantyCardNo.hashCode() : 0);
-        result = 31 * result + (saleRegion != null ? saleRegion.hashCode() : 0);
-        result = 31 * result + (shopId != null ? shopId.hashCode() : 0);
-        result = 31 * result + (shopName != null ? shopName.hashCode() : 0);
-        result = 31 * result + (productLine != null ? productLine.hashCode() : 0);
-        result = 31 * result + (model != null ? model.hashCode() : 0);
-        result = 31 * result + (fuselage != null ? fuselage.hashCode() : 0);
-        result = 31 * result + (installedDate != null ? installedDate.hashCode() : 0);
-        result = 31 * result + (endDate != null ? endDate.hashCode() : 0);
-        result = 31 * result + (userCompanyName != null ? userCompanyName.hashCode() : 0);
-        result = 31 * result + (installedFee != null ? installedFee.hashCode() : 0);
-        result = 31 * result + (maintenanceFee != null ? maintenanceFee.hashCode() : 0);
-        result = 31 * result + (ttl != null ? ttl.hashCode() : 0);
-        return result;
     }
 
     public String getNote() {

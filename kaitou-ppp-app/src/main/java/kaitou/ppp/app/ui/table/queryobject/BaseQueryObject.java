@@ -1,7 +1,8 @@
 package kaitou.ppp.app.ui.table.queryobject;
 
-import kaitou.ppp.app.ui.table.IQueryObject;
+import kaitou.ppp.domain.BaseDomain;
 
+import javax.swing.*;
 import java.lang.reflect.ParameterizedType;
 
 import static com.womai.bsp.tool.utils.PropertyUtil.getValue;
@@ -75,5 +76,10 @@ public abstract class BaseQueryObject<T> implements IQueryObject {
     @Override
     public Class domainClass() {
         return (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    @Override
+    public boolean tableBtnEvent(JFrame frame, BaseDomain domain) {
+        return true;
     }
 }
