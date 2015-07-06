@@ -17,6 +17,10 @@ public class CachedShop {
      */
     private String saleRegion;
     /**
+     * 省份
+     */
+    private String province;
+    /**
      * 认定店编码
      */
     private String id;
@@ -77,10 +81,19 @@ public class CachedShop {
     public String toString() {
         return "CachedShop{" +
                 "saleRegion='" + saleRegion + '\'' +
+                ", province='" + province + '\'' +
                 ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", details=" + details +
                 '}';
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
     }
 
     public String getSaleRegion() {

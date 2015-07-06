@@ -1,5 +1,9 @@
 package kaitou.ppp.service;
 
+import kaitou.ppp.domain.system.OperationLog;
+
+import java.util.List;
+
 /**
  * 系统设置业务处理层.
  * User: 赵立伟
@@ -47,4 +51,14 @@ public interface SystemSettingsService {
      * @param targetFilePath 目标文件路径
      */
     public void backPPP(String targetFilePath);
+
+    /**
+     * 查询今天操作日志
+     * <p>
+     * 按照操作时间倒序排列
+     * </p>
+     *
+     * @return 操作日志对象列表
+     */
+    public List<OperationLog> queryTodayOperationLogs();
 }

@@ -70,6 +70,13 @@ public interface IQueryObject<T extends BaseDomain> {
     public int editableColumnStartIndex();
 
     /**
+     * 可编辑列号集合
+     *
+     * @return 列号集合
+     */
+    public Integer[] editableColumnIndex();
+
+    /**
      * 保存属性标题集合
      *
      * @return 标题集合

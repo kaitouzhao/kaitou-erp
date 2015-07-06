@@ -29,4 +29,9 @@ public interface RemoteRegistryManager {
      * @return ip列表
      */
     public List<String> queryRegistryIps();
+
+    /**
+     * 清空IP注册表
+     */
+    public void clear();
 }

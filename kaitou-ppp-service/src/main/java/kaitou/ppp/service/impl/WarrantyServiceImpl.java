@@ -3,22 +3,18 @@ package kaitou.ppp.service.impl;
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
-import kaitou.ppp.domain.warranty.WarrantyConsumables;
-import kaitou.ppp.domain.warranty.WarrantyFee;
-import kaitou.ppp.domain.warranty.WarrantyParts;
-import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.domain.shop.CachedShop;
+import kaitou.ppp.domain.warranty.*;
 import kaitou.ppp.manager.listener.WarrantyUpdateListener;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
-import kaitou.ppp.manager.warranty.WarrantyConsumablesManager;
-import kaitou.ppp.manager.warranty.WarrantyFeeManager;
-import kaitou.ppp.manager.warranty.WarrantyPartsManager;
-import kaitou.ppp.manager.warranty.WarrantyPrintManager;
+import kaitou.ppp.manager.warranty.*;
 import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteWarrantyService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.WarrantyService;
+import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.rmi.RemoteException;
@@ -37,6 +33,7 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
 
     private ShopManager shopManager;
     private WarrantyFeeManager warrantyFeeManager;
+    private IpfEquipmentManager ipfEquipmentManager;
     private WarrantyPartsManager warrantyPartsManager;
     private WarrantyPrintManager warrantyPrintManager;
     private SystemSettingsManager systemSettingsManager;
@@ -46,6 +43,10 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
 
     public void setWarrantyUpdateListeners(List<WarrantyUpdateListener> warrantyUpdateListeners) {
         this.warrantyUpdateListeners = warrantyUpdateListeners;
+    }
+
+    public void setIpfEquipmentManager(IpfEquipmentManager ipfEquipmentManager) {
+        this.ipfEquipmentManager = ipfEquipmentManager;
     }
 
     public void setWarrantyConsumablesManager(WarrantyConsumablesManager warrantyConsumablesManager) {
@@ -74,6 +75,75 @@ public class WarrantyServiceImpl extends BaseExcelService implements WarrantySer
 
     public void setWarrantyFeeManager(WarrantyFeeManager warrantyFeeManager) {
         this.warrantyFeeManager = warrantyFeeManager;
+    }
+
+    @Override
+    public void importIpfEquipment(File srcFile) {
+        saveOrUpdateIpfEquipment(CollectionUtil.toArray(readFromExcel(srcFile, IpfEquipment.class), IpfEquipment.class));
+    }
+
+    @Override
+    public void exportIpfEquipment(File targetFile) {
+        export2Excel(ipfEquipmentManager.queryAll(), targetFile, IpfEquipment.class);
+    }
+
+    @Override
+    public List<IpfEquipment> queryIpfEquipment() {
+        return ipfEquipmentManager.queryAll();
+    }
+
+    @Override
+    public Pager<IpfEquipment> queryIpfEquipmentPager(int currentPage, List<Condition> conditions) {
+        return ipfEquipmentManager.queryPager(currentPage, conditions);
+    }
+
+    @Override
+    public List<IpfEquipment> queryIpfEquipment(List<Condition> conditions) {
+        return ipfEquipmentManager.queryAll(conditions);
+    }
+
+    @Override
+    public void saveOrUpdateIpfEquipment(IpfEquipment... equipments) {
+        if (CollectionUtil.isEmpty(equipments)) {
+            return;
+        }
+        final List<IpfEquipment> equipmentList = new ArrayList<IpfEquipment>();
+        for (IpfEquipment equipment : equipments) {
+            String shopId = shopManager.getCachedIdByName(equipment.getShopName());
+            equipment.setShopId(shopId);
+            if (!StringUtils.isEmpty(shopId)) {
+                CachedShop shop = shopManager.getCachedShop(shopId);
+                equipment.setSaleRegion(shop.getSaleRegion());
+                equipment.setShopArea(shop.getProvince());
+            }
+            equipmentList.add(equipment);
+        }
+        logOperation("成功导入/更新iPF设备数：" + ipfEquipmentManager.save(equipmentList));
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteWarrantyService> remoteWarrantyServices = queryRemoteService(RemoteWarrantyService.class);
+                logOperation("通知已注册的远程服务更新iPF设备");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    remoteWarrantyService.saveIpfEquipment(equipmentList);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void deleteIpfEquipment(final Object... equipments) {
+        logOperation("成功删除iPF设备个数：" + ipfEquipmentManager.delete(equipments));
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteWarrantyService> remoteWarrantyServices = queryRemoteService(RemoteWarrantyService.class);
+                logOperation("通知已注册的远程服务更新删除iPF设备");
+                for (RemoteWarrantyService remoteWarrantyService : remoteWarrantyServices) {
+                    remoteWarrantyService.deleteIpfEquipment(equipments);
+                }
+            }
+        });
     }
 
     @Override

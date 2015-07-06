@@ -56,10 +56,10 @@ public class PartsLibraryManagerImpl extends BaseFileDaoManager<PartsLibrary> im
 //        FileUtil.deleteFilesOfDir(dbDir, "PartsLibrary.kdb");
 //        for (PartsLibrary partsLibrary : partsLibraryList) {
 //            for (Shop shop : shops) {
-//                if (!shop.getName().equals(partsLibrary.getShopName())) {
+//                if (!shop.getName().equals(partsLibrary.getName())) {
 //                    continue;
 //                }
-//                partsLibrary.setShopId(shop.getId());
+//                partsLibrary.setId(shop.getId());
 //            }
 //        }
 //        save(partsLibraryList);

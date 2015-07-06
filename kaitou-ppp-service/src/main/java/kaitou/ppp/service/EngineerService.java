@@ -65,10 +65,9 @@ public interface EngineerService {
     /**
      * 根据认定店信息统计在职工程师数
      *
-     * @param productLine 产品线。为空默认全部
      * @param targetFile  目标文件
      */
-    public void countEngineersByShop(String productLine, File targetFile);
+    public void countEngineersByShop(File targetFile);
 
     /**
      * 查询全部工程师

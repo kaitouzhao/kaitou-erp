@@ -21,6 +21,10 @@ public class TSManualPermissions extends BaseDomain {
      */
     private String applyDate;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 工程师名称
      */
     private String engineerName;
@@ -56,12 +60,21 @@ public class TSManualPermissions extends BaseDomain {
         return "TSManualPermissions{" +
                 "saleRegion='" + saleRegion + '\'' +
                 ", applyDate='" + applyDate + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", engineerName='" + engineerName + '\'' +
                 ", robinAccount='" + robinAccount + '\'' +
                 ", email='" + email + '\'' +
                 ", addModel='" + addModel + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
     }
 
     public String getApplyDate() {

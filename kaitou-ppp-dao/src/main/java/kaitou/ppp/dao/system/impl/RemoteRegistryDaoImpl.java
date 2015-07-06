@@ -48,4 +48,10 @@ public class RemoteRegistryDaoImpl extends BaseDao<RemoteRegistry> implements Re
         }
         return registries.get(0).getRemoteIps();
     }
+
+    @Override
+    public void clear() {
+        List<RemoteRegistry> remoteRegistryList = queryRemoteRegistries();
+        delete(CollectionUtil.toArray(remoteRegistryList, RemoteRegistry.class));
+    }
 }

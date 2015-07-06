@@ -62,9 +62,11 @@ public class LocalDBVersionServiceImpl extends BaseLogManager implements LocalDB
             String dbFilePath = dbDir + File.separatorChar + dbFileName;
             String backDbFilePath = dbFilePath + ".back";
             copy(dbFilePath, backDbFilePath);
-            delete(dbFilePath);
             try {
-                writeLines(dbFilePath, item.getValue());
+                List<String> localDBList = readLines(dbFilePath);
+                List<String> remoteDBList = item.getValue();
+                delete(dbFilePath);
+                writeLines(dbFilePath, mergedDB(remoteDBList, localDBList));
                 toUpgradeDBMap.put(dbFileName, remoteDBVersion.getLatestVersion());
                 logOperation("已同步升级：" + dbFileName);
             } catch (IOException e) {
@@ -77,6 +79,59 @@ public class LocalDBVersionServiceImpl extends BaseLogManager implements LocalDB
             return;
         }
         localDBVersionManager.upgrade(toUpgradeDBMap);
+    }
+
+    private static final String SERIAL_NO_FIELD_NAME = "serialNo";
+
+    /**
+     * 合并DB
+     *
+     * @param remoteDBList 远程DB列表
+     * @param localDBList  本地DB列表
+     * @return 合并后的DB列表
+     */
+    private List<String> mergedDB(List<String> remoteDBList, List<String> localDBList) {
+        List<String> mergedDBList = new ArrayList<String>();
+        mergedDBList.addAll(remoteDBList);
+        for (String localDB : localDBList) {
+            String localSerialNoValue = getSerialNoValue(localDB);
+            boolean isExists = false;
+            for (String remoteDB : remoteDBList) {
+                if (hasFieldValue(SERIAL_NO_FIELD_NAME, localSerialNoValue, remoteDB)) {
+                    isExists = true;
+                    break;
+                }
+            }
+            if (!isExists) {
+                mergedDBList.add(localDB);
+            }
+        }
+        return mergedDBList;
+    }
+
+    /**
+     * 获取序列号
+     *
+     * @param db 一行db
+     * @return 序列号
+     */
+    private String getSerialNoValue(String db) {
+        String substring = db.substring(db.indexOf("\"" + SERIAL_NO_FIELD_NAME + "\":") + 11);
+        return substring.substring(0, substring.indexOf(","));
+    }
+
+    /**
+     * 校验数据行是否含有指定属性的指定值
+     *
+     * @param fieldName  属性名
+     * @param fieldValue 属性值
+     * @param oneDb      某行数据
+     * @return 如果含有即为真
+     */
+    private boolean hasFieldValue(String fieldName, Object fieldValue, String oneDb) {
+        String fieldStr = "\"" + fieldName + "\":\"" + String.valueOf(fieldValue) + "\"";
+        String fieldStr1 = "\"" + fieldName + "\":" + String.valueOf(fieldValue);
+        return oneDb.contains(fieldStr) || oneDb.contains(fieldStr1);
     }
 
     @Override

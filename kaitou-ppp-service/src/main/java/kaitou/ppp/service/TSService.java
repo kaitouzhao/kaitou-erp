@@ -14,6 +14,57 @@ import java.util.List;
  * Time: 11:21
  */
 public interface TSService {
+    /**
+     * 导入工程师
+     *
+     * @param srcFile 源文件
+     */
+    public void importTSEngineer(File srcFile);
+
+    /**
+     * 导出工程师
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportTSEngineer(File targetFile);
+
+    /**
+     * 查询工程师
+     *
+     * @return 工程师列表
+     */
+    public List<EngineerTS> queryTSEngineer();
+
+    /**
+     * 保存/更新工程师
+     *
+     * @param engineerTSes 工程师
+     */
+    public void saveOrUpdateTSEngineer(EngineerTS... engineerTSes);
+
+    /**
+     * 删除工程师
+     *
+     * @param tsEngineers 工程师
+     */
+    public void deleteTSEngineer(Object... tsEngineers);
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<EngineerTS> queryTSEngineer(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<EngineerTS> queryTSEngineer(List<Condition> conditions);
 
     /**
      * 导入TS培训记录
@@ -125,7 +176,7 @@ public interface TSService {
     /**
      * 获取TS SDS权限到期时间提醒
      *
-     * @return 提醒语
+     * @return 需要提醒的列表
      */
     public List<TSSDSPermission> getTSSDSEndDateReminder();
 

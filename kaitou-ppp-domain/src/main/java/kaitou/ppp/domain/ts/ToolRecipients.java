@@ -34,6 +34,10 @@ public class ToolRecipients extends BaseDomain {
      */
     private String recipients;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 使用工程师姓名
      */
     private String useEngineerName;
@@ -84,8 +88,10 @@ public class ToolRecipients extends BaseDomain {
         return "ToolRecipients{" +
                 "numberOfYear='" + numberOfYear + '\'' +
                 ", numberOfMonth='" + numberOfMonth + '\'' +
+                ", saleRegion='" + saleRegion + '\'' +
                 ", applyDate='" + applyDate + '\'' +
                 ", recipients='" + recipients + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", useEngineerName='" + useEngineerName + '\'' +
                 ", toolNo='" + toolNo + '\'' +
                 ", toolName='" + toolName + '\'' +
@@ -94,6 +100,14 @@ public class ToolRecipients extends BaseDomain {
                 ", totalPrice='" + totalPrice + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
     }
 
     public String getSaleRegion() {

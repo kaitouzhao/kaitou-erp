@@ -1,6 +1,8 @@
 package kaitou.ppp.app.ui.table.queryobject;
 
+import kaitou.ppp.common.log.BaseLogManager;
 import kaitou.ppp.domain.BaseDomain;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import java.lang.reflect.ParameterizedType;
@@ -55,6 +57,24 @@ public abstract class BaseQueryObject<T> implements IQueryObject {
     @Override
     public int editableColumnStartIndex() {
         return Integer.valueOf(getValue(SCHEME_PROPERTIES, domainType() + "_EDITABLE_COLUMN_START_INDEX"));
+    }
+
+    @Override
+    public Integer[] editableColumnIndex() {
+        String editableColumnIndex = getValue(SCHEME_PROPERTIES, domainType() + "_EDITABLE_COLUMN_INDEX");
+        if (StringUtils.isEmpty(editableColumnIndex)) {
+            return new Integer[0];
+        }
+        String[] editableColumnIndexes = editableColumnIndex.split(",");
+        Integer[] result = new Integer[editableColumnIndexes.length];
+        for (int i = 0; i < editableColumnIndexes.length; i++) {
+            try {
+                result[i] = Integer.valueOf(editableColumnIndexes[i]);
+            } catch (NumberFormatException e) {
+                BaseLogManager.logSystemEx(e);
+            }
+        }
+        return result;
     }
 
     @Override

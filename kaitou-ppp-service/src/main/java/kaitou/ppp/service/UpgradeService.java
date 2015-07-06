@@ -55,5 +55,14 @@ public interface UpgradeService {
      * 升级至3.4操作
      * <p>修改认定店名称：广西南宁八图数码科技有限公司->广西南宁八图数码信息有限公司</p>
      */
+    @Deprecated
     public void upgradeTo3Dot4();
+
+    /**
+     * 升级至3.7操作
+     * <p>
+     * 关联TS管理下的工程师
+     * </p>
+     */
+    public void upgradeTo3Dot7();
 }

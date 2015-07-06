@@ -65,7 +65,7 @@
         </Style>
     </Styles>
     <Worksheet ss:Name="Sheet1">
-        <Table ss:ExpandedColumnCount="23" ss:ExpandedRowCount="1000" x:FullColumns="1"
+        <Table ss:ExpandedColumnCount="23" ss:ExpandedRowCount="${total+2}" x:FullColumns="1"
                x:FullRows="1" ss:DefaultColumnWidth="54" ss:DefaultRowHeight="14.25">
             <Column ss:Index="2" ss:AutoFitWidth="0" ss:Width="69"/>
             <Column ss:AutoFitWidth="0" ss:Width="75.75"/>
@@ -164,10 +164,10 @@
                     <Data ss:Type="String">${data.saleRegion}</Data>
                 </Cell>
                 <Cell ss:StyleID="s25">
-                    <Data ss:Type="String">${data.shopId}</Data>
+                    <Data ss:Type="String">${data.id}</Data>
                 </Cell>
                 <Cell ss:StyleID="s25">
-                    <Data ss:Type="String">${data.shopName}</Data>
+                    <Data ss:Type="String">${data.name}</Data>
                 </Cell>
                 <Cell ss:StyleID="s25">
                     <Data ss:Type="String">${data.cpp2013}</Data>

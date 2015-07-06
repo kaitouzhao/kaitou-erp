@@ -2,6 +2,10 @@ package kaitou.ppp.domain.tech;
 
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.system.SysCode;
+import org.joda.time.DateTime;
+
+import static kaitou.ppp.common.utils.DateTimeUtil.isSameDate;
+import static kaitou.ppp.common.utils.DateTimeUtil.toDate;
 
 /**
  * SDS权限管理.
@@ -10,6 +14,10 @@ import kaitou.ppp.domain.system.SysCode;
  * Time: 16:33
  */
 public class TechSDSPermission extends BaseDomain {
+    /**
+     * 提前提醒天数
+     */
+    private static final int REMINDER_DAYS = 3;
     /**
      * 区域
      *
@@ -60,10 +68,23 @@ public class TechSDSPermission extends BaseDomain {
      * 备注
      */
     private String note;
+    /**
+     * 是否被更新
+     */
+    private String updated = "未更新";
 
-    @Override
-    public void check() {
-
+    /**
+     * 是否需要提醒
+     * <p>到期时间三天前需要提醒</p>
+     *
+     * @return 是为真
+     */
+    public boolean shouldReminder() {
+        DateTime endDateTime = toDate(endDate);
+        if (endDateTime == null || "更新".equals(updated)) {
+            return false;
+        }
+        return isSameDate(endDateTime.minusDays(REMINDER_DAYS), new DateTime());
     }
 
     @Override
@@ -78,7 +99,7 @@ public class TechSDSPermission extends BaseDomain {
 
     @Override
     public String toString() {
-        return "SDSPermission{" +
+        return "TechSDSPermission{" +
                 "saleRegion='" + saleRegion + '\'' +
                 ", productLine='" + productLine + '\'' +
                 ", shopId='" + shopId + '\'' +
@@ -91,7 +112,16 @@ public class TechSDSPermission extends BaseDomain {
                 ", phone='" + phone + '\'' +
                 ", firstApplyOrDelay='" + firstApplyOrDelay + '\'' +
                 ", note='" + note + '\'' +
+                ", updated='" + updated + '\'' +
                 '}';
+    }
+
+    public String getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(String updated) {
+        this.updated = updated;
     }
 
     public String getSaleRegion() {

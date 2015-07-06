@@ -1,5 +1,7 @@
 package kaitou.ppp.service;
 
+import kaitou.ppp.domain.system.IPRegistry;
+
 import java.util.List;
 
 /**
@@ -23,4 +25,25 @@ public interface LocalRegistryService {
      * @return IP列表
      */
     public List<String> queryRegistryIps();
+
+    /**
+     * 查询已注册的IP地址列表
+     *
+     * @return IP地址列表
+     */
+    public List<IPRegistry> queryIPRegistry();
+
+    /**
+     * 保存新的IP地址
+     *
+     * @param ipRegistry 注册IP
+     */
+    public void saveOrUpdateIPRegistry(IPRegistry... ipRegistry);
+
+    /**
+     * 删除IP地址
+     *
+     * @param ipRegistries 已注册的IP地址
+     */
+    public void deleteIPRegistry(Object... ipRegistries);
 }

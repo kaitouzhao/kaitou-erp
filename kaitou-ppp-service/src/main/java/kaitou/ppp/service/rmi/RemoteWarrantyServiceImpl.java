@@ -1,15 +1,9 @@
 package kaitou.ppp.service.rmi;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
-import kaitou.ppp.domain.warranty.WarrantyConsumables;
-import kaitou.ppp.domain.warranty.WarrantyFee;
-import kaitou.ppp.domain.warranty.WarrantyParts;
-import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.domain.warranty.*;
 import kaitou.ppp.manager.listener.WarrantyUpdateListener;
-import kaitou.ppp.manager.warranty.WarrantyConsumablesManager;
-import kaitou.ppp.manager.warranty.WarrantyFeeManager;
-import kaitou.ppp.manager.warranty.WarrantyPartsManager;
-import kaitou.ppp.manager.warranty.WarrantyPrintManager;
+import kaitou.ppp.manager.warranty.*;
 import kaitou.ppp.rmi.service.RemoteWarrantyService;
 import kaitou.ppp.service.ServiceInvokeManager;
 
@@ -28,6 +22,7 @@ import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
 public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements RemoteWarrantyService {
 
     private WarrantyFeeManager warrantyFeeManager;
+    private IpfEquipmentManager ipfEquipmentManager;
     private WarrantyPartsManager warrantyPartsManager;
     private WarrantyPrintManager warrantyPrintManager;
     private WarrantyConsumablesManager warrantyConsumablesManager;
@@ -35,6 +30,10 @@ public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements Re
 
     public void setWarrantyUpdateListeners(List<WarrantyUpdateListener> warrantyUpdateListeners) {
         this.warrantyUpdateListeners = warrantyUpdateListeners;
+    }
+
+    public void setIpfEquipmentManager(IpfEquipmentManager ipfEquipmentManager) {
+        this.ipfEquipmentManager = ipfEquipmentManager;
     }
 
     public void setWarrantyConsumablesManager(WarrantyConsumablesManager warrantyConsumablesManager) {
@@ -55,6 +54,16 @@ public class RemoteWarrantyServiceImpl extends UnicastRemoteObject implements Re
 
     public RemoteWarrantyServiceImpl() throws RemoteException {
         super();
+    }
+
+    @Override
+    public void saveIpfEquipment(List<IpfEquipment> equipments) throws RemoteException {
+        ipfEquipmentManager.save(equipments);
+    }
+
+    @Override
+    public void deleteIpfEquipment(Object... equipments) throws RemoteException {
+        ipfEquipmentManager.delete(equipments);
     }
 
     @Override

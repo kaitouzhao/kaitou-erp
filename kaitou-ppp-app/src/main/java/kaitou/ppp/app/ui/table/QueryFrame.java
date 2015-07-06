@@ -432,12 +432,20 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
      * @see javax.swing.table.DefaultTableModel
      */
     protected class QueryTable extends DefaultTableModel {
-        private QueryTable(Object[][] data, Object[] columnNames) {
+        public QueryTable(Object[][] data, Object[] columnNames) {
             super(data, columnNames);
         }
 
         @Override
         public boolean isCellEditable(int row, int column) {
+            Integer[] editableColumnIndexes = queryObject.editableColumnIndex();
+            if (CollectionUtil.isNotEmpty(editableColumnIndexes)) {
+                for (Integer editableColumnIndex : editableColumnIndexes) {
+                    if (column == editableColumnIndex) {
+                        return true;
+                    }
+                }
+            }
             int editableColumnStartIndex = queryObject.editableColumnStartIndex();
             return (editableColumnStartIndex >= DATA_COLUMN_START_INDEX && column >= editableColumnStartIndex) || column == opColumnIndex || column == SELECT_COLUMN_INDEX;
         }
@@ -523,6 +531,9 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
             }
             Object shownObj = shownDatas.get(getShownDataIndex(opIndexes[0]));
             final Object dataObj = datas.get(datas.indexOf(shownObj));
+            if (!queryObject.tableBtnEvent(self, (T) shownObj)) {
+                return;
+            }
             String btnText = btn.getText();
             String changeValue;
             String[] opNames = queryObject.opNames();
@@ -669,7 +680,7 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     /**
      * 初始化界面
      */
-    private void initComponents() {
+    protected void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         resultArea = new JScrollPane();
         dataTable = new JTable();
@@ -961,24 +972,24 @@ public class QueryFrame<T extends BaseDomain> extends JFrame {
     }
 
     // JFormDesigner - Variables declaration - DO NOT MODIFY  //GEN-BEGIN:variables
-    private JScrollPane resultArea;
-    private JTable dataTable;
-    private JButton firstPageBtn;
-    private JButton previousPageBtn;
-    private JButton nextPageBtn;
-    private JLabel recordCountShow;
-    private JLabel jump2Page;
-    private JComboBox selectPage;
-    private JPanel queryArea;
-    private JButton queryBtn;
-    private JButton resetBtn;
-    private JButton deleteBtn;
-    private JButton saveBtn;
-    private JButton exportBtn;
-    private JButton sendBtn;
-    private JButton allSelectedBtn;
-    private JButton noSelectedBtn;
-    private JLabel editableHint;
-    private JButton downloadImportModelBtn;
+    protected JScrollPane resultArea;
+    protected JTable dataTable;
+    protected JButton firstPageBtn;
+    protected JButton previousPageBtn;
+    protected JButton nextPageBtn;
+    protected JLabel recordCountShow;
+    protected JLabel jump2Page;
+    protected JComboBox selectPage;
+    protected JPanel queryArea;
+    protected JButton queryBtn;
+    protected JButton resetBtn;
+    protected JButton deleteBtn;
+    protected JButton saveBtn;
+    protected JButton exportBtn;
+    protected JButton sendBtn;
+    protected JButton allSelectedBtn;
+    protected JButton noSelectedBtn;
+    protected JLabel editableHint;
+    protected JButton downloadImportModelBtn;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -147,6 +147,11 @@ public class WarrantyFee extends BaseDomain4InDoubt {
     }
 
     @Override
+    public boolean isInDoubt() {
+        return false;
+    }
+
+    @Override
     public void check() {
         if (StringUtils.isEmpty(numberOfYear)) {
             throw new RuntimeException("年份为空");

@@ -63,6 +63,7 @@ public class CardApplication {
     private String endDate;
     private String status = "保修中";
     private String allModels;
+    private String modelType;
 
     /**
      * 获取保修卡sheet名
@@ -109,6 +110,7 @@ public class CardApplication {
         rowData.add(status);//状态
         rowData.add("");//是否寄回
         rowData.add(warrantyCard);//保修卡号
+        rowData.add(allModels);//机型
         rowData.add(models);//产品型号
         rowData.add(fuselage);//机身号
         rowData.add(serviceCompanyName);//销售单位
@@ -233,7 +235,7 @@ public class CardApplication {
 
     @Override
     public String toString() {
-        return "Application{" +
+        return "CardApplication{" +
                 "applyDate='" + applyDate + '\'' +
                 ", serviceCompanyCode='" + serviceCompanyCode + '\'' +
                 ", serviceCompanyName='" + serviceCompanyName + '\'' +
@@ -254,7 +256,16 @@ public class CardApplication {
                 ", endDate='" + endDate + '\'' +
                 ", status='" + status + '\'' +
                 ", allModels='" + allModels + '\'' +
+                ", modelType='" + modelType + '\'' +
                 '}';
+    }
+
+    public String getModelType() {
+        return modelType;
+    }
+
+    public void setModelType(String modelType) {
+        this.modelType = modelType;
     }
 
     public String getAllModels() {

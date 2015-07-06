@@ -6,6 +6,7 @@ import kaitou.ppp.app.ui.dialog.InputHint;
 import kaitou.ppp.app.ui.table.queryobject.BaseQueryObject;
 import kaitou.ppp.domain.BaseDomain;
 import kaitou.ppp.domain.ts.TSSDSPermission;
+import org.joda.time.DateTime;
 
 import javax.swing.*;
 
@@ -28,6 +29,7 @@ public class TSSDSPermissionQueryObject extends BaseQueryObject<TSSDSPermission>
         final TSSDSPermission newPermission = new TSSDSPermission();
         BeanCopyUtil.copyBean(outPermission, newPermission);
         newPermission.setEndDate(inputHint.getInputResult()[0]);
+        newPermission.setApplyDate(new DateTime().toString("yyyy/MM/dd"));
         doRunWithWaiting(frame, new OpRunnable() {
             @Override
             public void run() {

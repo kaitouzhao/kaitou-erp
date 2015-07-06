@@ -7,6 +7,10 @@
     <import resource="applicationContext-manager.xml"/>
     <import resource="applicationContext-tx.xml"/>
 
+    <bean id="basicService" class="kaitou.ppp.service.impl.BasicServiceImpl">
+        <property name="modelsManager" ref="modelsManager"/>
+    </bean>
+
     <bean id="cardService" class="kaitou.ppp.service.impl.CardServiceImpl">
         <property name="complete" value="${card.complete}"/>
         <property name="logFileName" value="${card.logFileName}"/>
@@ -16,6 +20,7 @@
         <property name="workspace" value="${card.workspace}"/>
 
         <property name="shopManager" ref="shopManager"/>
+        <property name="modelsManager" ref="modelsManager"/>
         <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
     </bean>
@@ -32,8 +37,8 @@
     </bean>
 
     <bean id="shopService" class="kaitou.ppp.service.impl.ShopServiceImpl">
-        <property name="dbDir" value="${db.file.dir}"/>
         <property name="shopManager" ref="shopManager"/>
+        <property name="ipfEquipmentManager" ref="ipfEquipmentManager"/>
         <property name="shopDetailManager" ref="shopDetailManager"/>
         <property name="shopRTSManager" ref="shopRTSManager"/>
         <property name="shopPayManager" ref="shopPayManager"/>
@@ -57,6 +62,7 @@
                 <ref bean="techSupportManager"/>
                 <ref bean="installPermissionManager"/>
                 <ref bean="cardApplicationRecordManager"/>
+                <ref bean="ipfEquipmentManager"/>
             </list>
         </property>
         <property name="cardApplicationRecordManager" ref="cardApplicationRecordManager"/>
@@ -68,6 +74,7 @@
 
     <bean id="systemSettingsService" class="kaitou.ppp.service.impl.SystemSettingsServiceImpl">
         <property name="systemSettingsManager" ref="systemSettingsManager"/>
+        <property name="logDir" value="${log.dir}"/>
         <property name="pppDir" value="${ppp.file.dir}"/>
     </bean>
 
@@ -86,6 +93,15 @@
         <property name="shopManager" ref="shopManager"/>
         <property name="shopPayManager" ref="shopPayManager"/>
         <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
+
+        <property name="tsDongleManager" ref="tsDongleManager"/>
+        <property name="tsEngineerManager" ref="tsEngineerManager"/>
+        <property name="tsTrainingManager" ref="tsTrainingManager"/>
+        <property name="toolRecipientsManager" ref="toolRecipientsManager"/>
+        <property name="tsSDSPermissionManager" ref="tsSDSPermissionManager"/>
+        <property name="componentBorrowingManager" ref="componentBorrowingManager"/>
+        <property name="tsInstallPermissionManager" ref="tsInstallPermissionManager"/>
+        <property name="tsManualPermissionsManager" ref="tsManualPermissionsManager"/>
     </bean>
 
     <bean id="localRegistryService" class="kaitou.ppp.service.impl.LocalRegistryServiceImpl">
@@ -98,6 +114,7 @@
     </bean>
 
     <bean id="exportService" class="kaitou.ppp.service.impl.ExportServiceImpl">
+        <property name="shopManager" ref="shopManager"/>
         <property name="soidCodeManager" ref="soidCodeManager"/>
         <property name="shopDetailManager" ref="shopDetailManager"/>
     </bean>
@@ -105,6 +122,7 @@
     <bean id="warrantyService" class="kaitou.ppp.service.impl.WarrantyServiceImpl">
         <property name="shopManager" ref="shopManager"/>
         <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
+        <property name="ipfEquipmentManager" ref="ipfEquipmentManager"/>
         <property name="warrantyPartsManager" ref="warrantyPartsManager"/>
         <property name="warrantyPrintManager" ref="warrantyPrintManager"/>
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
@@ -131,6 +149,7 @@
 
     <bean id="tsService" class="kaitou.ppp.service.impl.TSServiceImpl">
         <property name="tsDongleManager" ref="tsDongleManager"/>
+        <property name="tsEngineerManager" ref="tsEngineerManager"/>
         <property name="tsTrainingManager" ref="tsTrainingManager"/>
         <property name="toolRecipientsManager" ref="toolRecipientsManager"/>
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
@@ -141,6 +160,17 @@
         <property name="componentBorrowingManager" ref="componentBorrowingManager"/>
         <property name="tsInstallPermissionManager" ref="tsInstallPermissionManager"/>
         <property name="tsManualPermissionsManager" ref="tsManualPermissionsManager"/>
+        <property name="engineerTSUpdateListeners">
+            <list>
+                <ref bean="tsDongleManager"/>
+                <ref bean="tsTrainingManager"/>
+                <ref bean="toolRecipientsManager"/>
+                <ref bean="tsSDSPermissionManager"/>
+                <ref bean="componentBorrowingManager"/>
+                <ref bean="tsInstallPermissionManager"/>
+                <ref bean="tsManualPermissionsManager"/>
+            </list>
+        </property>
     </bean>
 
     <import resource="applicationContext-remote.xml"/>

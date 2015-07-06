@@ -3,10 +3,12 @@ package kaitou.ppp.service.impl;
 import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
+import kaitou.ppp.domain.basic.Models;
 import kaitou.ppp.domain.card.CardApplication;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.system.SysCode;
 import kaitou.ppp.domain.warranty.WarrantyFee;
+import kaitou.ppp.manager.basic.ModelsManager;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
@@ -54,11 +56,16 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
     private String template;
 
     private ShopManager shopManager;
+    private ModelsManager modelsManager;
     private WarrantyFeeManager warrantyFeeManager;
     private CardApplicationRecordManager cardApplicationRecordManager;
 
     public void setShopManager(ShopManager shopManager) {
         this.shopManager = shopManager;
+    }
+
+    public void setModelsManager(ModelsManager modelsManager) {
+        this.modelsManager = modelsManager;
     }
 
     public void setWarrantyFeeManager(WarrantyFeeManager warrantyFeeManager) {
@@ -101,6 +108,13 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
         if (appFiles == null) {
             return;
         }
+        for (File appFile : appFiles) {
+            Workbook workbook = create(appFile);
+            Sheet sheet = workbook.getSheet(APPLICATION_SHEET_NAME);
+            if (sheet == null) {
+                throw new RuntimeException(appFile.getName() + " 找不到sheet：" + APPLICATION_SHEET_NAME);
+            }
+        }
         String completePath = complete;
         List<Object[]> rowDataList = new ArrayList<Object[]>();
         List<Object[]> sheetDataList = new ArrayList<Object[]>();
@@ -134,6 +148,10 @@ public class CardServiceImpl extends BaseExcelService implements CardService {
             String shopName = application.getServiceCompanyName();
             cardApplicationRecord.setShopName(shopName);
             cardApplicationRecord.setShopId(shopManager.getCachedIdByName(shopName));
+            Models models = modelsManager.getByModel(cardApplicationRecord.getModels());
+            if (models != null) {
+                cardApplicationRecord.setModelType(models.getModelType());
+            }
             cardApplicationRecords.add(cardApplicationRecord);
             rowDataList.add(application.getAllRowData());
             sheetDataList.add(application.getRowData());

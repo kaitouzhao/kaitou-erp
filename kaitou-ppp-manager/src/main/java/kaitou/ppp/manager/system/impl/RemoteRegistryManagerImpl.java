@@ -35,4 +35,9 @@ public class RemoteRegistryManagerImpl extends FileDaoManager implements RemoteR
     public List<String> queryRegistryIps() {
         return remoteRegistryDao.queryRegistryIps();
     }
+
+    @Override
+    public void clear() {
+        remoteRegistryDao.clear();
+    }
 }

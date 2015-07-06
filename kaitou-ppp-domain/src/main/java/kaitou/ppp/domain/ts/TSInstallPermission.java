@@ -17,6 +17,10 @@ public class TSInstallPermission extends BaseDomain {
      */
     private String saleRegion;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 工程师姓名
      */
     private String engineerName;
@@ -63,6 +67,7 @@ public class TSInstallPermission extends BaseDomain {
     public String toString() {
         return "TSInstallPermission{" +
                 "saleRegion='" + saleRegion + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", engineerName='" + engineerName + '\'' +
                 ", applyDate='" + applyDate + '\'' +
                 ", modelType='" + modelType + '\'' +
@@ -72,6 +77,14 @@ public class TSInstallPermission extends BaseDomain {
                 ", mac='" + mac + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
     }
 
     public String getEngineerName() {

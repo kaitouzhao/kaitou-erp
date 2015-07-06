@@ -22,4 +22,9 @@ public interface RemoteRegistryDao {
      * @return ip列表
      */
     public List<String> queryRegistryIps();
+
+    /**
+     * 清空
+     */
+    public void clear();
 }

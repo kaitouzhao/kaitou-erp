@@ -22,6 +22,10 @@ public class ShopContract extends BaseDomain {
      */
     private String shopName;
     /**
+     * 年份
+     */
+    private String numberOfYear;
+    /**
      * 合同邮寄地址
      */
     private String deliveryAddress;
@@ -66,6 +70,7 @@ public class ShopContract extends BaseDomain {
                 "contractNo='" + contractNo + '\'' +
                 ", shopId='" + shopId + '\'' +
                 ", shopName='" + shopName + '\'' +
+                ", numberOfYear='" + numberOfYear + '\'' +
                 ", deliveryAddress='" + deliveryAddress + '\'' +
                 ", recipient='" + recipient + '\'' +
                 ", phone='" + phone + '\'' +
@@ -73,6 +78,14 @@ public class ShopContract extends BaseDomain {
                 ", deliveryTime='" + deliveryTime + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getNumberOfYear() {
+        return numberOfYear;
+    }
+
+    public void setNumberOfYear(String numberOfYear) {
+        this.numberOfYear = numberOfYear;
     }
 
     public String getContractNo() {

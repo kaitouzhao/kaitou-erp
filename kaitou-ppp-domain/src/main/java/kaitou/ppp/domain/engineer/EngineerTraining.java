@@ -91,6 +91,10 @@ public class EngineerTraining extends BaseDomain {
      * 年份
      */
     private String year;
+    /**
+     * 培训期数
+     */
+    private String trainingPeriods;
 
     @Override
     public String dbFileSuffix() {
@@ -104,9 +108,6 @@ public class EngineerTraining extends BaseDomain {
 
     @Override
     public void check() {
-        if (StringUtils.isEmpty(id)) {
-            throw new RuntimeException("编号为空");
-        }
         if (StringUtils.isEmpty(name)) {
             throw new RuntimeException("姓名为空");
         }
@@ -158,7 +159,16 @@ public class EngineerTraining extends BaseDomain {
                 ", qualified='" + qualified + '\'' +
                 ", note='" + note + '\'' +
                 ", year='" + year + '\'' +
+                ", trainingPeriods='" + trainingPeriods + '\'' +
                 '}';
+    }
+
+    public String getTrainingPeriods() {
+        return trainingPeriods;
+    }
+
+    public void setTrainingPeriods(String trainingPeriods) {
+        this.trainingPeriods = trainingPeriods;
     }
 
     public String getYear() {

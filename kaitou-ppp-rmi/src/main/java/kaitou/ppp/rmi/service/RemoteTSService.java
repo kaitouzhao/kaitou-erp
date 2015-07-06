@@ -14,6 +14,20 @@ import java.util.List;
  */
 public interface RemoteTSService extends Remote {
     /**
+     * 保存TS工程师
+     *
+     * @param engineerTSes TS工程师列表
+     */
+    public void saveTSEngineer(List<EngineerTS> engineerTSes) throws RemoteException;
+
+    /**
+     * 删除工程师
+     *
+     * @param tsEngineers 工程师
+     */
+    public void deleteTSEngineer(Object... tsEngineers) throws RemoteException;
+
+    /**
      * 保存TS培训记录
      *
      * @param tsTrainings TS培训记录列表

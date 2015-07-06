@@ -383,6 +383,14 @@ public class PageQueryFrame<T extends BaseDomain> extends JFrame {
 
         @Override
         public boolean isCellEditable(int row, int column) {
+            Integer[] editableColumnIndexes = queryObject.editableColumnIndex();
+            if (CollectionUtil.isNotEmpty(editableColumnIndexes)) {
+                for (Integer editableColumnIndex : editableColumnIndexes) {
+                    if (column == editableColumnIndex) {
+                        return true;
+                    }
+                }
+            }
             int editableColumnStartIndex = queryObject.editableColumnStartIndex();
             return (editableColumnStartIndex >= DATA_COLUMN_START_INDEX && column >= editableColumnStartIndex) || column == opColumnIndex || column == SELECT_COLUMN_INDEX;
         }

@@ -7,11 +7,13 @@ import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopPay;
 import kaitou.ppp.domain.system.SysCode;
+import kaitou.ppp.domain.ts.*;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.manager.shop.ShopPayManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
+import kaitou.ppp.manager.ts.*;
 import kaitou.ppp.manager.warranty.WarrantyFeeManager;
 import kaitou.ppp.service.ServiceInvokeManager;
 import kaitou.ppp.service.UpgradeService;
@@ -42,11 +44,55 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
      * 配置文件目录
      */
     private String confDir;
-    private CardApplicationRecordManager cardApplicationRecordManager;
-    private SystemSettingsManager systemSettingsManager;
     private ShopManager shopManager;
     private ShopPayManager shopPayManager;
+
     private WarrantyFeeManager warrantyFeeManager;
+
+    private SystemSettingsManager systemSettingsManager;
+
+    private TsDongleManager tsDongleManager;
+    private TSEngineerManager tsEngineerManager;
+    private TSTrainingManager tsTrainingManager;
+    private ToolRecipientsManager toolRecipientsManager;
+    private TSSDSPermissionManager tssdsPermissionManager;
+    private ComponentBorrowingManager componentBorrowingManager;
+    private TSInstallPermissionManager tsInstallPermissionManager;
+    private TSManualPermissionsManager tsManualPermissionsManager;
+
+    private CardApplicationRecordManager cardApplicationRecordManager;
+
+    public void setTsDongleManager(TsDongleManager tsDongleManager) {
+        this.tsDongleManager = tsDongleManager;
+    }
+
+    public void setTsEngineerManager(TSEngineerManager tsEngineerManager) {
+        this.tsEngineerManager = tsEngineerManager;
+    }
+
+    public void setTsTrainingManager(TSTrainingManager tsTrainingManager) {
+        this.tsTrainingManager = tsTrainingManager;
+    }
+
+    public void setToolRecipientsManager(ToolRecipientsManager toolRecipientsManager) {
+        this.toolRecipientsManager = toolRecipientsManager;
+    }
+
+    public void setTsSDSPermissionManager(TSSDSPermissionManager tssdsPermissionManager) {
+        this.tssdsPermissionManager = tssdsPermissionManager;
+    }
+
+    public void setComponentBorrowingManager(ComponentBorrowingManager componentBorrowingManager) {
+        this.componentBorrowingManager = componentBorrowingManager;
+    }
+
+    public void setTsInstallPermissionManager(TSInstallPermissionManager tsInstallPermissionManager) {
+        this.tsInstallPermissionManager = tsInstallPermissionManager;
+    }
+
+    public void setTsManualPermissionsManager(TSManualPermissionsManager tsManualPermissionsManager) {
+        this.tsManualPermissionsManager = tsManualPermissionsManager;
+    }
 
     public void setWarrantyFeeManager(WarrantyFeeManager warrantyFeeManager) {
         this.warrantyFeeManager = warrantyFeeManager;
@@ -177,6 +223,7 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void upgradeTo3Dot4() {
         if ("3.4".equals(systemSettingsManager.getSystemSetting(SysCode.LATEST_VERSION_KEY))) {
@@ -191,5 +238,81 @@ public class UpgradeServiceImpl extends BaseLogManager implements UpgradeService
             shopManager.save(CollectionUtil.newList(shop));
             break;
         }
+    }
+
+    @Override
+    public void upgradeTo3Dot7() {
+        if ("3.7".equals(systemSettingsManager.getSystemSetting(SysCode.LATEST_VERSION_KEY))) {
+            return;
+        }
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+                List<ComponentBorrowing> componentBorrowingList = componentBorrowingManager.query();
+                for (ComponentBorrowing borrowing : componentBorrowingList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(borrowing.getBorrowingPerson())) {
+                            borrowing.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                componentBorrowingManager.save(componentBorrowingList);
+                List<ToolRecipients> toolRecipientsList = toolRecipientsManager.query();
+                for (ToolRecipients toolRecipient : toolRecipientsList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(toolRecipient.getUseEngineerName())) {
+                            toolRecipient.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                toolRecipientsManager.save(toolRecipientsList);
+                List<TSDongle> tsDongleList = tsDongleManager.queryAll();
+                for (TSDongle dongle : tsDongleList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(dongle.getName())) {
+                            dongle.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                tsDongleManager.save(tsDongleList);
+                List<TSInstallPermission> tsInstallPermissionList = tsInstallPermissionManager.queryAll();
+                for (TSInstallPermission permission : tsInstallPermissionList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(permission.getEngineerName())) {
+                            permission.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                tsInstallPermissionManager.save(tsInstallPermissionList);
+                List<TSManualPermissions> tsManualPermissionsList = tsManualPermissionsManager.queryAll();
+                for (TSManualPermissions permission : tsManualPermissionsList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(permission.getEngineerName())) {
+                            permission.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                tsManualPermissionsManager.save(tsManualPermissionsList);
+                List<TSSDSPermission> tsSDSPermissionList = tssdsPermissionManager.queryAll();
+                for (TSSDSPermission permission : tsSDSPermissionList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(permission.getEngineerName())) {
+                            permission.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                tssdsPermissionManager.save(tsSDSPermissionList);
+                List<TSTraining> tsTrainingList = tsTrainingManager.query();
+                for (TSTraining training : tsTrainingList) {
+                    for (EngineerTS engineerTS : engineerTSList) {
+                        if (engineerTS.getEngineerName().equals(training.getEngineerName())) {
+                            training.setEmployeeNo(engineerTS.getEmployeeNo());
+                        }
+                    }
+                }
+                tsTrainingManager.save(tsTrainingList);
+            }
+        });
     }
 }

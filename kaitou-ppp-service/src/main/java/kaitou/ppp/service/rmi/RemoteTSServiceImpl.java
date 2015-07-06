@@ -1,12 +1,17 @@
 package kaitou.ppp.service.rmi;
 
+import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.domain.ts.*;
+import kaitou.ppp.manager.listener.EngineerTSUpdateListener;
 import kaitou.ppp.manager.ts.*;
 import kaitou.ppp.rmi.service.RemoteTSService;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+
+import static kaitou.ppp.service.ServiceInvokeManager.InvokeRunnable;
+import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
 
 /**
  * 远程TS管理服务实现.
@@ -17,6 +22,7 @@ import java.util.List;
 public class RemoteTSServiceImpl extends UnicastRemoteObject implements RemoteTSService {
 
     private TsDongleManager tsDongleManager;
+    private TSEngineerManager tsEngineerManager;
     private TSTrainingManager tsTrainingManager;
     private ToolRecipientsManager toolRecipientsManager;
     private TSSDSPermissionManager tssdsPermissionManager;
@@ -25,9 +31,18 @@ public class RemoteTSServiceImpl extends UnicastRemoteObject implements RemoteTS
     private ComponentBorrowingManager componentBorrowingManager;
     private TSInstallPermissionManager tsInstallPermissionManager;
     private TSManualPermissionsManager tsManualPermissionsManager;
+    private List<EngineerTSUpdateListener> engineerTSUpdateListeners;
+
+    public void setEngineerTSUpdateListeners(List<EngineerTSUpdateListener> engineerTSUpdateListeners) {
+        this.engineerTSUpdateListeners = engineerTSUpdateListeners;
+    }
 
     public void setTsDongleManager(TsDongleManager tsDongleManager) {
         this.tsDongleManager = tsDongleManager;
+    }
+
+    public void setTsEngineerManager(TSEngineerManager tsEngineerManager) {
+        this.tsEngineerManager = tsEngineerManager;
     }
 
     public void setToolRecipientsManager(ToolRecipientsManager toolRecipientsManager) {
@@ -64,6 +79,24 @@ public class RemoteTSServiceImpl extends UnicastRemoteObject implements RemoteTS
 
     public RemoteTSServiceImpl() throws RemoteException {
         super();
+    }
+
+    @Override
+    public void saveTSEngineer(final List<EngineerTS> engineerTSes) throws RemoteException {
+        tsEngineerManager.save(engineerTSes);
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                for (EngineerTSUpdateListener listener : engineerTSUpdateListeners) {
+                    listener.updateEngineerEvent(CollectionUtil.toArray(engineerTSes, EngineerTS.class));
+                }
+            }
+        });
+    }
+
+    @Override
+    public void deleteTSEngineer(Object... tsEngineers) throws RemoteException {
+        tsEngineerManager.delete(tsEngineers);
     }
 
     @Override

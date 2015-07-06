@@ -2,10 +2,7 @@ package kaitou.ppp.service;
 
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
-import kaitou.ppp.domain.warranty.WarrantyConsumables;
-import kaitou.ppp.domain.warranty.WarrantyFee;
-import kaitou.ppp.domain.warranty.WarrantyParts;
-import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.domain.warranty.*;
 
 import java.io.File;
 import java.util.List;
@@ -17,6 +14,58 @@ import java.util.List;
  * Time: 10:11
  */
 public interface WarrantyService {
+
+    /**
+     * 导入iPF设备
+     *
+     * @param srcFile 源文件
+     */
+    public void importIpfEquipment(File srcFile);
+
+    /**
+     * 导出iPF设备
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportIpfEquipment(File targetFile);
+
+    /**
+     * 查询iPF设备
+     *
+     * @return iPF设备列表
+     */
+    public List<IpfEquipment> queryIpfEquipment();
+
+    /**
+     * 分页查询
+     *
+     * @param currentPage 当前页码
+     * @param conditions  查询条件列表
+     * @return 封装结果集的分页对象
+     */
+    public Pager<IpfEquipment> queryIpfEquipmentPager(int currentPage, List<Condition> conditions);
+
+    /**
+     * 不分页查询
+     *
+     * @param conditions 查询条件列表
+     * @return 结果集
+     */
+    public List<IpfEquipment> queryIpfEquipment(List<Condition> conditions);
+
+    /**
+     * 保存/更新iPF设备
+     *
+     * @param equipments iPF设备
+     */
+    public void saveOrUpdateIpfEquipment(IpfEquipment... equipments);
+
+    /**
+     * 删除iPF设备
+     *
+     * @param equipments iPF设备
+     */
+    public void deleteIpfEquipment(Object... equipments);
 
     /**
      * 导入保修费记录

@@ -33,6 +33,10 @@ public class TSSDSPermission extends BaseDomain {
      */
     private String addOrUpdate;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 工程师姓名
      */
     private String engineerName;
@@ -91,14 +95,23 @@ public class TSSDSPermission extends BaseDomain {
                 "saleRegion='" + saleRegion + '\'' +
                 ", city='" + city + '\'' +
                 ", addOrUpdate='" + addOrUpdate + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", engineerName='" + engineerName + '\'' +
                 ", email='" + email + '\'' +
                 ", mac='" + mac + '\'' +
                 ", applyDate='" + applyDate + '\'' +
                 ", endDate='" + endDate + '\'' +
                 ", note='" + note + '\'' +
-                ", updated=" + updated +
+                ", updated='" + updated + '\'' +
                 '}';
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
     }
 
     public String getUpdated() {

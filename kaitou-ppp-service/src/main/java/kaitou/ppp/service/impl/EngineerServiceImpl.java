@@ -15,7 +15,6 @@ import kaitou.ppp.manager.shop.ShopManager;
 import kaitou.ppp.rmi.service.RemoteEngineerService;
 import kaitou.ppp.service.BaseExcelService;
 import kaitou.ppp.service.EngineerService;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.rmi.RemoteException;
@@ -129,34 +128,27 @@ public class EngineerServiceImpl extends BaseExcelService implements EngineerSer
     }
 
     @Override
-    public void countEngineersByShop(String productLine, File targetFile) {
+    public void countEngineersByShop(File targetFile) {
         List<Engineer> allEngineers = engineerManager.query();
         List<CountByShop> result = new ArrayList<CountByShop>();
         CountByShop countByShop;
         String shopId;
-        String engineerProductLine;
         int index;
         for (Engineer engineer : allEngineers) {
             if (!SysCode.EngineerStatus.ON.getValue().equals(engineer.getStatus())) {
                 continue;
             }
-            if (!StringUtils.isEmpty(productLine)) {
-                if (!productLine.equals(engineer.getProductLine())) {
-                    continue;
-                }
-            }
             shopId = engineer.getShopId();
-            engineerProductLine = engineer.getProductLine();
-            index = result.indexOf(new CountByShop().setShopId(shopId).setProductLine(engineerProductLine));
+            index = result.indexOf(new CountByShop().setShopId(shopId));
             if (index < 0) {
-                countByShop = new CountByShop().setShopId(shopId).setShopName(engineer.getShopName()).setProductLine(engineerProductLine);
+                countByShop = new CountByShop().setShopId(shopId).setShopName(engineer.getShopName());
                 result.add(countByShop);
             } else {
                 countByShop = result.get(index);
             }
             countByShop.setCount(countByShop.getCount() + 1);
         }
-        export2Excel(result, "认定店在职工程师统计", new String[]{"认定店编码", "认定店名", "产品线", "人数"}, new String[]{"shopId", "shopName", "productLine", "count"}, targetFile);
+        export2Excel(result, "认定店在职工程师统计", new String[]{"认定店编码", "认定店名", "人数"}, new String[]{"shopId", "shopName", "count"}, targetFile);
     }
 
     @Override
@@ -226,7 +218,9 @@ public class EngineerServiceImpl extends BaseExcelService implements EngineerSer
         for (EngineerTraining training : trainings) {
             for (Engineer engineer : allEngineers) {
                 if (!training.getId().equals(engineer.getId())) {
-                    continue;
+                    if (!training.getName().equals(engineer.getName()) || !training.getShopName().equals(engineer.getShopName())) {
+                        continue;
+                    }
                 }
                 copyBean(engineer, training);
             }

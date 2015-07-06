@@ -3,6 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+    <bean id="modelsDao" class="kaitou.ppp.dao.basic.impl.ModelsDaoImpl">
+        <property name="dbDir" value="d://ppp//db"/>
+    </bean>
+
     <bean id="engineerDao" class="kaitou.ppp.dao.engineer.impl.EngineerDaoImpl">
         <property name="dbDir" value="d://ppp//db"/>
     </bean>
@@ -57,6 +61,10 @@
         <property name="dbDir" value="d://ppp//db"/>
     </bean>
 
+    <bean id="ipfEquipmentDao" class="kaitou.ppp.dao.warranty.impl.IpfEquipmentDaoImpl">
+        <property name="dbDir" value="d://ppp//db"/>
+    </bean>
+
     <bean id="warrantyFeeDao" class="kaitou.ppp.dao.warranty.impl.WarrantyFeeDaoImpl">
         <property name="dbDir" value="d://ppp//db"/>
     </bean>
@@ -94,6 +102,10 @@
     </bean>
 
     <bean id="installPermissionDao" class="kaitou.ppp.dao.tech.impl.InstallPermissionDaoImpl">
+        <property name="dbDir" value="d://ppp//db"/>
+    </bean>
+
+    <bean id="tsEngineerDao" class="kaitou.ppp.dao.ts.impl.TSEngineerDaoImpl">
         <property name="dbDir" value="d://ppp//db"/>
     </bean>
 

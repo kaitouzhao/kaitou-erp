@@ -62,6 +62,10 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
     @PKField(PKViolationType = PKViolationType.IN_DOUBT)
     private String fuselage;
     /**
+     * 扫描仪机身号
+     */
+    private String scannerFuselage;
+    /**
      * 认定店编号
      */
     private String shopId;
@@ -139,6 +143,7 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
                 ", modelType='" + modelType + '\'' +
                 ", models='" + models + '\'' +
                 ", fuselage='" + fuselage + '\'' +
+                ", scannerFuselage='" + scannerFuselage + '\'' +
                 ", shopId='" + shopId + '\'' +
                 ", shopName='" + shopName + '\'' +
                 ", installedDate='" + installedDate + '\'' +
@@ -150,6 +155,14 @@ public class CardApplicationRecord extends BaseDomain4InDoubt {
                 ", installedAddress='" + installedAddress + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getScannerFuselage() {
+        return scannerFuselage;
+    }
+
+    public void setScannerFuselage(String scannerFuselage) {
+        this.scannerFuselage = scannerFuselage;
     }
 
     public String getSaleRegion() {

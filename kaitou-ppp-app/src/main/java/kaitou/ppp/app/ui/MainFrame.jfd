@@ -13,7 +13,7 @@ new FormModel {
 				"autoSize": false
 			} ) {
 				name: "tsSDSReminderPanel"
-				"border": new javax.swing.border.TitledBorder( "正在获取SDS需要更新提醒......" )
+				"border": &TitledBorder0 new javax.swing.border.TitledBorder( "正在获取SDS需要更新提醒......" )
 				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
 					name: "tsSDSReminderScrollPane"
 					add( new FormComponent( "javax.swing.JTable" ) {
@@ -30,6 +30,28 @@ new FormModel {
 				"y": 10
 				"height": 255
 				"width": 345
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class com.jformdesigner.runtime.NullLayout ) {
+				"autoSize": false
+			} ) {
+				name: "techSDSReminderPanel"
+				"border": #TitledBorder0
+				add( new FormContainer( "javax.swing.JScrollPane", new FormLayoutManager( class javax.swing.JScrollPane ) ) {
+					name: "techSDSReminderScrollPane"
+					add( new FormComponent( "javax.swing.JTable" ) {
+						name: "techSDSReminderTable"
+					} )
+				}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+					"x": 10
+					"y": 25
+					"width": 325
+					"height": 215
+				} )
+			}, new FormLayoutConstraints( class com.jformdesigner.runtime.NullConstraints ) {
+				"width": 345
+				"height": 255
+				"x": 365
+				"y": 10
 			} )
 			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
 				name: "managerMenuBar"
@@ -99,12 +121,12 @@ new FormModel {
 						} )
 						add( new FormComponent( "javax.swing.JMenuItem" ) {
 							name: "countEngineerByProductLine"
-							"text": "产品线在职人数"
+							"text": "统计每个产品线的在职工程师数"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "countEngineerByProductLineActionPerformed", true ) )
 						} )
 						add( new FormComponent( "javax.swing.JMenuItem" ) {
 							name: "countEngineerByShop"
-							"text": "认定店在职人数"
+							"text": "统计每个认定店的在职工程师数"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "countEngineerByShopActionPerformed", true ) )
 						} )
 					} )
@@ -181,6 +203,25 @@ new FormModel {
 							name: "exportCardApplicationRecord"
 							"text": "导出"
 							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportCardApplicationRecordActionPerformed", true ) )
+						} )
+					} )
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "ipfEquipment"
+						"text": "iPF设备管理"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "queryIpfEquipment"
+							"text": "查询"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "queryIpfEquipmentActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "importIpfEquipment"
+							"text": "导入"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "importIpfEquipmentActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "exportIpfEquipment"
+							"text": "导出"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportIpfEquipmentActionPerformed", true ) )
 						} )
 					} )
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
@@ -401,6 +442,25 @@ new FormModel {
 					name: "tsManagement"
 					"text": "TS管理"
 					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "tsEngineer"
+						"text": "工程师基础信息"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "queryTSEngineer"
+							"text": "查询"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "queryTSEngineerActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "importTSEngineer"
+							"text": "导入"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "importTSEngineerActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "exportTSEngineer"
+							"text": "导出"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportTSEngineerActionPerformed", true ) )
+						} )
+					} )
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 						name: "tsTraining"
 						"text": "培训记录"
 						add( new FormComponent( "javax.swing.JMenuItem" ) {
@@ -573,6 +633,29 @@ new FormModel {
 					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+					name: "basicDataManagement"
+					"text": "基础数据"
+					add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+						name: "models"
+						"text": "机型分类"
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "queryModels"
+							"text": "查询"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "queryModelsActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "importModels"
+							"text": "导入"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "importModelsActionPerformed", true ) )
+						} )
+						add( new FormComponent( "javax.swing.JMenuItem" ) {
+							name: "exportModels"
+							"text": "导出"
+							addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "exportModelsActionPerformed", true ) )
+						} )
+					} )
+				} )
+				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "onlineMenu"
 					"text": "联机"
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
@@ -590,6 +673,11 @@ new FormModel {
 						"text": "配置"
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "onlineConfigActionPerformed", true ) )
 					} )
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "ipManagement"
+						"text": "管理注册IP"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "ipManagementActionPerformed", true ) )
+					} )
 				} )
 				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
 					name: "helpMenu"
@@ -598,6 +686,11 @@ new FormModel {
 						name: "aboutItem"
 						"text": "关于"
 						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "aboutItemActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "queryOperationLog"
+						"text": "操作日志查询"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "queryOperationLogActionPerformed", true ) )
 					} )
 					add( new FormComponent( "javax.swing.JMenuItem" ) {
 						name: "backupDB"

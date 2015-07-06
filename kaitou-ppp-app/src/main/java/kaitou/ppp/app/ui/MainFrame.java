@@ -9,14 +9,18 @@ import kaitou.ppp.app.ui.dialog.InputHint;
 import kaitou.ppp.app.ui.dialog.OnlineConfig;
 import kaitou.ppp.app.ui.dialog.OperationHint;
 import kaitou.ppp.app.ui.dialog.ReportErrorHint;
+import kaitou.ppp.app.ui.table.OnlyQueryFrame;
 import kaitou.ppp.app.ui.table.PageQueryFrame;
 import kaitou.ppp.app.ui.table.QueryFrame;
 import kaitou.ppp.app.ui.table.WarrantyPartsQueryFrame;
 import kaitou.ppp.app.ui.table.queryobject.basic.*;
+import kaitou.ppp.app.ui.table.queryobject.system.IPRegistryQueryObject;
+import kaitou.ppp.app.ui.table.queryobject.system.OperationLogQueryObject;
 import kaitou.ppp.app.ui.table.queryobject.tech.*;
 import kaitou.ppp.app.ui.table.queryobject.ts.*;
 import kaitou.ppp.app.ui.table.queryobject.warranty.*;
 import kaitou.ppp.common.utils.NetworkUtil;
+import kaitou.ppp.domain.basic.Models;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
 import kaitou.ppp.domain.engineer.EngineerTraining;
@@ -25,8 +29,11 @@ import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopContract;
 import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.domain.system.DBVersion;
+import kaitou.ppp.domain.system.IPRegistry;
+import kaitou.ppp.domain.system.OperationLog;
 import kaitou.ppp.domain.tech.*;
 import kaitou.ppp.domain.ts.*;
+import kaitou.ppp.domain.warranty.IpfEquipment;
 import kaitou.ppp.domain.warranty.WarrantyConsumables;
 import kaitou.ppp.domain.warranty.WarrantyFee;
 import kaitou.ppp.domain.warranty.WarrantyPrint;
@@ -62,7 +69,7 @@ import static kaitou.ppp.app.SpringContextManager.getTsService;
 import static kaitou.ppp.app.SpringContextManager.getWarrantyService;
 import static kaitou.ppp.app.ui.UIUtil.*;
 import static kaitou.ppp.app.ui.table.OPManager.*;
-import static kaitou.ppp.app.ui.table.OPManager.getUpgradeService;
+import static kaitou.ppp.app.ui.table.OPManager.getBasicService;
 import static kaitou.ppp.service.ServiceInvokeManager.InvokeRunnable;
 import static kaitou.ppp.service.ServiceInvokeManager.asynchronousRun;
 
@@ -97,7 +104,7 @@ public class MainFrame extends JFrame {
      * @param args 参数
      */
     public static void main(String[] args) {
-        getUpgradeService().upgradeTo3Dot4();
+        getUpgradeService().upgradeTo3Dot7();
 
         asynchronousInit();
 
@@ -110,6 +117,7 @@ public class MainFrame extends JFrame {
      * <li>更新系统设置</li>
      * <li>备份DB</li>
      * <li>缓存认定店</li>
+     * <li>缓存机型分类基础数据</li>
      * </ul>
      */
     private static void asynchronousInit() {
@@ -119,6 +127,7 @@ public class MainFrame extends JFrame {
                 getSystemSettingsService().updateSystemSettings();
                 getDbService().backupDB();
                 getShopService().cacheAllShops();
+                getBasicService().cacheModels();
             }
         }).start();
     }
@@ -175,6 +184,30 @@ public class MainFrame extends JFrame {
     }
 
     /**
+     * 异步获取技术管理SDS权限到期提醒
+     */
+    private void asynchronousGetTechSDSReminder() {
+        asynchronousRun(new InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<TechSDSPermission> reminderList = getTechService().getSDSEndDateReminder();
+                Object[] column = {"技术管理工程师姓名", "到期时间"};
+                Object[][] data = new Object[(reminderList.size())][2];
+                if (CollectionUtil.isNotEmpty(reminderList)) {
+                    for (int i = 0; i < reminderList.size(); i++) {
+                        TechSDSPermission permission = reminderList.get(i);
+                        data[i][0] = permission.getApplicant();
+                        data[i][1] = permission.getEndDate();
+                    }
+                }
+                techSDSReminderTable.setModel(new DefaultTableModel(data, column));
+                ((TitledBorder) techSDSReminderPanel.getBorder()).setTitle("技术管理SDS需要更新提醒");
+                techSDSReminderPanel.setVisible(true);
+            }
+        });
+    }
+
+    /**
      * 异步获取TS SDS到期提醒
      */
     private void asynchronousGetTSSDSReminder() {
@@ -182,7 +215,7 @@ public class MainFrame extends JFrame {
             @Override
             public void run() throws RemoteException {
                 List<TSSDSPermission> reminderList = getTsService().getTSSDSEndDateReminder();
-                Object[] column = {"工程师姓名", "到期时间"};
+                Object[] column = {"TS工程师姓名", "到期时间"};
                 Object[][] data = new Object[(reminderList.size())][2];
                 if (CollectionUtil.isNotEmpty(reminderList)) {
                     for (int i = 0; i < reminderList.size(); i++) {
@@ -192,7 +225,7 @@ public class MainFrame extends JFrame {
                     }
                 }
                 tsSDSReminderTable.setModel(new DefaultTableModel(data, column));
-                ((TitledBorder) tsSDSReminderPanel.getBorder()).setTitle("SDS需要更新提醒");
+                ((TitledBorder) tsSDSReminderPanel.getBorder()).setTitle("TS管理SDS需要更新提醒");
                 tsSDSReminderPanel.setVisible(true);
             }
         });
@@ -223,6 +256,7 @@ public class MainFrame extends JFrame {
         asynchronousUpgradeDBVersions();
 
         asynchronousGetTSSDSReminder();
+        asynchronousGetTechSDSReminder();
     }
 
     /**
@@ -403,15 +437,14 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                InputHint inputHint = new InputHint(self, new String[]{"请选择产品线"});
-                if (!inputHint.isOk()) {
-                    return;
-                }
-                String productLine = inputHint.getInputResult()[0];
-                File targetFile = chooseExportFile("excel文件", "xlsx");
+                final File targetFile = chooseExportFile("excel文件", "xlsx");
                 if (targetFile == null) return;
-                getEngineerService().countEngineersByShop(productLine, targetFile);
-                new OperationHint(self, "导出成功");
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getEngineerService().countEngineersByShop(targetFile);
+                    }
+                }, "导出成功");
             }
         });
     }
@@ -457,12 +490,12 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(this, new OpRunnable() {
             @Override
             public void run() {
-                final File targetFile = chooseExportFile("excel文件", "xlsx");
+                final File targetFile = chooseExportFile("excel文件", "xls");
                 if (targetFile == null) return;
                 doRunWithWaiting(self, new OpRunnable() {
                     @Override
                     public void run() {
-                        getShopService().exportAll(targetFile);
+                        getExportService().exportShopAll(targetFile);
                     }
                 }, "导出成功");
             }
@@ -825,7 +858,7 @@ public class MainFrame extends JFrame {
         doRunWithExHandler(self, new OpRunnable() {
             @Override
             public void run() {
-                final File targetFile = chooseExportFile("excel文件", "xlsx");
+                final File targetFile = chooseExportFile("excel文件", "xls");
                 if (targetFile == null) return;
                 doRunWithWaiting(self, new OpRunnable() {
                     @Override
@@ -1265,6 +1298,122 @@ public class MainFrame extends JFrame {
         });
     }
 
+    private void queryModelsActionPerformed(ActionEvent e) {
+        new PageQueryFrame<Models>(new ModelsQueryObject());
+    }
+
+    private void importModelsActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getBasicService().importBasicModels(srcFile);
+                    }
+                }, "导入成功");
+            }
+        });
+    }
+
+    private void exportModelsActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getBasicService().exportBasicModels(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
+    }
+
+    private void queryTSEngineerActionPerformed(ActionEvent e) {
+        new PageQueryFrame<EngineerTS>(new TSEngineerQueryObject());
+    }
+
+    private void importTSEngineerActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getTsService().importTSEngineer(srcFile);
+                    }
+                }, "导入成功");
+            }
+        });
+    }
+
+    private void exportTSEngineerActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getTsService().exportTSEngineer(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
+    }
+
+    private void queryIpfEquipmentActionPerformed(ActionEvent e) {
+        new PageQueryFrame<IpfEquipment>(new IpfEquipmentQueryObject());
+    }
+
+    private void importIpfEquipmentActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File srcFile = chooseImportFile("excel文件", "xls", "xlsx");
+                if (srcFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getWarrantyService().importIpfEquipment(srcFile);
+                    }
+                }, "导入成功");
+            }
+        });
+    }
+
+    private void exportIpfEquipmentActionPerformed(ActionEvent e) {
+        doRunWithExHandler(self, new OpRunnable() {
+            @Override
+            public void run() {
+                final File targetFile = chooseExportFile("excel文件", "xls");
+                if (targetFile == null) return;
+                doRunWithWaiting(self, new OpRunnable() {
+                    @Override
+                    public void run() {
+                        getWarrantyService().exportIpfEquipment(targetFile);
+                    }
+                }, "导出成功");
+            }
+        });
+    }
+
+    private void ipManagementActionPerformed(ActionEvent e) {
+        new QueryFrame<IPRegistry>(getLocalRegistryService().queryIPRegistry(), new IPRegistryQueryObject());
+    }
+
+    private void queryOperationLogActionPerformed(ActionEvent e) {
+        new OnlyQueryFrame<OperationLog>(new OperationLogQueryObject());
+    }
+
     private void initComponents() {
         // JFormDesigner - Component initialization - DO NOT MODIFY  //GEN-BEGIN:initComponents
         managerMenuBar = new JMenuBar();
@@ -1300,6 +1449,10 @@ public class MainFrame extends JFrame {
         genCardMenu = new JMenuItem();
         importCardApplicationRecord = new JMenuItem();
         exportCardApplicationRecord = new JMenuItem();
+        ipfEquipment = new JMenu();
+        queryIpfEquipment = new JMenuItem();
+        importIpfEquipment = new JMenuItem();
+        exportIpfEquipment = new JMenuItem();
         parts4Warranty = new JMenu();
         queryWarrantyParts = new JMenuItem();
         importWarrantyParts = new JMenuItem();
@@ -1346,6 +1499,10 @@ public class MainFrame extends JFrame {
         importTechDongle = new JMenuItem();
         exportTechDongle = new JMenuItem();
         tsManagement = new JMenu();
+        tsEngineer = new JMenu();
+        queryTSEngineer = new JMenuItem();
+        importTSEngineer = new JMenuItem();
+        exportTSEngineer = new JMenuItem();
         tsTraining = new JMenu();
         queryTSTraining = new JMenuItem();
         importTSTraining = new JMenuItem();
@@ -1382,12 +1539,19 @@ public class MainFrame extends JFrame {
         queryTSDongle = new JMenuItem();
         importTSDongle = new JMenuItem();
         exportTSDongle = new JMenuItem();
+        basicDataManagement = new JMenu();
+        models = new JMenu();
+        queryModels = new JMenuItem();
+        importModels = new JMenuItem();
+        exportModels = new JMenuItem();
         onlineMenu = new JMenu();
         onlineSetting = new JMenuItem();
         startOnline = new JMenuItem();
         onlineConfig = new JMenuItem();
+        ipManagement = new JMenuItem();
         helpMenu = new JMenu();
         aboutItem = new JMenuItem();
+        queryOperationLog = new JMenuItem();
         backupDB = new JMenuItem();
         recoveryDB = new JMenuItem();
         reportError = new JMenuItem();
@@ -1395,6 +1559,9 @@ public class MainFrame extends JFrame {
         tsSDSReminderPanel = new JPanel();
         tsSDSReminderScrollPane = new JScrollPane();
         tsSDSReminderTable = new JTable();
+        techSDSReminderPanel = new JPanel();
+        techSDSReminderScrollPane = new JScrollPane();
+        techSDSReminderTable = new JTable();
 
         //======== this ========
         setTitle("PPP-ERP\u4e3b\u754c\u9762");
@@ -1525,7 +1692,7 @@ public class MainFrame extends JFrame {
                     shopManagement.add(exportAll);
 
                     //---- countEngineerByProductLine ----
-                    countEngineerByProductLine.setText("\u4ea7\u54c1\u7ebf\u5728\u804c\u4eba\u6570");
+                    countEngineerByProductLine.setText("\u7edf\u8ba1\u6bcf\u4e2a\u4ea7\u54c1\u7ebf\u7684\u5728\u804c\u5de5\u7a0b\u5e08\u6570");
                     countEngineerByProductLine.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1535,7 +1702,7 @@ public class MainFrame extends JFrame {
                     shopManagement.add(countEngineerByProductLine);
 
                     //---- countEngineerByShop ----
-                    countEngineerByShop.setText("\u8ba4\u5b9a\u5e97\u5728\u804c\u4eba\u6570");
+                    countEngineerByShop.setText("\u7edf\u8ba1\u6bcf\u4e2a\u8ba4\u5b9a\u5e97\u7684\u5728\u804c\u5de5\u7a0b\u5e08\u6570");
                     countEngineerByShop.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1685,6 +1852,42 @@ public class MainFrame extends JFrame {
                     cardRecordManagement.add(exportCardApplicationRecord);
                 }
                 warrantyManagement.add(cardRecordManagement);
+
+                //======== ipfEquipment ========
+                {
+                    ipfEquipment.setText("iPF\u8bbe\u5907\u7ba1\u7406");
+
+                    //---- queryIpfEquipment ----
+                    queryIpfEquipment.setText("\u67e5\u8be2");
+                    queryIpfEquipment.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryIpfEquipmentActionPerformed(e);
+                        }
+                    });
+                    ipfEquipment.add(queryIpfEquipment);
+
+                    //---- importIpfEquipment ----
+                    importIpfEquipment.setText("\u5bfc\u5165");
+                    importIpfEquipment.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importIpfEquipmentActionPerformed(e);
+                        }
+                    });
+                    ipfEquipment.add(importIpfEquipment);
+
+                    //---- exportIpfEquipment ----
+                    exportIpfEquipment.setText("\u5bfc\u51fa");
+                    exportIpfEquipment.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportIpfEquipmentActionPerformed(e);
+                        }
+                    });
+                    ipfEquipment.add(exportIpfEquipment);
+                }
+                warrantyManagement.add(ipfEquipment);
 
                 //======== parts4Warranty ========
                 {
@@ -2094,6 +2297,42 @@ public class MainFrame extends JFrame {
             {
                 tsManagement.setText("TS\u7ba1\u7406");
 
+                //======== tsEngineer ========
+                {
+                    tsEngineer.setText("\u5de5\u7a0b\u5e08\u57fa\u7840\u4fe1\u606f");
+
+                    //---- queryTSEngineer ----
+                    queryTSEngineer.setText("\u67e5\u8be2");
+                    queryTSEngineer.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryTSEngineerActionPerformed(e);
+                        }
+                    });
+                    tsEngineer.add(queryTSEngineer);
+
+                    //---- importTSEngineer ----
+                    importTSEngineer.setText("\u5bfc\u5165");
+                    importTSEngineer.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importTSEngineerActionPerformed(e);
+                        }
+                    });
+                    tsEngineer.add(importTSEngineer);
+
+                    //---- exportTSEngineer ----
+                    exportTSEngineer.setText("\u5bfc\u51fa");
+                    exportTSEngineer.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportTSEngineerActionPerformed(e);
+                        }
+                    });
+                    tsEngineer.add(exportTSEngineer);
+                }
+                tsManagement.add(tsEngineer);
+
                 //======== tsTraining ========
                 {
                     tsTraining.setText("\u57f9\u8bad\u8bb0\u5f55");
@@ -2420,6 +2659,48 @@ public class MainFrame extends JFrame {
             }
             managerMenuBar.add(tsManagement);
 
+            //======== basicDataManagement ========
+            {
+                basicDataManagement.setText("\u57fa\u7840\u6570\u636e");
+
+                //======== models ========
+                {
+                    models.setText("\u673a\u578b\u5206\u7c7b");
+
+                    //---- queryModels ----
+                    queryModels.setText("\u67e5\u8be2");
+                    queryModels.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            queryModelsActionPerformed(e);
+                        }
+                    });
+                    models.add(queryModels);
+
+                    //---- importModels ----
+                    importModels.setText("\u5bfc\u5165");
+                    importModels.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            importModelsActionPerformed(e);
+                        }
+                    });
+                    models.add(importModels);
+
+                    //---- exportModels ----
+                    exportModels.setText("\u5bfc\u51fa");
+                    exportModels.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            exportModelsActionPerformed(e);
+                        }
+                    });
+                    models.add(exportModels);
+                }
+                basicDataManagement.add(models);
+            }
+            managerMenuBar.add(basicDataManagement);
+
             //======== onlineMenu ========
             {
                 onlineMenu.setText("\u8054\u673a");
@@ -2453,6 +2734,16 @@ public class MainFrame extends JFrame {
                     }
                 });
                 onlineMenu.add(onlineConfig);
+
+                //---- ipManagement ----
+                ipManagement.setText("\u7ba1\u7406\u6ce8\u518cIP");
+                ipManagement.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        ipManagementActionPerformed(e);
+                    }
+                });
+                onlineMenu.add(ipManagement);
             }
             managerMenuBar.add(onlineMenu);
 
@@ -2469,6 +2760,16 @@ public class MainFrame extends JFrame {
                     }
                 });
                 helpMenu.add(aboutItem);
+
+                //---- queryOperationLog ----
+                queryOperationLog.setText("\u64cd\u4f5c\u65e5\u5fd7\u67e5\u8be2");
+                queryOperationLog.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        queryOperationLogActionPerformed(e);
+                    }
+                });
+                helpMenu.add(queryOperationLog);
 
                 //---- backupDB ----
                 backupDB.setText("\u5907\u4efd\u6570\u636e");
@@ -2529,6 +2830,21 @@ public class MainFrame extends JFrame {
         contentPane.add(tsSDSReminderPanel);
         tsSDSReminderPanel.setBounds(15, 10, 345, 255);
 
+        //======== techSDSReminderPanel ========
+        {
+            techSDSReminderPanel.setBorder(new TitledBorder("\u6b63\u5728\u83b7\u53d6SDS\u9700\u8981\u66f4\u65b0\u63d0\u9192......"));
+            techSDSReminderPanel.setLayout(null);
+
+            //======== techSDSReminderScrollPane ========
+            {
+                techSDSReminderScrollPane.setViewportView(techSDSReminderTable);
+            }
+            techSDSReminderPanel.add(techSDSReminderScrollPane);
+            techSDSReminderScrollPane.setBounds(10, 25, 325, 215);
+        }
+        contentPane.add(techSDSReminderPanel);
+        techSDSReminderPanel.setBounds(365, 10, 345, 255);
+
         contentPane.setPreferredSize(new Dimension(960, 530));
         pack();
         setLocationRelativeTo(getOwner());
@@ -2569,6 +2885,10 @@ public class MainFrame extends JFrame {
     private JMenuItem genCardMenu;
     private JMenuItem importCardApplicationRecord;
     private JMenuItem exportCardApplicationRecord;
+    private JMenu ipfEquipment;
+    private JMenuItem queryIpfEquipment;
+    private JMenuItem importIpfEquipment;
+    private JMenuItem exportIpfEquipment;
     private JMenu parts4Warranty;
     private JMenuItem queryWarrantyParts;
     private JMenuItem importWarrantyParts;
@@ -2615,6 +2935,10 @@ public class MainFrame extends JFrame {
     private JMenuItem importTechDongle;
     private JMenuItem exportTechDongle;
     private JMenu tsManagement;
+    private JMenu tsEngineer;
+    private JMenuItem queryTSEngineer;
+    private JMenuItem importTSEngineer;
+    private JMenuItem exportTSEngineer;
     private JMenu tsTraining;
     private JMenuItem queryTSTraining;
     private JMenuItem importTSTraining;
@@ -2651,12 +2975,19 @@ public class MainFrame extends JFrame {
     private JMenuItem queryTSDongle;
     private JMenuItem importTSDongle;
     private JMenuItem exportTSDongle;
+    private JMenu basicDataManagement;
+    private JMenu models;
+    private JMenuItem queryModels;
+    private JMenuItem importModels;
+    private JMenuItem exportModels;
     private JMenu onlineMenu;
     private JMenuItem onlineSetting;
     private JMenuItem startOnline;
     private JMenuItem onlineConfig;
+    private JMenuItem ipManagement;
     private JMenu helpMenu;
     private JMenuItem aboutItem;
+    private JMenuItem queryOperationLog;
     private JMenuItem backupDB;
     private JMenuItem recoveryDB;
     private JMenuItem reportError;
@@ -2664,5 +2995,8 @@ public class MainFrame extends JFrame {
     private JPanel tsSDSReminderPanel;
     private JScrollPane tsSDSReminderScrollPane;
     private JTable tsSDSReminderTable;
+    private JPanel techSDSReminderPanel;
+    private JScrollPane techSDSReminderScrollPane;
+    private JTable techSDSReminderTable;
     // JFormDesigner - End of variables declaration  //GEN-END:variables
 }

@@ -41,6 +41,10 @@ public class ComponentBorrowing extends BaseDomain {
      */
     private String borrowingCompany;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 借用人
      */
     private String borrowingPerson;
@@ -127,13 +131,14 @@ public class ComponentBorrowing extends BaseDomain {
     @Override
     public String toString() {
         return "ComponentBorrowing{" +
-                "serialNo='" + serialNo + '\'' +
+                "serialNumber='" + serialNumber + '\'' +
                 ", numberOfYear='" + numberOfYear + '\'' +
                 ", numberOfMonth='" + numberOfMonth + '\'' +
                 ", borrowingDate='" + borrowingDate + '\'' +
                 ", insideOrOutside='" + insideOrOutside + '\'' +
                 ", borrowingRegion='" + borrowingRegion + '\'' +
                 ", borrowingCompany='" + borrowingCompany + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", borrowingPerson='" + borrowingPerson + '\'' +
                 ", productLine='" + productLine + '\'' +
                 ", model='" + model + '\'' +
@@ -149,6 +154,14 @@ public class ComponentBorrowing extends BaseDomain {
                 ", deliverySite='" + deliverySite + '\'' +
                 ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
     }
 
     public String getSerialNumber() {

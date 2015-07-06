@@ -3,7 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
        default-lazy-init="true">
-
+    <!--远程基础数据服务-->
+    <bean id="remoteBasicService" class="kaitou.ppp.service.rmi.RemoteBasicServiceImpl">
+        <property name="modelsManager" ref="modelsManager"/>
+    </bean>
     <!--远程注册服务-->
     <bean id="remoteRegistryService" class="kaitou.ppp.service.rmi.RemoteRegistryServiceImpl">
         <property name="remoteRegistryManager" ref="remoteRegistryManager"/>
@@ -36,6 +39,7 @@
                 <ref bean="techSupportManager"/>
                 <ref bean="installPermissionManager"/>
                 <ref bean="cardApplicationRecordManager"/>
+                <ref bean="ipfEquipmentManager"/>
             </list>
         </property>
     </bean>
@@ -66,6 +70,7 @@
     <!--远程保修管理服务-->
     <bean id="remoteWarrantyService" class="kaitou.ppp.service.rmi.RemoteWarrantyServiceImpl">
         <property name="warrantyFeeManager" ref="warrantyFeeManager"/>
+        <property name="ipfEquipmentManager" ref="ipfEquipmentManager"/>
         <property name="warrantyPartsManager" ref="warrantyPartsManager"/>
         <property name="warrantyPrintManager" ref="warrantyPrintManager"/>
         <property name="warrantyConsumablesManager" ref="warrantyConsumablesManager"/>
@@ -87,6 +92,7 @@
     <!--远程TS管理服务-->
     <bean id="remoteTSService" class="kaitou.ppp.service.rmi.RemoteTSServiceImpl">
         <property name="tsDongleManager" ref="tsDongleManager"/>
+        <property name="tsEngineerManager" ref="tsEngineerManager"/>
         <property name="tsTrainingManager" ref="tsTrainingManager"/>
         <property name="toolRecipientsManager" ref="toolRecipientsManager"/>
         <property name="tsSDSPermissionManager" ref="tsSDSPermissionManager"/>
@@ -95,6 +101,17 @@
         <property name="componentBorrowingManager" ref="componentBorrowingManager"/>
         <property name="tsInstallPermissionManager" ref="tsInstallPermissionManager"/>
         <property name="tsManualPermissionsManager" ref="tsManualPermissionsManager"/>
+        <property name="engineerTSUpdateListeners">
+            <list>
+                <ref bean="tsDongleManager"/>
+                <ref bean="tsTrainingManager"/>
+                <ref bean="toolRecipientsManager"/>
+                <ref bean="tsSDSPermissionManager"/>
+                <ref bean="componentBorrowingManager"/>
+                <ref bean="tsInstallPermissionManager"/>
+                <ref bean="tsManualPermissionsManager"/>
+            </list>
+        </property>
     </bean>
     <!--远程服务提供容器-->
     <bean id="serviceProvider" class="kaitou.ppp.rmi.ServiceProvider">
@@ -108,6 +125,7 @@
                 <entry key="RemoteWarrantyService" value-ref="remoteWarrantyService"/>
                 <entry key="RemoteTechService" value-ref="remoteTechService"/>
                 <entry key="RemoteTSService" value-ref="remoteTSService"/>
+                <entry key="RemoteBasicService" value-ref="remoteBasicService"/>
             </map>
         </property>
     </bean>

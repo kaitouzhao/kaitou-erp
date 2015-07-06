@@ -10,16 +10,16 @@ import kaitou.ppp.app.ui.table.queryobject.tech.InstallPermissionQueryObject;
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.BaseDomain;
+import kaitou.ppp.domain.basic.Models;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.engineer.Engineer;
 import kaitou.ppp.domain.engineer.EngineerTraining;
 import kaitou.ppp.domain.shop.*;
+import kaitou.ppp.domain.system.IPRegistry;
+import kaitou.ppp.domain.system.OperationLog;
 import kaitou.ppp.domain.tech.*;
 import kaitou.ppp.domain.ts.*;
-import kaitou.ppp.domain.warranty.WarrantyConsumables;
-import kaitou.ppp.domain.warranty.WarrantyFee;
-import kaitou.ppp.domain.warranty.WarrantyParts;
-import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.domain.warranty.*;
 import kaitou.ppp.service.BaseExcelService;
 import org.apache.commons.lang.StringUtils;
 
@@ -64,6 +64,18 @@ public abstract class OPManager extends SpringContextManager {
      * @param toDoObj    待操作对象
      */
     public static void saveOrUpdate(String domainType, Object... toDoObj) {
+        if (IPRegistry.class.getSimpleName().equals(domainType)) {
+            getLocalRegistryService().saveOrUpdateIPRegistry((IPRegistry[]) toDoObj);
+            return;
+        }
+        if (Models.class.getSimpleName().equals(domainType)) {
+            getBasicService().saveOrUpdateBasicModels((Models[]) toDoObj);
+            return;
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            getTsService().saveOrUpdateTSEngineer((EngineerTS[]) toDoObj);
+            return;
+        }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             getTsService().saveOrUpdateTSDongles((TSDongle[]) toDoObj);
             return;
@@ -122,6 +134,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
             getTechService().saveOrUpdateManualPermissions((TechManualPermissions[]) toDoObj);
+            return;
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            getWarrantyService().saveOrUpdateIpfEquipment((IpfEquipment[]) toDoObj);
             return;
         }
         if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
@@ -186,6 +202,14 @@ public abstract class OPManager extends SpringContextManager {
      * @param targetFile 目标文件
      */
     public static void exportImportModel(String domainType, File targetFile) {
+        if (Models.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getBasicService()).exportImportModel(targetFile, Models.class);
+            return;
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).exportImportModel(targetFile, EngineerTS.class);
+            return;
+        }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             ((BaseExcelService) getTsService()).exportImportModel(targetFile, TSDongle.class);
             return;
@@ -244,6 +268,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
             ((BaseExcelService) getTechService()).exportImportModel(targetFile, TechManualPermissions.class);
+            return;
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getWarrantyService()).exportImportModel(targetFile, IpfEquipment.class);
             return;
         }
         if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
@@ -310,6 +338,14 @@ public abstract class OPManager extends SpringContextManager {
      */
     @SuppressWarnings("unchecked")
     public static void export(String domainType, List dataList, File targetFile) {
+        if (Models.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getBasicService()).export2Excel(dataList, targetFile, Models.class);
+            return;
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getTsService()).export2Excel(dataList, targetFile, EngineerTS.class);
+            return;
+        }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             ((BaseExcelService) getTsService()).export2Excel(dataList, targetFile, TSDongle.class);
             return;
@@ -368,6 +404,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
             ((BaseExcelService) getTechService()).export2Excel(dataList, targetFile, TechManualPermissions.class);
+            return;
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            ((BaseExcelService) getWarrantyService()).export2Excel(dataList, targetFile, IpfEquipment.class);
             return;
         }
         if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
@@ -432,6 +472,14 @@ public abstract class OPManager extends SpringContextManager {
      * @param deleted    待删除对象
      */
     public static void delete(String domainType, Object... deleted) {
+        if (IPRegistry.class.getSimpleName().equals(domainType)) {
+            getLocalRegistryService().deleteIPRegistry(deleted);
+            return;
+        }
+        if (Models.class.getSimpleName().equals(domainType)) {
+            getBasicService().deleteBasicModels(deleted);
+            return;
+        }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             getTsService().deleteTSDongles(deleted);
             return;
@@ -450,6 +498,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (OldMachineRenew.class.getSimpleName().equals(domainType)) {
             getTsService().deleteOldMachineRenew(deleted);
+            return;
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            getTsService().deleteTSEngineer(deleted);
             return;
         }
         if (TSInstallPermission.class.getSimpleName().equals(domainType)) {
@@ -490,6 +542,10 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
             getTechService().deleteManualPermissions(deleted);
+            return;
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            getWarrantyService().deleteIpfEquipment(deleted);
             return;
         }
         if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
@@ -555,6 +611,18 @@ public abstract class OPManager extends SpringContextManager {
      * @return 对象列表
      */
     public static <T extends BaseDomain> List<T> query(String domainType) {
+        if (OperationLog.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getSystemSettingsService().queryTodayOperationLogs();
+        }
+        if (IPRegistry.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getLocalRegistryService().queryIPRegistry();
+        }
+        if (Models.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getBasicService().queryBasicModels();
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSEngineer();
+        }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTsService().queryTSDongles();
         }
@@ -599,6 +667,9 @@ public abstract class OPManager extends SpringContextManager {
         }
         if (TechManualPermissions.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTechService().queryManualPermissions();
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryIpfEquipment();
         }
         if (WarrantyConsumables.class.getSimpleName().equals(domainType)) {
             return (List<T>) getWarrantyService().queryWarrantyConsumables();
@@ -652,14 +723,23 @@ public abstract class OPManager extends SpringContextManager {
      * @return 封装后的分页对象
      */
     public static <T extends BaseDomain> Pager<T> queryPager(String domainType, int currentPage, List<Condition> conditions) {
+        if (Models.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getBasicService().queryBasicModels(currentPage, conditions);
+        }
         if (TechDongle.class.getSimpleName().equals(domainType)) {
             return (Pager<T>) getTechService().queryTechDonglePager(currentPage, conditions);
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getTsService().queryTSEngineer(currentPage, conditions);
         }
         if (TSSDSPermission.class.getSimpleName().equals(domainType)) {
             return (Pager<T>) getTsService().queryTSSDSPermissionPager(currentPage, conditions);
         }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             return (Pager<T>) getTsService().queryTSDonglePager(currentPage, conditions);
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            return (Pager<T>) getWarrantyService().queryIpfEquipmentPager(currentPage, conditions);
         }
         if (WarrantyParts.class.getSimpleName().equals(domainType)) {
             return (Pager<T>) getWarrantyService().queryWarrantyPartsPager(currentPage, conditions);
@@ -679,14 +759,23 @@ public abstract class OPManager extends SpringContextManager {
      * @return 结果集
      */
     public static <T extends BaseDomain> List<T> queryAll(String domainType, List<Condition> conditions) {
+        if (Models.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getBasicService().queryBasicModels(conditions);
+        }
         if (TechDongle.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTechService().queryTechDongle(conditions);
+        }
+        if (EngineerTS.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getTsService().queryTSEngineer(conditions);
         }
         if (TSSDSPermission.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTsService().queryTSSDSPermission(conditions);
         }
         if (TSDongle.class.getSimpleName().equals(domainType)) {
             return (List<T>) getTsService().queryTSDongle(conditions);
+        }
+        if (IpfEquipment.class.getSimpleName().equals(domainType)) {
+            return (List<T>) getWarrantyService().queryIpfEquipment(conditions);
         }
         if (WarrantyParts.class.getSimpleName().equals(domainType)) {
             return (List<T>) getWarrantyService().queryWarrantyParts(conditions);

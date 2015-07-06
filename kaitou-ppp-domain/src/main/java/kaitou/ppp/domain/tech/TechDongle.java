@@ -69,6 +69,10 @@ public class TechDongle extends BaseDomain {
      * CW700
      */
     private String cw700;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public String dbFileName() {
@@ -94,12 +98,20 @@ public class TechDongle extends BaseDomain {
                 ", pw360='" + pw360 + '\'' +
                 ", pw500='" + pw500 + '\'' +
                 ", pw750='" + pw750 + '\'' +
-                ", pw900='" + pw900 + '\'' +
                 ", cw500='" + cw500 + '\'' +
                 ", cw550='" + cw550 + '\'' +
                 ", cw650='" + cw650 + '\'' +
                 ", cw700='" + cw700 + '\'' +
+                ", note='" + note + '\'' +
                 '}';
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getCompanyName() {

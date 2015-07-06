@@ -14,6 +14,10 @@ public class TSDongle extends BaseDomain {
      */
     private String companyName;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 姓名
      */
     private String name;
@@ -69,11 +73,16 @@ public class TSDongle extends BaseDomain {
      * CW700
      */
     private String cw700;
+    /**
+     * 备注
+     */
+    private String note;
 
     @Override
     public String toString() {
         return "TSDongle{" +
                 "companyName='" + companyName + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
@@ -88,6 +97,7 @@ public class TSDongle extends BaseDomain {
                 ", cw550='" + cw550 + '\'' +
                 ", cw650='" + cw650 + '\'' +
                 ", cw700='" + cw700 + '\'' +
+                ", note='" + note + '\'' +
                 '}';
     }
 
@@ -99,6 +109,22 @@ public class TSDongle extends BaseDomain {
     @Override
     public String dbFileSuffix() {
         return getClass().getSimpleName() + DB_SUFFIX;
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     public String getCompanyName() {

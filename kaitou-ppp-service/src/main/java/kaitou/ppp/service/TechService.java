@@ -121,6 +121,13 @@ public interface TechService {
     public void deleteSDSPermissions(Object... sdsPermissions);
 
     /**
+     * 获取技术管理SDS权限到期时间提醒
+     *
+     * @return 需要提醒的列表
+     */
+    public List<TechSDSPermission> getSDSEndDateReminder();
+
+    /**
      * 导入技术支援
      *
      * @param srcFile 源文件

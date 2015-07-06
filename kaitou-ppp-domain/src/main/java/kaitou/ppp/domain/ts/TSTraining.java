@@ -50,6 +50,10 @@ public class TSTraining extends BaseDomain {
      */
     private String saleRegion;
     /**
+     * 员工号
+     */
+    private String employeeNo;
+    /**
      * 工程师姓名
      */
     private String engineerName;
@@ -69,6 +73,10 @@ public class TSTraining extends BaseDomain {
      * 备注
      */
     private String note;
+    /**
+     * 培训期数
+     */
+    private String trainingPeriods;
 
     @Override
     public void check() {
@@ -99,12 +107,30 @@ public class TSTraining extends BaseDomain {
                 ", model='" + model + '\'' +
                 ", trainer='" + trainer + '\'' +
                 ", saleRegion='" + saleRegion + '\'' +
+                ", employeeNo='" + employeeNo + '\'' +
                 ", engineerName='" + engineerName + '\'' +
                 ", contact='" + contact + '\'' +
                 ", email='" + email + '\'' +
                 ", trainingSite='" + trainingSite + '\'' +
                 ", note='" + note + '\'' +
+                ", trainingPeriods='" + trainingPeriods + '\'' +
                 '}';
+    }
+
+    public String getEmployeeNo() {
+        return employeeNo;
+    }
+
+    public void setEmployeeNo(String employeeNo) {
+        this.employeeNo = employeeNo;
+    }
+
+    public String getTrainingPeriods() {
+        return trainingPeriods;
+    }
+
+    public void setTrainingPeriods(String trainingPeriods) {
+        this.trainingPeriods = trainingPeriods;
     }
 
     public String getModel() {

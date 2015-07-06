@@ -4,6 +4,7 @@ import com.womai.bsp.tool.utils.CollectionUtil;
 import kaitou.ppp.dao.support.Condition;
 import kaitou.ppp.dao.support.Pager;
 import kaitou.ppp.domain.ts.*;
+import kaitou.ppp.manager.listener.EngineerTSUpdateListener;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
 import kaitou.ppp.manager.ts.*;
@@ -32,6 +33,7 @@ import static kaitou.ppp.service.ServiceInvokeManager.queryRemoteService;
 public class TSServiceImpl extends BaseExcelService implements TSService {
 
     private TsDongleManager tsDongleManager;
+    private TSEngineerManager tsEngineerManager;
     private TSTrainingManager tsTrainingManager;
     private ToolRecipientsManager toolRecipientsManager;
     private TSSDSPermissionManager tssdsPermissionManager;
@@ -40,12 +42,21 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
     private ComponentBorrowingManager componentBorrowingManager;
     private TSInstallPermissionManager tsInstallPermissionManager;
     private TSManualPermissionsManager tsManualPermissionsManager;
+    private List<EngineerTSUpdateListener> engineerTSUpdateListeners;
 
     private SystemSettingsManager systemSettingsManager;
     private RemoteRegistryManager remoteRegistryManager;
 
+    public void setEngineerTSUpdateListeners(List<EngineerTSUpdateListener> engineerTSUpdateListeners) {
+        this.engineerTSUpdateListeners = engineerTSUpdateListeners;
+    }
+
     public void setTsDongleManager(TsDongleManager tsDongleManager) {
         this.tsDongleManager = tsDongleManager;
+    }
+
+    public void setTsEngineerManager(TSEngineerManager tsEngineerManager) {
+        this.tsEngineerManager = tsEngineerManager;
     }
 
     public void setToolRecipientsManager(ToolRecipientsManager toolRecipientsManager) {
@@ -89,6 +100,70 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
     }
 
     @Override
+    public void importTSEngineer(File srcFile) {
+        saveOrUpdateTSEngineer(CollectionUtil.toArray(readFromExcel(srcFile, EngineerTS.class), EngineerTS.class));
+    }
+
+    @Override
+    public void exportTSEngineer(File targetFile) {
+        export2Excel(tsEngineerManager.queryAll(), targetFile, EngineerTS.class);
+    }
+
+    @Override
+    public List<EngineerTS> queryTSEngineer() {
+        return tsEngineerManager.queryAll();
+    }
+
+    @Override
+    public void saveOrUpdateTSEngineer(final EngineerTS... engineerTSes) {
+        final List<EngineerTS> engineerTSList = CollectionUtil.newList(engineerTSes);
+        logOperation("成功导入/更新TS工程师数：" + tsEngineerManager.save(engineerTSList));
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                for (EngineerTSUpdateListener listener : engineerTSUpdateListeners) {
+                    listener.updateEngineerEvent(engineerTSes);
+                }
+            }
+        });
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteTSService> remoteTSServices = queryRemoteService(RemoteTSService.class);
+                logOperation("通知已注册的远程服务更新TS工程师");
+                for (RemoteTSService remoteTSService : remoteTSServices) {
+                    remoteTSService.saveTSEngineer(engineerTSList);
+                }
+            }
+        });
+    }
+
+    @Override
+    public void deleteTSEngineer(final Object... tsEngineers) {
+        logOperation("成功删除TS工程师数：" + tsEngineerManager.delete(tsEngineers));
+        asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
+            @Override
+            public void run() throws RemoteException {
+                List<RemoteTSService> remoteTSServices = queryRemoteService(RemoteTSService.class);
+                logOperation("通知已注册的远程服务删除TS工程师");
+                for (RemoteTSService remoteTSService : remoteTSServices) {
+                    remoteTSService.deleteTSEngineer(tsEngineers);
+                }
+            }
+        });
+    }
+
+    @Override
+    public Pager<EngineerTS> queryTSEngineer(int currentPage, List<Condition> conditions) {
+        return tsEngineerManager.queryPager(currentPage, conditions);
+    }
+
+    @Override
+    public List<EngineerTS> queryTSEngineer(List<Condition> conditions) {
+        return tsEngineerManager.queryAll(conditions);
+    }
+
+    @Override
     public void importTSTraining(File srcFile) {
         saveOrUpdateTSTraining(CollectionUtil.toArray(readFromExcel(srcFile, TSTraining.class), TSTraining.class));
     }
@@ -110,6 +185,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
             return;
         }
         final List<TSTraining> tsTrainingList = CollectionUtil.newList(tsTraining);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (TSTraining training : tsTrainingList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(training.getEngineerName())) {
+                    training.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新TS培训记录数：" + tsTrainingManager.save(tsTrainingList));
         new Thread(new Runnable() {
             @Override
@@ -177,6 +260,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
             return;
         }
         final List<TSManualPermissions> tsManualPermissionsList = CollectionUtil.newList(tsManualPermissions);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (TSManualPermissions permission : tsManualPermissionsList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(permission.getEngineerName())) {
+                    permission.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新TS手册权限数：" + tsManualPermissionsManager.save(tsManualPermissionsList));
         new Thread(new Runnable() {
             @Override
@@ -244,6 +335,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
             return;
         }
         final List<TSSDSPermission> tsSDSPermissionList = CollectionUtil.newList(tsSDSPermissions);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (TSSDSPermission permission : tsSDSPermissionList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(permission.getEngineerName())) {
+                    permission.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新TS SDS权限数：" + tssdsPermissionManager.save(tsSDSPermissionList));
         new Thread(new Runnable() {
             @Override
@@ -336,6 +435,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
             return;
         }
         final List<TSInstallPermission> tsInstallPermissionList = CollectionUtil.newList(tsInstallPermissions);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (TSInstallPermission permission : tsInstallPermissionList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(permission.getEngineerName())) {
+                    permission.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新TS装机权限数：" + tsInstallPermissionManager.save(tsInstallPermissionList));
         new Thread(new Runnable() {
             @Override
@@ -537,6 +644,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
             return;
         }
         final List<ToolRecipients> toolRecipientsList = CollectionUtil.newList(toolRecipients);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (ToolRecipients toolRecipient : toolRecipientsList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(toolRecipient.getUseEngineerName())) {
+                    toolRecipient.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新工具领用记录数：" + toolRecipientsManager.save(toolRecipientsList));
         new Thread(new Runnable() {
             @Override
@@ -611,6 +726,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
             return;
         }
         final List<ComponentBorrowing> componentBorrowingList = CollectionUtil.newList(componentBorrowing);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (ComponentBorrowing borrowing : componentBorrowingList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(borrowing.getBorrowingPerson())) {
+                    borrowing.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新零件借用记录数：" + componentBorrowingManager.save(componentBorrowingList));
         new Thread(new Runnable() {
             @Override
@@ -674,6 +797,14 @@ public class TSServiceImpl extends BaseExcelService implements TSService {
     @Override
     public void saveOrUpdateTSDongles(TSDongle... tsDongles) {
         final List<TSDongle> tsDongleList = CollectionUtil.newList(tsDongles);
+        List<EngineerTS> engineerTSList = tsEngineerManager.queryAll();
+        for (TSDongle dongle : tsDongleList) {
+            for (EngineerTS engineerTS : engineerTSList) {
+                if (engineerTS.getEngineerName().equals(dongle.getName())) {
+                    dongle.setEmployeeNo(engineerTS.getEmployeeNo());
+                }
+            }
+        }
         logOperation("成功导入/更新TS dongle记录数：" + tsDongleManager.save(tsDongleList));
         asynchronousRun(new ServiceInvokeManager.InvokeRunnable() {
             @Override

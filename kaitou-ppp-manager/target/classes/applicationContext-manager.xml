@@ -3,6 +3,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
        default-lazy-init="false">
 
+    <bean id="modelsManager" class="kaitou.ppp.manager.basic.impl.ModelsManagerImpl">
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="dao" ref="modelsDao"/>
+        <property name="modelsDao" ref="modelsDao"/>
+        <property name="localDBVersionDao" ref="localDBVersionDao"/>
+    </bean>
+
     <bean id="engineerManager" class="kaitou.ppp.manager.engineer.impl.EngineerManagerImpl">
         <property name="dbDir" value="d://ppp//db"/>
         <property name="dao" ref="engineerDao"/>
@@ -86,6 +93,12 @@
         <property name="localDBVersionDao" ref="localDBVersionDao"/>
     </bean>
 
+    <bean id="ipfEquipmentManager" class="kaitou.ppp.manager.warranty.impl.IpfEquipmentManagerImpl">
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="dao" ref="ipfEquipmentDao"/>
+        <property name="localDBVersionDao" ref="localDBVersionDao"/>
+    </bean>
+
     <bean id="warrantyFeeManager" class="kaitou.ppp.manager.warranty.impl.WarrantyFeeManagerImpl">
         <property name="dbDir" value="d://ppp//db"/>
         <property name="dao" ref="warrantyFeeDao"/>
@@ -143,6 +156,12 @@
     <bean id="installPermissionManager" class="kaitou.ppp.manager.tech.impl.InstallPermissionManagerImpl">
         <property name="dbDir" value="d://ppp//db"/>
         <property name="dao" ref="installPermissionDao"/>
+        <property name="localDBVersionDao" ref="localDBVersionDao"/>
+    </bean>
+
+    <bean id="tsEngineerManager" class="kaitou.ppp.manager.ts.impl.TSEngineerManagerImpl">
+        <property name="dbDir" value="d://ppp//db"/>
+        <property name="dao" ref="tsEngineerDao"/>
         <property name="localDBVersionDao" ref="localDBVersionDao"/>
     </bean>
 

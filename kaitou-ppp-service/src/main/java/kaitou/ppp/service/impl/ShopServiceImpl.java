@@ -5,11 +5,13 @@ import com.womai.bsp.tool.utils.CollectionUtil;
 import com.womai.bsp.tool.utils.ExcelUtil;
 import kaitou.ppp.domain.card.CardApplicationRecord;
 import kaitou.ppp.domain.shop.*;
+import kaitou.ppp.domain.warranty.IpfEquipment;
 import kaitou.ppp.manager.card.CardApplicationRecordManager;
 import kaitou.ppp.manager.listener.ShopUpdateListener;
 import kaitou.ppp.manager.shop.*;
 import kaitou.ppp.manager.system.RemoteRegistryManager;
 import kaitou.ppp.manager.system.SystemSettingsManager;
+import kaitou.ppp.manager.warranty.IpfEquipmentManager;
 import kaitou.ppp.rmi.ServiceClient;
 import kaitou.ppp.rmi.service.RemoteShopService;
 import kaitou.ppp.service.BaseExcelService;
@@ -32,15 +34,11 @@ import static kaitou.ppp.service.ServiceInvokeManager.*;
  * Time: 13:24
  */
 public class ShopServiceImpl extends BaseExcelService implements ShopService {
-    /**
-     * DB文件目录
-     */
-    private String dbDir;
-
     private ShopManager shopManager;
     private ShopRTSManager shopRTSManager;
     private ShopPayManager shopPayManager;
     private ShopDetailManager shopDetailManager;
+    private IpfEquipmentManager ipfEquipmentManager;
     private ShopContractManager shopContractManager;
     private PartsLibraryManager partsLibraryManager;
     private SystemSettingsManager systemSettingsManager;
@@ -48,12 +46,12 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
     private List<ShopUpdateListener> shopUpdateListeners;
     private CardApplicationRecordManager cardApplicationRecordManager;
 
-    public void setDbDir(String dbDir) {
-        this.dbDir = dbDir;
-    }
-
     public void setPartsLibraryManager(PartsLibraryManager partsLibraryManager) {
         this.partsLibraryManager = partsLibraryManager;
+    }
+
+    public void setIpfEquipmentManager(IpfEquipmentManager ipfEquipmentManager) {
+        this.ipfEquipmentManager = ipfEquipmentManager;
     }
 
     public void setShopContractManager(ShopContractManager shopContractManager) {
@@ -228,19 +226,20 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
         int currentYear = new DateTime().getYear();
         ShopAll shopAll;
         for (Shop shop : allShops) {
-            shopAll = new ShopAll();
-            copyBean(shop, shopAll);
-            List<CachedShopDetail> details = shopManager.queryCachedShopDetails(shopAll.getId());
+            List<CachedShopDetail> details = shopManager.queryCachedShopDetails(shop.getId());
             for (CachedShopDetail detail : details) {
                 try {
-                    if (currentYear <= Integer.valueOf(detail.getNumberOfYear())) {
-                        copyBean(detail, shopAll);
+                    if (currentYear > Integer.valueOf(detail.getNumberOfYear())) {
+                        continue;
                     }
+                    shopAll = new ShopAll();
+                    copyBean(shop, shopAll);
+                    copyBean(detail, shopAll);
+                    shopAlls.add(shopAll);
                 } catch (NumberFormatException e) {
-                    logSystemInfo("认定年份不正确。认定店编码：" + shopAll.getId());
+                    logSystemInfo("认定年份不正确。认定店编码：" + shop.getId());
                 }
             }
-            shopAlls.add(shopAll);
         }
         export2Excel(shopAlls, targetFile, ShopAll.class);
     }
@@ -414,6 +413,19 @@ public class ShopServiceImpl extends BaseExcelService implements ShopService {
             if ("IPF".equals(cardApplicationRecord.getAllModels())) {
                 count.setIpf(count.getIpf() + 1);
             }
+        }
+        List<IpfEquipment> ipfEquipmentList = ipfEquipmentManager.queryAll();
+        for (IpfEquipment ipfEquipment : ipfEquipmentList) {
+            ShopEquipmentCount count = new ShopEquipmentCount();
+            count.setShopId(ipfEquipment.getShopId());
+            int index = counts.indexOf(count);
+            if (index < 0) {
+                count.setShopName(ipfEquipment.getShopName());
+                counts.add(count);
+            } else {
+                count = counts.get(index);
+            }
+            count.setIpf(count.getIpf() + 1);
         }
         export2Excel(counts, targetFile, ShopEquipmentCount.class);
     }

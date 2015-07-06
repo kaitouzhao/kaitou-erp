@@ -1,9 +1,6 @@
 package kaitou.ppp.rmi.service;
 
-import kaitou.ppp.domain.warranty.WarrantyConsumables;
-import kaitou.ppp.domain.warranty.WarrantyFee;
-import kaitou.ppp.domain.warranty.WarrantyParts;
-import kaitou.ppp.domain.warranty.WarrantyPrint;
+import kaitou.ppp.domain.warranty.*;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -16,6 +13,20 @@ import java.util.List;
  * Time: 15:08
  */
 public interface RemoteWarrantyService extends Remote {
+    /**
+     * 保存iPF设备记录
+     *
+     * @param equipments iPF设备记录列表
+     */
+    public void saveIpfEquipment(List<IpfEquipment> equipments) throws RemoteException;
+
+    /**
+     * 删除iPF设备记录
+     *
+     * @param equipments iPF设备
+     */
+    public void deleteIpfEquipment(Object... equipments) throws RemoteException;
+
     /**
      * 保存保修费记录
      *

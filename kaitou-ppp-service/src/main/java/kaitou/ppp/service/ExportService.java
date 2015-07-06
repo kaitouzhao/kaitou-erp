@@ -24,4 +24,11 @@ public interface ExportService {
      * @param targetFile 目标文件
      */
     public void exportSOIDCode(File targetFile);
+
+    /**
+     * 基础信息全导出
+     *
+     * @param targetFile 目标文件
+     */
+    public void exportShopAll(File targetFile);
 }

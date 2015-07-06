@@ -2,9 +2,11 @@ package kaitou.ppp.tool;
 
 import com.womai.bsp.tool.utils.CollectionUtil;
 import com.womai.bsp.tool.utils.ExcelUtil;
+import kaitou.ppp.domain.basic.Models;
 import kaitou.ppp.domain.shop.Shop;
 import kaitou.ppp.domain.shop.ShopDetail;
 import kaitou.ppp.service.BaseExcelService;
+import kaitou.ppp.service.BasicService;
 import kaitou.ppp.service.ShopService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -22,8 +24,10 @@ import java.util.List;
 public class ScreeningShops {
 
     private static ShopService shopService;
+    private static BasicService basicService;
 
     private static final String DIR = "d://ppp//";
+    private static List<Models> modelsList;
 
     /**
      * 主程序入口
@@ -31,12 +35,14 @@ public class ScreeningShops {
      * @param args 参数
      */
     public static void main(String[] args) {
-        shopService = new ClassPathXmlApplicationContext(
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(
                 new String[]{
                         "applicationContext-service.xml"
                 }
-        ).getBean(ShopService.class);
-
+        );
+        shopService = ctx.getBean(ShopService.class);
+        basicService = ctx.getBean(BasicService.class);
+        modelsList = basicService.queryBasicModels();
 //        screenShops();
         screenShopDetails();
     }
@@ -75,11 +81,8 @@ public class ScreeningShops {
     }
 
     private static void screenShopDetails() {
-        File srcFile = new File("C:\\Users\\zhao\\Desktop\\PPP\\需求\\认定店原始认定级别数据2015.6.15.xlsx");
-        if (!srcFile.exists()) {
-            return;
-        }
-        List<String[]> dataList = ExcelUtil.readExcel(srcFile, "Sheet1", 18, 2);
+        File srcFile = new File("C:\\Users\\zhao\\Desktop\\PPP\\需求\\认定店原始认定级别数据2015.6.22.xlsx");
+        List<String[]> dataList = ExcelUtil.readExcel(srcFile, "Sheet1", 20, 2);
         List<Shop> shops = shopService.queryAllShops();
         List<ShopDetail> shopDetails = new ArrayList<ShopDetail>();
         for (String[] oneRow : dataList) {
@@ -101,8 +104,28 @@ public class ScreeningShops {
                 shopDetails.add(shopDetail);
             }
         }
-        File targetFile = new File("C:\\Users\\zhao\\Desktop\\PPP\\需求\\认定店认定级别数据.xlsx");
+        File targetFile = new File("C:\\Users\\zhao\\Desktop\\PPP\\需求\\认定店认定级别数据2015.6.22.xlsx");
         ((BaseExcelService) shopService).export2Excel(shopDetails, targetFile, ShopDetail.class);
+    }
+
+    private static String get2014Model(String productLine, String src) {
+        StringBuilder result = new StringBuilder();
+        for (Models models : modelsList) {
+            if (productLine.equals(models.getFirstType()) && src.contains(models.getModel())) {
+                result.append(models.getModel()).append("\\");
+            }
+        }
+        return result.toString();
+    }
+
+    private static String get2015Model(String productLine, String src) {
+        StringBuilder result = new StringBuilder();
+        for (Models models : modelsList) {
+            if (productLine.equals(models.getProductLine()) && src.contains(models.getModel())) {
+                result.append(models.getModel()).append("\\");
+            }
+        }
+        return result.toString();
     }
 
     private static ShopDetail getShopDetail(String[] oneRow, String shopId, String shopName, String saleRegion, int i) {
@@ -117,48 +140,51 @@ public class ScreeningShops {
             shopDetail.setProductLine("CPP");
             if (i == 1) {
                 shopDetail.setNumberOfYear("2013");
+                shopDetail.setModel(oneRow[14]);
             } else if (i == 4) {
                 shopDetail.setNumberOfYear("2014");
+                shopDetail.setModel(get2014Model("CPP", oneRow[16]));
             } else {
                 shopDetail.setNumberOfYear("2015");
             }
-            shopDetail.setModel(oneRow[14]);
         } else if (i == 2 || i == 5 || i == 12) {
             shopDetail.setProductLine("WFP");
             if (i == 2) {
                 shopDetail.setNumberOfYear("2013");
+                shopDetail.setModel(oneRow[15]);
             } else if (i == 5) {
                 shopDetail.setNumberOfYear("2014");
+                shopDetail.setModel(get2014Model("WFP", oneRow[16]));
             } else {
                 shopDetail.setNumberOfYear("2015");
             }
-            shopDetail.setModel(oneRow[15]);
         } else if (i == 3 || i == 6 || i == 13) {
             shopDetail.setProductLine("IPF");
             if (i == 3) {
                 shopDetail.setNumberOfYear("2013");
             } else if (i == 6) {
                 shopDetail.setNumberOfYear("2014");
+                shopDetail.setModel(oneRow[17]);
             } else {
                 shopDetail.setNumberOfYear("2015");
+                shopDetail.setModel(oneRow[19]);
             }
-            shopDetail.setModel(oneRow[17]);
         } else if (i == 7) {
             shopDetail.setProductLine("PGA");
             shopDetail.setNumberOfYear("2015");
-            shopDetail.setModel("");
+            shopDetail.setModel(get2015Model("PGA", oneRow[18]));
         } else if (i == 8) {
             shopDetail.setProductLine("DP");
             shopDetail.setNumberOfYear("2015");
-            shopDetail.setModel("");
+            shopDetail.setModel(get2015Model("DP", oneRow[18]));
         } else if (i == 9) {
             shopDetail.setProductLine("TDS");
             shopDetail.setNumberOfYear("2015");
-            shopDetail.setModel("");
+            shopDetail.setModel(get2015Model("TDS", oneRow[18]));
         } else if (i == 10) {
             shopDetail.setProductLine("DGS");
             shopDetail.setNumberOfYear("2015");
-            shopDetail.setModel(oneRow[16]);
+            shopDetail.setModel(get2015Model("DGS", oneRow[18]));
         }
         shopDetail.setLevel(oneRow[i]);
         return shopDetail;

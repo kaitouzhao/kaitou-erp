@@ -1,5 +1,7 @@
 package kaitou.ppp.domain.export;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeXml;
+
 /**
  * 自定义SOID识别码导出模板.
  * User: 赵立伟
@@ -19,6 +21,23 @@ public class ExportSOIDCodeModel {
     private String newSoid = "";
     private String newVerificationCode = "";
     private String note = "";
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ExportSOIDCodeModel that = (ExportSOIDCodeModel) o;
+
+        if (shopName != null ? !shopName.equals(that.shopName) : that.shopName != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return shopName != null ? shopName.hashCode() : 0;
+    }
 
     @Override
     public String toString() {
@@ -102,7 +121,7 @@ public class ExportSOIDCodeModel {
     }
 
     public String getNewSoid() {
-        return newSoid;
+        return escapeXml(newSoid);
     }
 
     public void setNewSoid(String newSoid) {
@@ -110,7 +129,7 @@ public class ExportSOIDCodeModel {
     }
 
     public String getNewVerificationCode() {
-        return newVerificationCode;
+        return escapeXml(newVerificationCode);
     }
 
     public void setNewVerificationCode(String newVerificationCode) {
@@ -118,7 +137,7 @@ public class ExportSOIDCodeModel {
     }
 
     public String getNote() {
-        return note;
+        return escapeXml(note);
     }
 
     public void setNote(String note) {

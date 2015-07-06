@@ -268,6 +268,21 @@ public class TechServiceImpl extends BaseExcelService implements TechService {
     }
 
     @Override
+    public List<TechSDSPermission> getSDSEndDateReminder() {
+        List<TechSDSPermission> permissionList = sdsPermissionManager.query();
+        List<TechSDSPermission> reminderList = new ArrayList<TechSDSPermission>();
+        if (CollectionUtil.isEmpty(permissionList)) {
+            return reminderList;
+        }
+        for (TechSDSPermission permission : permissionList) {
+            if (permission.shouldReminder()) {
+                reminderList.add(permission);
+            }
+        }
+        return reminderList;
+    }
+
+    @Override
     public void importTechSupport(File srcFile) {
         saveOrUpdateTechSupport(CollectionUtil.toArray(readFromExcel(srcFile, TechSupport.class), TechSupport.class));
     }
